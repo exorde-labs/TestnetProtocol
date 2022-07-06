@@ -44,11 +44,8 @@ task("deploy-dxvote", "Deploy dxvote in localhost network")
     const RewardsManager = await hre.artifacts.require("RewardsManager");
     // --------------------------------
     const AttributeStore = artifacts.require('AttributeStore.sol');
-    const AttributeStore2 = artifacts.require('AttributeStore2.sol');
     const DLL = artifacts.require('DLL.sol');
-    const DLL2 = artifacts.require('DLL2.sol');
     const DataSpotting = await hre.artifacts.require("DataSpotting");
-    const DataFormatting = await hre.artifacts.require("DataFormatting");
     // ---------------------------------
     const DXDVotingMachine = await hre.artifacts.require("DXDVotingMachine");
     const ERC20Mock = await hre.artifacts.require("ERC20Mock");
@@ -135,11 +132,6 @@ task("deploy-dxvote", "Deploy dxvote in localhost network")
     let tokenTotalSupply = ethers.utils.parseUnits("200000000.0", 18).toString()
     console.log(ethers.utils.parseUnits("200000000.0", 18).toString());
     
-    // --------------------------------- EXISTING CONTRACTS ADDRESS ---------------------------------
-    const EXDTTokenAddress = "0x013121200dfcb362a55561d84A193c990c42706f";
-    const StakingManagerAddress = "0x0b1387Eb5D17114a514660E9eEE20d9791a0C14A";
-    const RewardsManagerAddress = "0xfc7232748A612eB874C799C23e317F4df746006c";
-
     for (const tokenToDeploy of deploymentConfig.tokens){
       console.log(
           "Deploying token",
@@ -157,22 +149,88 @@ task("deploy-dxvote", "Deploy dxvote in localhost network")
       let newToken;
       switch (tokenToDeploy.type) {
         case "ERC20":
-          newToken = await hre.ethers.getContractAt("DAOToken", EXDTTokenAddress);
-          console.log("IMPORTING EXISTING ERC20 TOKEN at ",newToken.address)
-        //   newToken = await ERC20Mock.new(accounts[0], tokenTotalSupply.toString());
-        //   await waitBlocks(1);
-        //   for (const tokenHolder of tokenToDeploy.distribution){
-        //       await newToken.transfer(tokenHolder.address, tokenHolder.amount, {
-        //           from: accounts[0],
-        //         });
-        //   }
-        //   break;
+          newToken = await ERC20Mock.new(accounts[0], tokenTotalSupply.toString());
+          
+          await waitBlocks(1);
+          for (const tokenHolder of tokenToDeploy.distribution){
+              await newToken.transfer(tokenHolder.address, tokenHolder.amount, {
+                  from: accounts[0],
+                });
+          }
+          break;
+        case "ERC20SnapshotRep":
+          newToken = await ERC20SnapshotRep.new();
+          
+          await waitBlocks(1);
+          await newToken.initialize(
+            tokenToDeploy.name,
+            tokenToDeploy.symbol,
+            {
+              from: accounts[0],
+            }
+          );
+          for (const tokenHolder of tokenToDeploy.distribution) {
+            await newToken.mint(tokenHolder.address, tokenHolder.amount, {
+              from: accounts[0],
+            });
+          }
+          break;
       }
       
       tokens[tokenToDeploy.symbol] = newToken;
       addresses[tokenToDeploy.symbol] = newToken.address;
   }
     
+    // await Promise.all(
+    //   deploymentConfig.tokens.map(async tokenToDeploy => {
+    //     console.log(
+    //       "Deploying token",
+    //       tokenToDeploy.name,
+    //       tokenToDeploy.symbol
+    //     );
+    //     const totalSupply = tokenToDeploy.distribution.reduce(function (
+    //       prev,
+    //       cur
+    //     ) {
+    //       return new BigNumber(prev).plus(cur.amount.toString());
+    //     },
+    //     0);
+        
+    //     let newToken;
+    //     switch (tokenToDeploy.type) {
+    //       case "ERC20":
+    //         newToken = await ERC20Mock.new(accounts[0], totalSupply.toString());
+            
+    //         await waitBlocks(1);
+    //         await tokenToDeploy.distribution.map(async tokenHolder => {
+    //           await newToken.transfer(tokenHolder.address, tokenHolder.amount, {
+    //             from: accounts[0],
+    //           });
+    //         });
+    //         break;
+    //       case "ERC20SnapshotRep":
+    //         newToken = await ERC20SnapshotRep.new();
+            
+    //         await waitBlocks(1);
+    //         await newToken.initialize(
+    //           tokenToDeploy.name,
+    //           tokenToDeploy.symbol,
+    //           {
+    //             from: accounts[0],
+    //           }
+    //         );
+    //         for (i in tokenToDeploy.distribution) {
+    //           const tokenHolder = tokenToDeploy.distribution[i];
+    //           await newToken.mint(tokenHolder.address, tokenHolder.amount, {
+    //             from: accounts[0],
+    //           });
+    //         }
+    //         break;
+    //     }
+    //     tokens[tokenToDeploy.symbol] = newToken;
+    //     addresses[tokenToDeploy.symbol] = newToken.address;
+    //   })
+    // );
 
     console.log(
       "waiting 1 blocks...",
@@ -195,7 +253,6 @@ task("deploy-dxvote", "Deploy dxvote in localhost network")
     );
     console.log("ExordeDAO Avatar deployed to:", avatar.address);
     console.log("ExordeDAO Token deployed to:", tokens.EXDT.address);
-
     networkContracts.avatar = avatar.address;
     networkContracts.token = addresses["EXDT"];
     addresses["Avatar"] = avatar.address;
@@ -218,23 +275,13 @@ task("deploy-dxvote", "Deploy dxvote in localhost network")
     let staking_manager;
     let rewards_manager;
     let address_manager;
-    // console.log("Deploying Staking Manager...");
-    // staking_manager = await StakingManager.new(tokens.EXDT.address);
-    // addresses["StakingManager"] = staking_manager.address;
-
-    console.log("IMPORTING EXISTING Staking Manager at ", StakingManagerAddress);
-    staking_manager = await hre.ethers.getContractAt("StakingManager", StakingManagerAddress);
+    console.log("Deploying Staking Manager...");
+    staking_manager = await StakingManager.new(tokens.EXDT.address);
     addresses["StakingManager"] = staking_manager.address;
     console.log("Staking Manager deployed to ", staking_manager.address);
-    // rewards_manager = await RewardsManager.new(tokens.EXDT.address);
-    // console.log("Rewards Manager deployed to ", rewards_manager.address);
-    // addresses["RewardsManager"] = rewards_manager.address;
-    
-    console.log("IMPORTING EXISTING Rewards Manager at ", RewardsManagerAddress);
-    rewards_manager = await hre.ethers.getContractAt("RewardsManager", RewardsManagerAddress);
-    addresses["RewardsManager"] = rewards_manager.address;
+    rewards_manager = await RewardsManager.new(tokens.EXDT.address);
     console.log("Rewards Manager deployed to ", rewards_manager.address);
-
+    addresses["RewardsManager"] = rewards_manager.address;
     console.log("Deploying Address Manager...");
     address_manager = await AddressManager.new();
     console.log("Address Manager deployed to ", address_manager.address);
@@ -249,6 +296,7 @@ task("deploy-dxvote", "Deploy dxvote in localhost network")
       
     let libAttributeStore;
     let libDLL;
+    // AttributeStore = await ethers.getContractFactory("AttributeStore");
     libAttributeStore = await AttributeStore.new();
     console.log("Library AttributeStore addr",libAttributeStore.address);
     libDLL = await DLL.new();
@@ -279,42 +327,6 @@ task("deploy-dxvote", "Deploy dxvote in localhost network")
     await rewards_manager.addAddress(spot_worksystem.address);
 
     
-    // -------------------------------------------------------------------------------------------------------
-
-    let format_worksystem;
-    let libAttributeStore2;
-    let libDLL2;
-
-    libAttributeStore2 = await AttributeStore2.new();
-    console.log("Library AttributeStore2 addr",libAttributeStore2.address);
-    libDLL2 = await DLL2.new();
-    console.log("Library DLL2 addr",libDLL2.address);
-
-    console.log("Deploying DataFormatting System...");
-    ////////////////////////////////////////      SPOTTING WORK SYSTEM     //////////////////////////////////////////
-
-    const DataFormattingFactory = await ethers.getContractFactory("DataFormatting", {
-      libraries: { 
-        AttributeStore2: libAttributeStore2.address,
-        DLL2: libDLL2.address           
-      },
-    });
-
-    const _DataFormattingFactory = await DataFormattingFactory.deploy(tokens.EXDT.address);
-    await _DataFormattingFactory.deployed();
-
-
-    console.log("DataFormatting deployed to ", _DataFormattingFactory.address);
-    format_worksystem = _DataFormattingFactory;
-    addresses["DataFormatting"] = _DataFormattingFactory.address;
-    // register the worksystem as allowed to use stakes
-    console.log("Add the DataFormatting as allowed to use stakes in StakingManager");
-    await staking_manager.addAddress(format_worksystem.address);    
-    console.log("Add the DataFormatting as allowed to use stakes in RewardsManager");
-    await rewards_manager.addAddress(format_worksystem.address);
-
-
-    // -------------------------------------------------------------------------------------------------------
 
 
     // Deploy DXDVotingMachine
@@ -327,15 +339,15 @@ task("deploy-dxvote", "Deploy dxvote in localhost network")
       token: tokens.EXDT.address,
     };
     await waitBlocks(1);
-    // await tokens.EXDT.approve(votingMachine.address, MAX_UINT_256, {
-    //   from: accounts[0],
-    // });
-    // await tokens.EXDT.approve(votingMachine.address, MAX_UINT_256, {
-    //   from: accounts[1],
-    // });
-    // await tokens.EXDT.approve(votingMachine.address, MAX_UINT_256, {
-    //   from: accounts[2],
-    // });
+    await tokens.EXDT.approve(votingMachine.address, MAX_UINT_256, {
+      from: accounts[0],
+    });
+    await tokens.EXDT.approve(votingMachine.address, MAX_UINT_256, {
+      from: accounts[1],
+    });
+    await tokens.EXDT.approve(votingMachine.address, MAX_UINT_256, {
+      from: accounts[2],
+    });
     addresses["DXDVotingMachine"] = votingMachine.address;
 
     // Deploy PermissionRegistry to be used by WalletSchemes
@@ -610,6 +622,19 @@ task("deploy-dxvote", "Deploy dxvote in localhost network")
         );
       }
 
+      // // console.log("Setting WorkSystems scheme permissions..");
+      // console.log("\nSetting Staking Manager scheme permissions..");
+      // await controller.registerScheme(
+      //   spot_worksystem.address,
+      //   "mintReputation",
+      //   encodePermission({
+      //     canGenericCall: false,
+      //     canUpgrade: false,
+      //     canRegisterSchemes: false,
+      //   }),
+      //   avatar.address
+      // );
+
 
       // Set the boostedVoteRequiredPercentage
       if (schemeConfiguration.boostedVoteRequiredPercentage > 0) {
@@ -675,9 +700,9 @@ task("deploy-dxvote", "Deploy dxvote in localhost network")
     
 
     // give back all ownerships to the DAO controller
-    console.log("[DISABLED] Transfer ownerships to the DAO controller... (StakingManager & Worksystems)\n");
-    // await spot_worksystem.transferOwnership(controller.address);
-    // await staking_manager.transferOwnership(controller.address);
+    console.log("Give back all ownerships to the DAO controller... (StakingManager & Worksystems)\n");
+    await spot_worksystem.transferOwnership(controller.address);
+    await staking_manager.transferOwnership(controller.address);
 
     // Deploy dxDaoNFT
     let dxDaoNFT;
@@ -719,13 +744,6 @@ task("deploy-dxvote", "Deploy dxvote in localhost network")
     //   method: "evm_increaseTime",
     //   params: [startTime - (await web3.eth.getBlock("latest")).timestamp],
     // });
-
-    
-    console.log(JSON.stringify(addresses));
-
-
-    console.log("\nexit before test actions");
-    process.exit(1)
     console.log("\nExecute actions now..");
 
     const ipfs = await IPFS.create();
