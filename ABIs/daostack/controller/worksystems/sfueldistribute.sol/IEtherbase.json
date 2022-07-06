@@ -1,0 +1,46 @@
+{
+  "_format": "hh-sol-artifact-1",
+  "contractName": "IEtherbase",
+  "sourceName": "contracts/worksystems/sfueldistribute.sol",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "address payable",
+          "name": "receiver",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "partiallyRetrieve",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address payable",
+          "name": "receiver",
+          "type": "address"
+        }
+      ],
+      "name": "retrieve",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "stateMutability": "payable",
+      "type": "receive"
+    }
+  ],
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "linkReferences": {},
+  "deployedLinkReferences": {}
+}
