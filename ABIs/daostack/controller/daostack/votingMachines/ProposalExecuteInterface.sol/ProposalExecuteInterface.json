@@ -1,0 +1,37 @@
+{
+  "_format": "hh-sol-artifact-1",
+  "contractName": "ProposalExecuteInterface",
+  "sourceName": "contracts/daostack/votingMachines/ProposalExecuteInterface.sol",
+  "abi": [
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "_proposalId",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "int256",
+          "name": "_decision",
+          "type": "int256"
+        }
+      ],
+      "name": "executeProposal",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "linkReferences": {},
+  "deployedLinkReferences": {}
+}

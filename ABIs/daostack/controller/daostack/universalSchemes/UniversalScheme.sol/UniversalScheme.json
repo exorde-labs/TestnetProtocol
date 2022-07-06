@@ -1,0 +1,10 @@
+{
+  "_format": "hh-sol-artifact-1",
+  "contractName": "UniversalScheme",
+  "sourceName": "contracts/daostack/universalSchemes/UniversalScheme.sol",
+  "abi": [],
+  "bytecode": "0x6080604052348015600f57600080fd5b50603e80601d6000396000f3fe6080604052600080fdfea265627a7a72315820d0a7cc5e47985f191e51fc9cf300dbc21fe9454b533aad5f95ce77cc2943f51964736f6c63430005110032",
+  "deployedBytecode": "0x6080604052600080fdfea265627a7a72315820d0a7cc5e47985f191e51fc9cf300dbc21fe9454b533aad5f95ce77cc2943f51964736f6c63430005110032",
+  "linkReferences": {},
+  "deployedLinkReferences": {}
+}
