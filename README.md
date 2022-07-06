@@ -2,7 +2,7 @@
 
 Early source code of the Exorde testnet, including the Technical Reputation-based DAO & Spotting + Formatting data processing pipeline.
 
- - Contracts
+ Smart Contracts:
  -- DAO based on Daostack framework
  -- Worksystems
  -- Simple Staking Manager
