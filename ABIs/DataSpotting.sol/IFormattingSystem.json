@@ -4,7 +4,13 @@
   "sourceName": "contracts/worksystems/DataSpotting.sol",
   "abi": [
     {
-      "inputs": [],
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "CheckedBatchId",
+          "type": "uint256"
+        }
+      ],
       "name": "Ping",
       "outputs": [
         {

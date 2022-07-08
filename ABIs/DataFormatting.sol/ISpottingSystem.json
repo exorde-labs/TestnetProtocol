@@ -11,6 +11,25 @@
           "type": "uint256"
         }
       ],
+      "name": "DataExists",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "exists",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_DataBatchId",
+          "type": "uint256"
+        }
+      ],
       "name": "getBatchByID",
       "outputs": [
         {
@@ -100,80 +119,6 @@
       "type": "function"
     },
     {
-      "inputs": [],
-      "name": "getCurrentWorkEpoch",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "WorkEpoch",
-          "type": "uint256"
-        }
-      ],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "_DataId",
-          "type": "uint256"
-        }
-      ],
-      "name": "getDataByID",
-      "outputs": [
-        {
-          "components": [
-            {
-              "internalType": "string",
-              "name": "ipfs_hash",
-              "type": "string"
-            },
-            {
-              "internalType": "address",
-              "name": "author",
-              "type": "address"
-            },
-            {
-              "internalType": "uint256",
-              "name": "timestamp",
-              "type": "uint256"
-            },
-            {
-              "internalType": "string",
-              "name": "URL_domain",
-              "type": "string"
-            },
-            {
-              "internalType": "string[]",
-              "name": "tags",
-              "type": "string[]"
-            },
-            {
-              "internalType": "uint256[]",
-              "name": "tags_id",
-              "type": "uint256[]"
-            },
-            {
-              "internalType": "string",
-              "name": "extra",
-              "type": "string"
-            },
-            {
-              "internalType": "enum ISpottingSystem.DataStatus",
-              "name": "status",
-              "type": "uint8"
-            }
-          ],
-          "internalType": "struct ISpottingSystem.SpottedData",
-          "name": "data",
-          "type": "tuple"
-        }
-      ],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
       "inputs": [
         {
           "internalType": "uint256",
@@ -231,19 +176,6 @@
         {
           "internalType": "uint256",
           "name": "LastCheckedBatchId",
-          "type": "uint256"
-        }
-      ],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "getLastDataId",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "DataId",
           "type": "uint256"
         }
       ],
