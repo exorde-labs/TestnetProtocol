@@ -1,0 +1,11 @@
+//  stakemanager
+0xb6b55f25 = deposit
+0x227a473b = Stake()
+
+//  worksystem
+0xf716596d = register
+0x275c2590 = unregister
+0x354dae40 = TriggerNextEpoch
+0x0b16d945 = Spot
+0xa7f830f4 = CommitSpotCheck
+0x035fbb55 = RevealSpotCheck
