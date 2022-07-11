@@ -714,9 +714,11 @@ contract DataFormatting is Ownable, RandomAllocator {
                 }
                 // if worker has not voted, he is disconnected "by force"
                 // this worker will have to register again
-                else{                      
+                else{            
                     if(worker_state.registered){ // only if the worker is still registered
                         worker_state.registered = false;
+                        PopFromAvailableWorkers(worker_addr_);
+                        PopFromBusyWorkers(worker_addr_);
                     }
                 }
             }
