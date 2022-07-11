@@ -7,3 +7,4 @@ Early source code of the Exorde testnet, including the Technical Reputation-base
  - Worksystems
  - Simple Staking Manager
  - Simple Rewards Manager
+ - WebScraping & Data Collection module config registry
