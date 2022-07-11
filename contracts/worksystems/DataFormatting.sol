@@ -315,6 +315,7 @@ contract DataFormatting is Ownable, RandomAllocator {
     mapping(uint256 => mapping(address => uint256)) public UserVotes;     // maps DataID -> user addresses ->  vote option
     mapping(uint256 => mapping(address => string)) public UserNewFiles;     // maps DataID -> user addresses -> ipfs string -> counter
 
+    mapping(uint256 => bool) public CollectedSpotBatchs; // maps DataID to FormattedData struct
     
     mapping(address => DLL2.FormattedData) dllMap;
     AttributeStore2.FormattedData store;
@@ -338,7 +339,6 @@ contract DataFormatting is Ownable, RandomAllocator {
 
 
     uint256 public LastBatchCounter = 1;
-    uint256 public LastSpotBatchId = 0;
     uint256 public BatchCheckingCursor = 1;
     uint256 public AllocatedBatchCursor = 1;
     mapping(uint256 => BatchMetadata) public DataBatch; // refers to FormattedData indices
@@ -365,8 +365,8 @@ contract DataFormatting is Ownable, RandomAllocator {
         DataNonce = INITIAL_Data_NONCE;
         
         MIN_STAKE = 25 * (10 ** 18); // 100 EXDT to participate
-        COMMIT_ROUND_DURATION = 40;
-        REVEAL_ROUND_DURATION = 30;
+        COMMIT_ROUND_DURATION = 180;
+        REVEAL_ROUND_DURATION = 180;
     }
     
 
@@ -436,12 +436,12 @@ contract DataFormatting is Ownable, RandomAllocator {
     // ---------------
 
 
-    function updatesFuelFaucet(address sFuel_)
-    public
-    onlyOwner
-    {
-        sFuel  = sFuel_;
-    }
+    // function updatesFuelFaucet(address sFuel_)
+    // public
+    // onlyOwner
+    // {
+    //     sFuel  = sFuel_;
+    // }
 
     function _retrieveSFuel() internal {
         require(sFuel != address(0), "0 Address Not Valid");
@@ -462,6 +462,31 @@ contract DataFormatting is Ownable, RandomAllocator {
     // --------------------------------------------------------------------------------------------------------------------------------------------------------
     
 
+    function isInAvailableWorkers(address _worker) internal view returns(bool){
+        bool found = false;
+        for(uint256 i = 0; i< availableWorkers.length; i++){
+            if(availableWorkers[i] == _worker){
+                found = true;
+                break;
+            }
+        }
+        return found;
+    }
+
+    function isInBusyWorkers(address _worker) internal view returns(bool){
+        bool found = false;
+        for(uint256 i = 0; i< busyWorkers.length; i++){
+            if(busyWorkers[i] == _worker){
+                found = true;
+                break;
+            }
+        }
+        return found;
+    }
+
+
+
+
     function PopFromAvailableWorkers(address _worker) internal{
         uint256 index = 0;
         bool found = false;
@@ -478,6 +503,7 @@ contract DataFormatting is Ownable, RandomAllocator {
             availableWorkers.pop();
         }
     }
+
 
     function PopFromBusyWorkers(address _worker) internal{
         uint256 index = 0;
@@ -518,7 +544,9 @@ contract DataFormatting is Ownable, RandomAllocator {
         // make sure msg.sender has enough voting rights
         require(FormatStakedTokenBalance[msg.sender] >= _numTokens, "Worker has not enough (_numTokens) in his FormatStakedTokenBalance ");
         //////////////////////////////////
-        availableWorkers.push(msg.sender);
+        if(!isInAvailableWorkers(msg.sender)){
+            availableWorkers.push(msg.sender);
+        }
         // busyWorkers;
         worker_state.worker_address = msg.sender;
         worker_state.master_address = msg.sender;
@@ -537,6 +565,7 @@ contract DataFormatting is Ownable, RandomAllocator {
     function UnregisterWorker() public topUpSFuel {
         WorkerState storage worker_state = WorkersState[msg.sender];
         require(worker_state.registered == true, "Worker is not available so can't unregister");
+        require(isInBusyWorkers(msg.sender) == false, "Worker must be NOT Busy to unregister");
         uint256 now_ = getBlockTimestamp();
         //////////////////////////////////
         PopFromAvailableWorkers(msg.sender);
@@ -556,12 +585,10 @@ contract DataFormatting is Ownable, RandomAllocator {
     ///////////////  ---------------------------------------------------------------------
 
 
-    function Ping(uint256 CheckedBatchId) external  returns(bool){
-        if(SpottingSystem != ISpottingSystem(address(0))){           
+    function Ping(uint256 CheckedBatchId) external returns(bool){
+        if(SpottingSystem != ISpottingSystem(address(0)) && !CollectedSpotBatchs[CheckedBatchId]){           // don't re import already collected batch 
 
-            // uint256 remaining_iterations = 20; // to catch up in case of a problem, but with a limiation
-            // while( LastSpotBatchId < LastCheckedBatchId_Spot && remaining_iterations > 0){
-            if( LastSpotBatchId < CheckedBatchId  && SpottingSystem.DataExists(CheckedBatchId)){                
+            if( SpottingSystem.DataExists(CheckedBatchId)){                
                 ISpottingSystem.BatchMetadata memory SpotBatch = SpottingSystem.getBatchByID(CheckedBatchId);
                 ISpottingSystem.DataStatus SpotBatchStatus = SpotBatch.status;
                 // If SpotSystem has produced a new APPROVED DATA BATCH, process it in this system. 
@@ -581,8 +608,9 @@ contract DataFormatting is Ownable, RandomAllocator {
                     if(current_data_batch.counter < DATA_BATCH_SIZE){
                         current_data_batch.counter += 1;
                         current_data_batch.end_idx = DataNonce;
-                    }
-                    else{ // batch is complete trigger new work round, new batch
+                    }                            
+                    if(current_data_batch.counter >= DATA_BATCH_SIZE)
+                    { // batch is complete trigger new work round, new batch
                         current_data_batch.complete = true;
                         current_data_batch.checked = false;
                         LastBatchCounter += 1;
@@ -592,11 +620,10 @@ contract DataFormatting is Ownable, RandomAllocator {
                     TriggerNextEpoch();
                     DataNonce = DataNonce + 1;
                     emit _FormatSubmitted(DataNonce, SpotBatch.batchIPFSfile, msg.sender);
-                
-                // remaining_iterations -= 1;            
+                       
                 }    
                 // }
-                LastSpotBatchId = CheckedBatchId;
+                CollectedSpotBatchs[CheckedBatchId] = true;
             }            
         
         }
@@ -607,7 +634,7 @@ contract DataFormatting is Ownable, RandomAllocator {
 
 
     function TriggerNextEpoch() public  {
-        require(DataBatch[AllocatedBatchCursor].complete || availableWorkers.length > 0, "TriggerNextEpoch: a batch must be completed, or enough workers must be available");
+        // require(DataBatch[AllocatedBatchCursor].complete || availableWorkers.length > 0, "TriggerNextEpoch: a batch must be completed, or enough workers must be available");
         bool progress = false;
         // IF CURRENT BATCH IS COMPLETE AND NOT ALLOCATED TO WORKERS TO BE CHECKED, THEN ALLOCATE!
         if( DataBatch[AllocatedBatchCursor].allocated_to_work != true  && availableWorkers.length > 0 && DataBatch[AllocatedBatchCursor].complete  ){ //nothing to allocate, waiting for this to end
@@ -615,7 +642,7 @@ contract DataFormatting is Ownable, RandomAllocator {
             progress = true;
         }
         // IF CURRENT BATCH IS ALLOCATED TO WORKERS AND VOTE HAS ENDED, THEN CHECK IT & MOVE ON!
-        if(DataBatch[BatchCheckingCursor].allocated_to_work == true && ( DataEnded(BatchCheckingCursor) || ( DataBatch[BatchCheckingCursor].unrevealed_workers == 0 ) )){
+        else if(DataBatch[BatchCheckingCursor].allocated_to_work == true && ( DataEnded(BatchCheckingCursor) || ( DataBatch[BatchCheckingCursor].unrevealed_workers == 0 ) )){
             ValidateDataBatch(BatchCheckingCursor);            
             BatchCheckingCursor = BatchCheckingCursor.add(1);        
             progress = true;
@@ -680,7 +707,9 @@ contract DataFormatting is Ownable, RandomAllocator {
                     }
                     // mark worker back available, removed from the busy list
                     if(worker_state.registered){ // only if the worker is still registered, of course.
-                        availableWorkers.push(worker_addr_);    
+                        if(!isInAvailableWorkers(worker_addr_)){
+                            availableWorkers.push(worker_addr_);
+                        }
                     }
                 }
                 // if worker has not voted, he is disconnected "by force"
@@ -773,10 +802,12 @@ contract DataFormatting is Ownable, RandomAllocator {
         for(uint i = 0; i<selected_workers_idx.length; i++){      
             address selected_worker_ = selected_workers_addresses[i];
             WorkerState storage worker_state = WorkersState[selected_worker_];
-            ///// worker swapping from available to busy, not to be picked again while working.            
-            busyWorkers.push(selected_worker_); //set worker as busy
+            ///// worker swapping from available to busy, not to be picked again while working.        
+            PopFromAvailableWorkers(selected_worker_);    
+            if(!isInBusyWorkers(selected_worker_)){
+                busyWorkers.push(selected_worker_); //set worker as busy
+            }
             WorkersPerBatch[AllocatedBatchCursor].push(selected_worker_);
-            PopFromAvailableWorkers(selected_workers_addresses[i]);
             ///// allocation
             worker_state.allocated_work_batch = AllocatedBatchCursor;
             worker_state.has_completed_work = false;
@@ -869,20 +900,20 @@ contract DataFormatting is Ownable, RandomAllocator {
     }
     
 
-    /**
-    @notice                 Commits format-check-votes using hashes of choices and secret salts to conceal format-check-votes until reveal
-    @param _DataBatchIDs         Array of integer identifiers associated with target Datas
-    @param _secretHashes    Array of commit keccak256 hashes of voter's choices and salts (tightly packed in this order)
-    */
-    function commitFormatChecks(uint256[] calldata  _DataBatchIDs, bytes32[] calldata _secretHashes, string[] calldata _newIPFSHash) external {
-        // make sure the array lengths are all the same
+    // /**
+    // @notice                 Commits format-check-votes using hashes of choices and secret salts to conceal format-check-votes until reveal
+    // @param _DataBatchIDs         Array of integer identifiers associated with target Datas
+    // @param _secretHashes    Array of commit keccak256 hashes of voter's choices and salts (tightly packed in this order)
+    // */
+    // function commitFormatChecks(uint256[] calldata  _DataBatchIDs, bytes32[] calldata _secretHashes, string[] calldata _newIPFSHash) external {
+    //     // make sure the array lengths are all the same
         
-        require(_DataBatchIDs.length == _secretHashes.length, "Error when commitFormatChecks: _DataBatchIDs.length == _secretHashes.length");
-        // loop through arrays, committing each individual format-check-vote values
-        for (uint256 i = 0; i < _DataBatchIDs.length; i++) {
-            commitFormatCheck(_DataBatchIDs[i], _secretHashes[i], _newIPFSHash[i]);
-        }
-    }
+    //     require(_DataBatchIDs.length == _secretHashes.length, "Error when commitFormatChecks: _DataBatchIDs.length == _secretHashes.length");
+    //     // loop through arrays, committing each individual format-check-vote values
+    //     for (uint256 i = 0; i < _DataBatchIDs.length; i++) {
+    //         commitFormatCheck(_DataBatchIDs[i], _secretHashes[i], _newIPFSHash[i]);
+    //     }
+    // }
 
     /**
     @notice Reveals format-check-vote with choice and secret salt used in generating commitHash to attribute committed tokens
@@ -918,7 +949,10 @@ contract DataFormatting is Ownable, RandomAllocator {
 
         // PUT BACK THE WORKER AS AVAILABLE
         PopFromBusyWorkers(msg.sender);
-        availableWorkers.push(msg.sender);
+        
+        if(!isInAvailableWorkers(msg.sender)){
+            availableWorkers.push(msg.sender);
+        }
  
 
         // // If that was the last worker to reveal, then go directly to Validation
@@ -929,22 +963,22 @@ contract DataFormatting is Ownable, RandomAllocator {
         emit _FormatCheckRevealed(_DataBatchId, numTokens, DataBatch[_DataBatchId].votesFor, DataBatch[_DataBatchId].votesAgainst, _voteOption, msg.sender);
     }
 
-    /**
-    @notice             Reveals multiple format-check-votes with choices and secret salts used in generating commitHashes to attribute committed tokens
-    @param _DataBatchIDs     Array of integer identifiers associated with target Datas
-    @param _voteOptions Array of format-check-vote choices used to generate commitHashes for associated Datas
-    @param _salts       Array of secret numbers used to generate commitHashes for associated Datas
-    */
-    function revealFormatChecks(uint256[] calldata _DataBatchIDs, uint256[] calldata _voteOptions, uint256[] calldata _salts) external {
-        // make sure the array lengths are all the same
-        require(_DataBatchIDs.length == _voteOptions.length, "Error revealFormatChecks: _DataBatchIDs.length and _voteOptions.length must be equal");
-        require(_DataBatchIDs.length == _salts.length, "Error revealFormatChecks: _DataBatchIDs.length and _salts.length must be equal");
+    // /**
+    // @notice             Reveals multiple format-check-votes with choices and secret salts used in generating commitHashes to attribute committed tokens
+    // @param _DataBatchIDs     Array of integer identifiers associated with target Datas
+    // @param _voteOptions Array of format-check-vote choices used to generate commitHashes for associated Datas
+    // @param _salts       Array of secret numbers used to generate commitHashes for associated Datas
+    // */
+    // function revealFormatChecks(uint256[] calldata _DataBatchIDs, uint256[] calldata _voteOptions, uint256[] calldata _salts) external {
+    //     // make sure the array lengths are all the same
+    //     require(_DataBatchIDs.length == _voteOptions.length, "Error revealFormatChecks: _DataBatchIDs.length and _voteOptions.length must be equal");
+    //     require(_DataBatchIDs.length == _salts.length, "Error revealFormatChecks: _DataBatchIDs.length and _salts.length must be equal");
 
-        // loop through arrays, revealing each individual format-check-vote values
-        for (uint256 i = 0; i < _DataBatchIDs.length; i++) {
-            revealFormatCheck(_DataBatchIDs[i], _voteOptions[i], _salts[i]);
-        }
-    }
+    //     // loop through arrays, revealing each individual format-check-vote values
+    //     for (uint256 i = 0; i < _DataBatchIDs.length; i++) {
+    //         revealFormatCheck(_DataBatchIDs[i], _voteOptions[i], _salts[i]);
+    //     }
+    // }
 
 
     // ================================================================================
