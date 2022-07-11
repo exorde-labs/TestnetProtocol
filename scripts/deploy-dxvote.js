@@ -12,6 +12,7 @@ const ANY_FUNC_SIGNATURE = "0xaaaaaaaa";
 const { encodePermission } = require("../test/helpers/permissions");
 const moment = require("moment");
 const { default: BigNumber } = require("bignumber.js");
+const { format } = require("prettier");
 
 task("deploy-dxvote", "Deploy dxvote in localhost network")
   .addParam("deployconfig", "The deploy config json in string format")
@@ -38,6 +39,7 @@ task("deploy-dxvote", "Deploy dxvote in localhost network")
     const PermissionRegistry = await hre.artifacts.require(
       "PermissionRegistry"
     );
+    const ConfigRegistry = await hre.artifacts.require("ConfigRegistry");
     const RandomAllocator = await hre.artifacts.require("RandomAllocator");
     const AddressManager = await hre.artifacts.require("AddressManager");
     const StakingManager = await hre.artifacts.require("StakingManager");
@@ -136,6 +138,7 @@ task("deploy-dxvote", "Deploy dxvote in localhost network")
     console.log(ethers.utils.parseUnits("200000000.0", 18).toString());
     
     // --------------------------------- EXISTING CONTRACTS ADDRESS ---------------------------------
+    const ConfigRegistryAddress = "0x2773D1fE65e9c22CF8e6e77f4a10c318b8beb71f";
     const EXDTTokenAddress = "0x013121200dfcb362a55561d84A193c990c42706f";
     const StakingManagerAddress = "0x0b1387Eb5D17114a514660E9eEE20d9791a0C14A";
     const RewardsManagerAddress = "0xfc7232748A612eB874C799C23e317F4df746006c";
@@ -213,6 +216,12 @@ task("deploy-dxvote", "Deploy dxvote in localhost network")
     addresses["Controller"] = controller.address;
     await waitBlocks(1);
 
+    let config_registry;
+        
+    console.log("IMPORTING EXISTING Config Registry at ", ConfigRegistryAddress);
+    config_registry = await hre.ethers.getContractAt("ConfigRegistry", ConfigRegistryAddress);
+    addresses["ConfigRegistry"] = config_registry.address;
+    console.log("Config Registry deployed to ", config_registry.address);
 
     // Deploy Staking & Rewards & Address Manager
     let staking_manager;
@@ -313,7 +322,11 @@ task("deploy-dxvote", "Deploy dxvote in localhost network")
     console.log("Add the DataFormatting as allowed to use stakes in RewardsManager");
     await rewards_manager.addAddress(format_worksystem.address);
 
-
+    ///////////// WORKSYSTEM BI DIRECTIONAL LINKING /////////////
+    console.log("[PIPELINE LINK] Add the DataSpotting to be referenced in the DataFormatting contract")
+    await format_worksystem.updateSpotManager(addresses["DataSpotting"]);
+    console.log("[PIPELINE LINK] Add the DataFormatting to be referenced in the DataSpotting contract")
+    await spot_worksystem.updateFormattingSystem(addresses["DataFormatting"])
     // -------------------------------------------------------------------------------------------------------
 
 
@@ -662,21 +675,30 @@ task("deploy-dxvote", "Deploy dxvote in localhost network")
     }
 
     // --------------------- MASTER WALLET REPUTATION FOR WORKSYSTEMS
-    console.log("\n\nAdd the DataSpotting (And other worksystems) as allowed to mint Reputation in MasterWallet");
+    console.log("\n\nAdd the DataSpotting as allowed to mint Reputation in MasterWallet");
     await masterWallet.addWorksystemAddress(spot_worksystem.address);
+    console.log("Add the DataFormatting as allowed to mint Reputation in MasterWallet\n");
+    await masterWallet.addWorksystemAddress(format_worksystem.address);
 
     
 
     // --------------------- WORKSYSTEMS: LINK Stake, Rewards, Rep & Address to the system
+    console.log("Update Stake/Rewards & Reputation Managers in the DataSpotting contract\n");
     await spot_worksystem.updateStakeManager(staking_manager.address);    
     await spot_worksystem.updateRewardManager(rewards_manager.address);    
     await spot_worksystem.updateRepManager(masterWallet.address);
     await spot_worksystem.updateAddressManager(masterWallet.address);
+    console.log("Update Stake/Rewards & Reputation Managers in the DataFormatting contract\n");    
+    await format_worksystem.updateStakeManager(staking_manager.address);    
+    await format_worksystem.updateRewardManager(rewards_manager.address);    
+    await format_worksystem.updateRepManager(masterWallet.address);
+    await format_worksystem.updateAddressManager(masterWallet.address);
     
 
     // give back all ownerships to the DAO controller
     console.log("[DISABLED] Transfer ownerships to the DAO controller... (StakingManager & Worksystems)\n");
     // await spot_worksystem.transferOwnership(controller.address);
+    // await format_worksystem.transferOwnership(controller.address);
     // await staking_manager.transferOwnership(controller.address);
 
     // Deploy dxDaoNFT
