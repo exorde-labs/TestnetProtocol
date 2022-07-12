@@ -1,0 +1,190 @@
+{
+  "_format": "hh-sol-artifact-1",
+  "contractName": "IFormattingSystem",
+  "sourceName": "contracts/worksystems/DataArchive.sol",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_DataBatchId",
+          "type": "uint256"
+        }
+      ],
+      "name": "DataExists",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "exists",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_DataBatchId",
+          "type": "uint256"
+        }
+      ],
+      "name": "getBatchByID",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "uint256",
+              "name": "start_idx",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "end_idx",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "counter",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "unrevealed_workers",
+              "type": "uint256"
+            },
+            {
+              "internalType": "bool",
+              "name": "complete",
+              "type": "bool"
+            },
+            {
+              "internalType": "bool",
+              "name": "checked",
+              "type": "bool"
+            },
+            {
+              "internalType": "bool",
+              "name": "allocated_to_work",
+              "type": "bool"
+            },
+            {
+              "internalType": "uint256",
+              "name": "commitEndDate",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "revealEndDate",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "votesFor",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "votesAgainst",
+              "type": "uint256"
+            },
+            {
+              "internalType": "string",
+              "name": "batchIPFSfile",
+              "type": "string"
+            },
+            {
+              "internalType": "enum IFormattingSystem.DataStatus",
+              "name": "status",
+              "type": "uint8"
+            },
+            {
+              "internalType": "string[]",
+              "name": "flags",
+              "type": "string[]"
+            },
+            {
+              "internalType": "uint256[]",
+              "name": "flags_id",
+              "type": "uint256[]"
+            }
+          ],
+          "internalType": "struct IFormattingSystem.BatchMetadata",
+          "name": "batch",
+          "type": "tuple"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_DataBatchId",
+          "type": "uint256"
+        }
+      ],
+      "name": "getDomainsForBatch",
+      "outputs": [
+        {
+          "internalType": "string[]",
+          "name": "",
+          "type": "string[]"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_DataBatchId",
+          "type": "uint256"
+        }
+      ],
+      "name": "getIPFShashesForBatch",
+      "outputs": [
+        {
+          "internalType": "string[]",
+          "name": "",
+          "type": "string[]"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getLastBatchId",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "LastBatchId",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getLastCheckedBatchId",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "LastCheckedBatchId",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "linkReferences": {},
+  "deployedLinkReferences": {}
+}
