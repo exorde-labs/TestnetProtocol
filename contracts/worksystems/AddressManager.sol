@@ -11,14 +11,59 @@ import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 
 contract AddressManager{
 
-    mapping (address =>  mapping (address => bool)) private WorkerSubAddresses; 
+    mapping (address =>  mapping (address => bool)) private WorkerSubAddresses;  // master -> worker -> true/false
+    mapping (address =>  mapping (address => bool)) private WorkersClaims; // master -> worker -> true/false
 
     // ------------------------------------------------------------------------------------------
 
-    event AddressAdded(address indexed account, bool isWhitelisted);
-    event AddressRemoved(address indexed account, bool isWhitelisted);
+    event AddressAddedByMaster(address indexed account, bool isWhitelisted);
+    event AddressRemovedByMaster(address indexed account, bool isWhitelisted);
+    event AddressAddedByWorker(address indexed account, bool isWhitelisted);
+    event AddressRemovedByWorker(address indexed account, bool isWhitelisted);
 
-    function isSenderMasterOf(address _address)
+
+    //// --------------------------- MASTER FUNCTIONS
+
+
+    function MasterClaimWorkerAddress(address _address)
+        public
+    {
+        require(WorkerSubAddresses[msg.sender][_address] != true);
+        WorkerSubAddresses[msg.sender][_address] = true;
+        emit AddressAddedByMaster(_address, true);
+    }
+
+    function MasterRemoveAddress(address _address)
+        public
+    {        
+        require(WorkerSubAddresses[msg.sender][_address] != false);
+        WorkerSubAddresses[msg.sender][_address] = false;
+        emit AddressRemovedByMaster(_address, false);        
+    }
+
+
+    //// --------------------------- WORKER FUNCTIONS
+
+    function WorkerAddMasterAddress(address _address)
+        public
+    {
+        require(WorkersClaims[_address][msg.sender] != true);
+        WorkersClaims[_address][msg.sender] = true;
+        emit AddressAddedByWorker(_address, true);
+    }
+
+    function WorkerRemoveMasterAddress(address _address)
+        public
+    {        
+        require(WorkersClaims[_address][msg.sender] != false);
+        WorkersClaims[_address][msg.sender] = false;
+        emit AddressRemovedByWorker(_address, false);        
+    }
+
+
+    //// --------------------------- GETTERS FOR MASTERS
+    
+        function isSMasterClaimingMe(address _address)
         public
         view
         returns (bool)
@@ -26,15 +71,8 @@ contract AddressManager{
         return WorkerSubAddresses[msg.sender][_address];
     }
 
-    function isSenderSubOf(address _master)
-        public
-        view
-        returns (bool)
-    {   
-        return WorkerSubAddresses[_master][msg.sender];
-    }
 
-    function isSubAddress(address _master, address _address)
+    function isMasterClaimingWorker(address _master, address _address)
         public
         view
         returns (bool)
@@ -42,22 +80,35 @@ contract AddressManager{
         return WorkerSubAddresses[_master][_address];
     }
 
-    function addAddress(address _address)
+    //// --------------------------- GETTERS FOR WORKERS
+
+
+    function isWorkerClaimingMe(address _worker)
         public
-    {
-        require(WorkerSubAddresses[msg.sender][_address] != true);
-        WorkerSubAddresses[msg.sender][_address] = true;
-        emit AddressAdded(_address, true);
+        view
+        returns (bool)
+    {   
+        return WorkersClaims[msg.sender][_worker];
     }
 
-    function removeAddress(address _address)
+    function isWorkerClaimingMaster(address _master, address _address)
         public
-    {        
-        require(WorkerSubAddresses[msg.sender][_address] != false);
-        WorkerSubAddresses[msg.sender][_address] = false;
-        emit AddressRemoved(_address, false);        
+        view
+        returns (bool)
+    {   
+        return WorkersClaims[_master][_address];
     }
 
+    //// ---------------------------
+
+    
+    function AreMasterWorkerLinked(address _master, address _worker)
+        public
+        view
+        returns (bool)
+    {   
+        return (isWorkerClaimingMaster(_master, _worker) && isMasterClaimingWorker(_master, _worker));
+    }
 
     
 }
