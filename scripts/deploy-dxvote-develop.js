@@ -26,7 +26,7 @@ task("deploy-dxvote-develop", "Deploy dxvote with develop config").setAction(
         },
         {
           address: "0x22ff0428359eab1644bf905dad2733e7bf041e54",
-          amount: 50,
+          amount: 1000,
         },
       ],
 

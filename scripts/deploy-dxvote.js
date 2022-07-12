@@ -39,6 +39,7 @@ task("deploy-dxvote", "Deploy dxvote in localhost network")
     const PermissionRegistry = await hre.artifacts.require(
       "PermissionRegistry"
     );
+    const SFuelContracts = await hre.artifacts.require("SFuelContracts");
     const ConfigRegistry = await hre.artifacts.require("ConfigRegistry");
     const RandomAllocator = await hre.artifacts.require("RandomAllocator");
     const AddressManager = await hre.artifacts.require("AddressManager");
@@ -51,6 +52,7 @@ task("deploy-dxvote", "Deploy dxvote in localhost network")
     const DLL2 = artifacts.require('DLL2.sol');
     const DataSpotting = await hre.artifacts.require("DataSpotting");
     const DataFormatting = await hre.artifacts.require("DataFormatting");
+    const DataArchive = await hre.artifacts.require("DataArchive");
     // ---------------------------------
     const DXDVotingMachine = await hre.artifacts.require("DXDVotingMachine");
     const ERC20Mock = await hre.artifacts.require("ERC20Mock");
@@ -138,10 +140,12 @@ task("deploy-dxvote", "Deploy dxvote in localhost network")
     console.log(ethers.utils.parseUnits("200000000.0", 18).toString());
     
     // --------------------------------- EXISTING CONTRACTS ADDRESS ---------------------------------
+    const SFuelContractsAddress = "0x14F52f3FC010ab6cA81568D4A6794D5eAB3c6155";
     const ConfigRegistryAddress = "0x2773D1fE65e9c22CF8e6e77f4a10c318b8beb71f";
     const EXDTTokenAddress = "0x013121200dfcb362a55561d84A193c990c42706f";
     const StakingManagerAddress = "0x0b1387Eb5D17114a514660E9eEE20d9791a0C14A";
     const RewardsManagerAddress = "0xfc7232748A612eB874C799C23e317F4df746006c";
+    const DataArchiveAddress = "0x94DbE547e79bc484A4Be6Bf2500ECda9F266F43d";
 
     for (const tokenToDeploy of deploymentConfig.tokens){
       console.log(
@@ -227,6 +231,7 @@ task("deploy-dxvote", "Deploy dxvote in localhost network")
     let staking_manager;
     let rewards_manager;
     let address_manager;
+    let data_archive;
     // console.log("Deploying Staking Manager...");
     // staking_manager = await StakingManager.new(tokens.EXDT.address);
     // addresses["StakingManager"] = staking_manager.address;
@@ -300,7 +305,7 @@ task("deploy-dxvote", "Deploy dxvote in localhost network")
     console.log("Library DLL2 addr",libDLL2.address);
 
     console.log("Deploying DataFormatting System...");
-    ////////////////////////////////////////      SPOTTING WORK SYSTEM     //////////////////////////////////////////
+    ////////////////////////////////////////      FORMATTING WORK SYSTEM     //////////////////////////////////////////
 
     const DataFormattingFactory = await ethers.getContractFactory("DataFormatting", {
       libraries: { 
@@ -329,6 +334,32 @@ task("deploy-dxvote", "Deploy dxvote in localhost network")
     await spot_worksystem.updateFormattingSystem(addresses["DataFormatting"])
     // -------------------------------------------------------------------------------------------------------
 
+    
+    console.log("IMPORTING EXISTING DataArchive at ", DataArchiveAddress);
+    data_archive = await hre.ethers.getContractAt("DataArchive", DataArchiveAddress);
+    addresses["DataArchive"] = data_archive.address;
+    console.log("Data Archive deployed to ", data_archive.address);
+
+    ///////////// WORKSYSTEM BI DIRECTIONAL LINKING /////////////
+    console.log("[PIPELINE LINK] Add the DataFormatting to be referenced in the DataArchive contract")
+    await data_archive.updatePreviousSystem(addresses["DataFormatting"]);
+    console.log("[PIPELINE LINK] Add the DataArchive to be referenced in the DataFormatting contract")
+    await format_worksystem.updateArchiveManager(addresses["DataArchive"])
+    // console.log("Add the DataArchive as allowed to use stakes in StakingManager");
+    // await staking_manager.addAddress(data_archive.address);    
+    // console.log("Add the DataArchive as allowed to use stakes in RewardsManager");
+    // await rewards_manager.addAddress(data_archive.address);
+    // -------------------------------------------------------------------------------------------------------
+
+    let sfuelcontract;
+    console.log("IMPORTING EXISTING SFUEL TOP-UP CONTRACT at ", SFuelContractsAddress);
+    sfuelcontract = await hre.ethers.getContractAt("SFuelContracts", SFuelContractsAddress);
+    console.log("Allow worksystems to topup sFuel");
+    await sfuelcontract.addAddress(addresses["DataSpotting"])
+    await sfuelcontract.addAddress(addresses["DataFormatting"])
+
+
+    // -------------------------------------------------------------------------------------------------------
 
     // Deploy DXDVotingMachine
     let votingMachine;
