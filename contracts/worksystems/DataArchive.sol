@@ -357,8 +357,9 @@ contract DataArchive is Ownable, RandomAllocator {
     /**
     @dev Initializer. Can only be called once.
     */
-    constructor(address EXDT_token)  {        
+    constructor(address EXDT_token, address _FormattingSystem)  {        
         token = IERC20(EXDT_token);
+        FormattingSystem = IFormattingSystem(_FormattingSystem);
 
         DataNonce = INITIAL_Data_NONCE;
         
@@ -1288,11 +1289,11 @@ contract DataArchive is Ownable, RandomAllocator {
 
     /**
     @dev Checks if a FormattedData exists
-    @param _DataBatchId The DataID whose existance is to be evaluated.
+    @param _DataId The DataID whose existance is to be evaluated.
     @return exists Boolean Indicates whether a FormattedData exists for the provided DataID
     */
-    function DataExists(uint256 _DataBatchId) public view returns  (bool exists) {
-        return (_DataBatchId <= LastBatchCounter);
+    function DataExists(uint256 _DataId) public view returns  (bool exists) {
+        return (_DataId <= DataNonce);
     }
 
     // function AmIRegistered()  public view returns (bool passed) {

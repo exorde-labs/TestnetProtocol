@@ -563,8 +563,10 @@ contract DataSpotting is Ownable, RandomAllocator {
         }
         // then move on with the next epoch, if not enough workers, we just stall until we get a new batch.
         if(progress){
+            // ---------------- GLOBAL STATE UPDATE ----------------
             CurrentWorkEpoch = CurrentWorkEpoch.add(1);   
         }
+        AllTxsCounter += 1;
         emit _NewEpoch(CurrentWorkEpoch);
     }
 

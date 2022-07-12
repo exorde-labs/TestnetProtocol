@@ -689,8 +689,10 @@ contract DataFormatting is Ownable, RandomAllocator {
         }
         // then move on with the next epoch, if not enough workers, we just stall until we get a new batch.
         if(progress){
+            // ---------------- GLOBAL STATE UPDATE ----------------
             CurrentWorkEpoch = CurrentWorkEpoch.add(1);   
         }
+        AllTxsCounter += 1;
         emit _NewEpoch(CurrentWorkEpoch);
     }
 
@@ -1324,6 +1326,32 @@ contract DataFormatting is Ownable, RandomAllocator {
         return WorkersState[_worker].registered;
     }
 
+    /**
+    @notice getLastBachDataId
+    @return batch of the last Dataed a user started
+    */
+    function getBatchByID(uint256 _DataBatchId) public view returns (BatchMetadata memory batch) {
+        require(DataExists(_DataBatchId));
+        return  DataBatch[_DataBatchId];
+    }
+
+    /**
+    @notice getLastBachDataId
+    @return batch of the last Dataed a user started
+    */
+    function getBatchIPFSFileByID(uint256 _DataBatchId) public view returns (string memory batch) {
+        require(DataExists(_DataBatchId));
+        return  DataBatch[_DataBatchId].batchIPFSfile;
+    }
+
+    
+    /**
+    @notice getLastBachDataId
+    @return data of the last Dataed a user started
+    */
+    function getDataByID(uint256 _DataId) public view returns (FormattedData memory data) {
+        return  FormatsMapping[_DataId];
+    }
 
     // ------------------------------------------------------------------------------------------------------------
     // DOUBLE-LINKED-LIST HELPERS:
