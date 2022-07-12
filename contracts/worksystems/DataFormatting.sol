@@ -184,6 +184,10 @@ interface ISpottingSystem {
 }
 
 
+interface IArchiveSystem {
+    function Ping(uint256 CheckedBatchId) external returns(bool);    
+}
+
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
@@ -299,15 +303,17 @@ contract DataFormatting is Ownable, RandomAllocator {
     uint256 constant INITIAL_Data_NONCE = 0;
     uint256 constant INITIAL_Checks_NONCE = 0;
     uint256 constant MAX_TOTAL_WORKERS = 1000;
+
     uint256 public DATA_BATCH_SIZE = 1;
+    uint256 public CONSENSUS_WORKER_SIZE  = 3;
+
     uint256 public MIN_STAKE;
     uint256 public COMMIT_ROUND_DURATION;
     uint256 public REVEAL_ROUND_DURATION;        
     uint256 public MIN_REWARD_Data = 1 * (10 ** 18);
     uint256 public MIN_REP_REVEAL = 1 * (10 ** 18);
-    uint256 public MIN_REP_Data  = 2 * (10 ** 18);
+    uint256 public MIN_REP_Data  = 100 * (10 ** 18);
     uint256 public SPOT_CHECK_VOTE_QUORUM  = 60;
-    uint256 public CONSENSUS_WORKER_SIZE  = 5;
     
 
     mapping(address => mapping(uint256 => bool)) public UserChecksCommits;     // indicates whether an address committed a format-check-vote for this poll
@@ -354,6 +360,7 @@ contract DataFormatting is Ownable, RandomAllocator {
     IAddressManager public AddressManager;
 
     ISpottingSystem public SpottingSystem;
+    IArchiveSystem public ArchiveSystem;
 
 
     /**
@@ -365,8 +372,8 @@ contract DataFormatting is Ownable, RandomAllocator {
         DataNonce = INITIAL_Data_NONCE;
         
         MIN_STAKE = 25 * (10 ** 18); // 100 EXDT to participate
-        COMMIT_ROUND_DURATION = 180;
-        REVEAL_ROUND_DURATION = 180;
+        COMMIT_ROUND_DURATION = 450;
+        REVEAL_ROUND_DURATION = 120;
     }
     
 
@@ -397,6 +404,14 @@ contract DataFormatting is Ownable, RandomAllocator {
     {
         SpottingSystem = ISpottingSystem(addr);
     }
+
+    function updateArchiveManager(address addr)
+    public
+    onlyOwner
+    {
+        ArchiveSystem = IArchiveSystem(addr);
+    }
+
 
     function updateAddressManager(address addr)
     public
@@ -435,6 +450,31 @@ contract DataFormatting is Ownable, RandomAllocator {
     // --------------- SFUEL MANAGEMENT SYSTEM ---------------
     // ---------------
 
+
+    function deleteMapping(uint256 _BatchId)
+    public
+    onlyOwner
+    {
+        if(CollectedSpotBatchs[_BatchId]){
+            delete CollectedSpotBatchs[_BatchId];
+        }
+    }
+
+    function deleteData(uint256 _DataId)
+    public
+    onlyOwner
+    {
+        delete FormatsMapping[_DataId];
+    }
+
+    function deleteDataBatch(uint256 _BatchId)
+    public
+    onlyOwner
+    {
+        if(DataExists(_BatchId)){
+            delete DataBatch[_BatchId];
+        }
+    }
 
     // function updatesFuelFaucet(address sFuel_)
     // public
@@ -633,18 +673,18 @@ contract DataFormatting is Ownable, RandomAllocator {
 
 
 
-    function TriggerNextEpoch() public  {
+    function TriggerNextEpoch() public topUpSFuel {
         // require(DataBatch[AllocatedBatchCursor].complete || availableWorkers.length > 0, "TriggerNextEpoch: a batch must be completed, or enough workers must be available");
         bool progress = false;
+        // IF CURRENT BATCH IS ALLOCATED TO WORKERS AND VOTE HAS ENDED, THEN CHECK IT & MOVE ON!
+        if(DataBatch[BatchCheckingCursor].allocated_to_work == true && ( DataEnded(BatchCheckingCursor) || ( DataBatch[BatchCheckingCursor].unrevealed_workers == 0 ) )){
+            ValidateDataBatch(BatchCheckingCursor);            
+            BatchCheckingCursor = BatchCheckingCursor.add(1);        
+            progress = true;
+        }
         // IF CURRENT BATCH IS COMPLETE AND NOT ALLOCATED TO WORKERS TO BE CHECKED, THEN ALLOCATE!
         if( DataBatch[AllocatedBatchCursor].allocated_to_work != true  && availableWorkers.length > 0 && DataBatch[AllocatedBatchCursor].complete  ){ //nothing to allocate, waiting for this to end
             AllocateWork();
-            progress = true;
-        }
-        // IF CURRENT BATCH IS ALLOCATED TO WORKERS AND VOTE HAS ENDED, THEN CHECK IT & MOVE ON!
-        else if(DataBatch[BatchCheckingCursor].allocated_to_work == true && ( DataEnded(BatchCheckingCursor) || ( DataBatch[BatchCheckingCursor].unrevealed_workers == 0 ) )){
-            ValidateDataBatch(BatchCheckingCursor);            
-            BatchCheckingCursor = BatchCheckingCursor.add(1);        
             progress = true;
         }
         // then move on with the next epoch, if not enough workers, we just stall until we get a new batch.
@@ -755,11 +795,11 @@ contract DataFormatting is Ownable, RandomAllocator {
                 require(RewardManager.ProxyAddReward(MIN_REWARD_Data, FormatsMapping[_DataBatchId].author), "could not reward token in TriggerCheckSpot, 2.b");
                 DataBatch[_DataBatchId].status = DataStatus.APPROVED;
 
-                // try ArchiveSystem.Ping(_DataBatchId) returns(bool) {
-                //     AllTxsCounter += 1;
-                // } catch(bytes memory err) {
-                //     emit BytesFailure(err);
-                // }
+                try ArchiveSystem.Ping(_DataBatchId) returns(bool) {
+                    AllTxsCounter += 1;
+                } catch(bytes memory err) {
+                    emit BytesFailure(err);
+                }
             }
             // -------------------------------------------------------------
             // IF THE DATA BLOCK IS REJECTED

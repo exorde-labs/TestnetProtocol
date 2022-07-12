@@ -294,7 +294,7 @@ contract StakingManager is Ownable { //, ReentrancyGuard  {
 
     
   function deposit(uint tokens) public {
-    require(token.balanceOf(msg.sender) >= tokens);
+    require(token.balanceOf(msg.sender) >= tokens, "not enough tokens to deposit");
     // add the deposited tokens into existing balance 
     balances[msg.sender].free_balance += tokens;
 
@@ -309,7 +309,7 @@ contract StakingManager is Ownable { //, ReentrancyGuard  {
     */
     function withdraw(uint _numTokens) public 
     {
-        require(balances[msg.sender].free_balance >= _numTokens);
+        require(balances[msg.sender].free_balance >= _numTokens, "not enough tokens in the free staked balance to withdraw");
         require(token.transfer(msg.sender, _numTokens));
         balances[msg.sender].free_balance -= _numTokens;
     }

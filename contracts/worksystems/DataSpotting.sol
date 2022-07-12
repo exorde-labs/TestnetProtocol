@@ -250,16 +250,18 @@ contract DataSpotting is Ownable, RandomAllocator {
 
     uint256 constant INITIAL_Data_NONCE = 0;
     uint256 constant INITIAL_Checks_NONCE = 0;
-    uint256 constant DATA_BATCH_SIZE = 5;
     uint256 constant MAX_TOTAL_WORKERS = 1000;
+
+    uint256 public DATA_BATCH_SIZE = 3;
+    uint256 public CONSENSUS_WORKER_SIZE  = 5;
+
     uint256 public MIN_STAKE;
     uint256 public COMMIT_ROUND_DURATION;
     uint256 public REVEAL_ROUND_DURATION;        
     uint256 public MIN_REWARD_Data = 1 * (10 ** 18);
     uint256 public MIN_REP_REVEAL = 1 * (10 ** 18);
-    uint256 public MIN_REP_Data  = 1 * (10 ** 18);
+    uint256 public MIN_REP_Data  = 25 * (10 ** 18);
     uint256 public SPOT_CHECK_VOTE_QUORUM  = 60;    
-    uint256 public CONSENSUS_WORKER_SIZE  = 5;
 
     mapping(address => mapping(uint256 => bool)) public UserChecksCommits;     // indicates whether an address committed a spot-check-vote for this poll
     mapping(address => mapping(uint256 => bool)) public UserChecksReveals;     // indicates whether an address revealed a spot-check-vote for this poll
@@ -341,6 +343,13 @@ contract DataSpotting is Ownable, RandomAllocator {
         RewardManager  = IRewardManager(addr);
     }
 
+    function updateDataBachSize(uint256 size)
+    public
+    onlyOwner
+    {
+        DATA_BATCH_SIZE  = size;
+    }
+    
     function updateAddressManager(address addr)
     public
     onlyOwner
@@ -472,7 +481,7 @@ contract DataSpotting is Ownable, RandomAllocator {
         require((availableWorkers.length+busyWorkers.length) < MAX_TOTAL_WORKERS, "Maximum registered workers already");
         require(worker_state.registered == false, "Worker is already registered");
         uint256 now_ = getBlockTimestamp();
-
+        
         //_numTokens The number of tokens to be committed towards the target SpottedData
         uint256 _numTokens = MIN_STAKE;
         
@@ -522,19 +531,34 @@ contract DataSpotting is Ownable, RandomAllocator {
     }
 
 
+    function deleteData(uint256 _DataId)
+    public
+    onlyOwner
+    {
+        delete SpotsMapping[_DataId];
+    }
 
-    function TriggerNextEpoch() public  {
+    function deleteDataBatch(uint256 _BatchId)
+    public
+    onlyOwner
+    {
+        if(DataExists(_BatchId)){
+            delete DataBatch[_BatchId];
+        }
+    }
+
+    function TriggerNextEpoch()  public topUpSFuel {
         // require(DataBatch[AllocatedBatchCursor].complete || availableWorkers.length > 0, "TriggerNextEpoch: a batch must be completed, or enough workers must be available");
         bool progress = false;
+        // IF CURRENT BATCH IS ALLOCATED TO WORKERS AND VOTE HAS ENDED, THEN CHECK IT & MOVE ON!
+        if(DataBatch[BatchCheckingCursor].allocated_to_work == true && ( DataEnded(BatchCheckingCursor) || ( DataBatch[BatchCheckingCursor].unrevealed_workers == 0 ) )){
+            ValidateDataBatch(BatchCheckingCursor);            
+            BatchCheckingCursor = BatchCheckingCursor.add(1);        
+            progress = true;
+        }
         // IF CURRENT BATCH IS COMPLETE AND NOT ALLOCATED TO WORKERS TO BE CHECKED, THEN ALLOCATE!
         if( DataBatch[AllocatedBatchCursor].allocated_to_work != true  && availableWorkers.length > 0 && DataBatch[AllocatedBatchCursor].complete  ){ //nothing to allocate, waiting for this to end
             AllocateWork();
-            progress = true;
-        }
-        // IF CURRENT BATCH IS ALLOCATED TO WORKERS AND VOTE HAS ENDED, THEN CHECK IT & MOVE ON!
-        else if(DataBatch[BatchCheckingCursor].allocated_to_work == true && ( DataEnded(BatchCheckingCursor) || ( DataBatch[BatchCheckingCursor].unrevealed_workers == 0 ) )){
-            ValidateDataBatch(BatchCheckingCursor);            
-            BatchCheckingCursor = BatchCheckingCursor.add(1);        
             progress = true;
         }
         // then move on with the next epoch, if not enough workers, we just stall until we get a new batch.
