@@ -142,7 +142,7 @@ task("deploy-dxvote", "Deploy dxvote in localhost network")
     // --------------------------------- EXISTING CONTRACTS ADDRESS ---------------------------------
     const SFuelContractsAddress = "0x14F52f3FC010ab6cA81568D4A6794D5eAB3c6155";
     const ConfigRegistryAddress = "0x2773D1fE65e9c22CF8e6e77f4a10c318b8beb71f";
-    const AddressManagerAddress = "0x2d7AD5B202f6FeEB7708563aacFC21c73fEE82F2";
+    const AddressManagerAddress = "0x1A433De5E02D87F238AF3500b8C57DAe7BFb29a3";
     const DataArchiveAddress = "0x94DbE547e79bc484A4Be6Bf2500ECda9F266F43d";
     const EXDTTokenAddress = "0x013121200dfcb362a55561d84A193c990c42706f";
     const StakingManagerAddress = "0x0b1387Eb5D17114a514660E9eEE20d9791a0C14A";
