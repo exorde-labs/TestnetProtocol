@@ -11,15 +11,15 @@ import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 
 contract AddressManager{
 
-    mapping (address =>  mapping (address => bool)) private WorkerSubAddresses;  // master -> worker -> true/false
-    mapping (address =>  mapping (address => bool)) private WorkersClaims; // master -> worker -> true/false
+    mapping (address =>  mapping (address => bool)) public WorkerSubAddresses;  // master -> worker -> true/false
+    mapping (address =>  mapping (address => bool)) public WorkersClaims; // master -> worker -> true/false
 
     // ------------------------------------------------------------------------------------------
 
-    event AddressAddedByMaster(address indexed account, bool isWhitelisted);
-    event AddressRemovedByMaster(address indexed account, bool isWhitelisted);
-    event AddressAddedByWorker(address indexed account, bool isWhitelisted);
-    event AddressRemovedByWorker(address indexed account, bool isWhitelisted);
+    event AddressAddedByMaster(address indexed account, address  account2, bool isWhitelisted);
+    event AddressRemovedByMaster(address indexed account, address  account2, bool isWhitelisted);
+    event AddressAddedByWorker(address indexed account, address  account2, bool isWhitelisted);
+    event AddressRemovedByWorker(address indexed account, address  account2, bool isWhitelisted);
 
 
     //// --------------------------- MASTER FUNCTIONS
@@ -30,7 +30,7 @@ contract AddressManager{
     {
         require(WorkerSubAddresses[msg.sender][_address] != true);
         WorkerSubAddresses[msg.sender][_address] = true;
-        emit AddressAddedByMaster(_address, true);
+        emit AddressAddedByMaster(msg.sender, _address, true);
     }
 
     function MasterRemoveAddress(address _address)
@@ -38,7 +38,7 @@ contract AddressManager{
     {        
         require(WorkerSubAddresses[msg.sender][_address] != false);
         WorkerSubAddresses[msg.sender][_address] = false;
-        emit AddressRemovedByMaster(_address, false);        
+        emit AddressRemovedByMaster(msg.sender, _address, false);        
     }
 
 
@@ -49,7 +49,7 @@ contract AddressManager{
     {
         require(WorkersClaims[_address][msg.sender] != true);
         WorkersClaims[_address][msg.sender] = true;
-        emit AddressAddedByWorker(_address, true);
+        emit AddressAddedByWorker(msg.sender, _address, true);
     }
 
     function WorkerRemoveMasterAddress(address _address)
@@ -57,7 +57,7 @@ contract AddressManager{
     {        
         require(WorkersClaims[_address][msg.sender] != false);
         WorkersClaims[_address][msg.sender] = false;
-        emit AddressRemovedByWorker(_address, false);        
+        emit AddressRemovedByWorker(msg.sender, _address, false);        
     }
 
 

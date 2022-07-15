@@ -306,6 +306,7 @@ contract DataFormatting is Ownable, RandomAllocator {
 
     uint256 public DATA_BATCH_SIZE = 1;
     uint256 public CONSENSUS_WORKER_SIZE  = 3;
+    uint256 public MIN_CONSENSUS_WORKER_COUNT  = 1;    
 
     uint256 public MIN_STAKE;
     uint256 public COMMIT_ROUND_DURATION;
@@ -441,12 +442,21 @@ contract DataFormatting is Ownable, RandomAllocator {
         REVEAL_ROUND_DURATION  = REVEAL_ROUND_DURATION_;
     }
 
-    function updateConsensusSize(uint256 CONSENSUS_WORKER_SIZE_)
+    function updateMaxConsensusSize(uint256 CONSENSUS_WORKER_SIZE_)
     public
     onlyOwner
     {
         CONSENSUS_WORKER_SIZE  = CONSENSUS_WORKER_SIZE_;
     }
+
+    function updateMinConsensusSize(uint256 CONSENSUS_WORKER_SIZE_)
+    public
+    onlyOwner
+    {
+        require(CONSENSUS_WORKER_SIZE_>=1);
+        MIN_CONSENSUS_WORKER_COUNT  = CONSENSUS_WORKER_SIZE_;
+    }
+
     // --------------- SFUEL MANAGEMENT SYSTEM ---------------
     // ---------------
 
@@ -605,7 +615,6 @@ contract DataFormatting is Ownable, RandomAllocator {
     function UnregisterWorker() public topUpSFuel {
         WorkerState storage worker_state = WorkersState[msg.sender];
         require(worker_state.registered == true, "Worker is not available so can't unregister");
-        require(isInBusyWorkers(msg.sender) == false, "Worker must be NOT Busy to unregister");
         uint256 now_ = getBlockTimestamp();
         //////////////////////////////////
         PopFromAvailableWorkers(msg.sender);
@@ -692,7 +701,6 @@ contract DataFormatting is Ownable, RandomAllocator {
             // ---------------- GLOBAL STATE UPDATE ----------------
             CurrentWorkEpoch = CurrentWorkEpoch.add(1);   
         }
-        AllTxsCounter += 1;
         emit _NewEpoch(CurrentWorkEpoch);
     }
 
@@ -824,7 +832,7 @@ contract DataFormatting is Ownable, RandomAllocator {
     function AllocateWork() public  {
         require(DataBatch[AllocatedBatchCursor].complete, "Can't allocate work, the current batch is not complete");
         require(DataBatch[AllocatedBatchCursor].allocated_to_work == false, "Can't allocate work, the current batch is already allocated");
-        uint256 selected_k = Math.max( Math.min(availableWorkers.length, CONSENSUS_WORKER_SIZE), 1); // pick at most CONSENSUS_WORKER_SIZE workers, minimum 1.
+        uint256 selected_k = Math.max( Math.min(availableWorkers.length, CONSENSUS_WORKER_SIZE), MIN_CONSENSUS_WORKER_COUNT); // pick at most CONSENSUS_WORKER_SIZE workers, minimum 1.
         uint256 n = availableWorkers.length;
 
         ///////////////////////////// BATCH UPDATE STATE /////////////////////////////
@@ -969,6 +977,7 @@ contract DataFormatting is Ownable, RandomAllocator {
         // Make sure the reveal period is active
         require(revealPeriodActive(_DataBatchId), "Reveal period not open for this DataID");
         require(UserChecksCommits[msg.sender][_DataBatchId], "User has not commited before, thus can't reveal");
+        require(!UserChecksReveals[msg.sender][_DataBatchId], "User has already revealed, thus can't reveal");   
         require(getEncryptedVoteHash(_voteOption, _salt) == getCommitHash(msg.sender, _DataBatchId),
         "Not the same vote than what was commited, impossible to match with given _salt & _voteOption"); // compare resultant hash from inputs to original commitHash
         
@@ -992,12 +1001,12 @@ contract DataFormatting is Ownable, RandomAllocator {
         worker_state.last_interaction_date = getBlockTimestamp();   
 
         // PUT BACK THE WORKER AS AVAILABLE
-        PopFromBusyWorkers(msg.sender);
-        
-        if(!isInAvailableWorkers(msg.sender)){
-            availableWorkers.push(msg.sender);
+        PopFromBusyWorkers(msg.sender);        
+        if(worker_state.registered){  // if still registered
+            if(!isInAvailableWorkers(msg.sender)){
+                availableWorkers.push(msg.sender);
+            }
         }
- 
 
         // // If that was the last worker to reveal, then go directly to Validation
         // if( DataBatch[_DataBatchId].unrevealed_workers == 0 ){
