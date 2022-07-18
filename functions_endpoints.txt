@@ -2,10 +2,18 @@
 0xb6b55f25 = deposit
 0x227a473b = Stake()
 
-//  worksystem
+//  worksystem DataSpotting
 0xf716596d = register
 0x275c2590 = unregister
 0x354dae40 = TriggerNextEpoch
 0x0b16d945 = Spot
 0xa7f830f4 = CommitSpotCheck
 0x035fbb55 = RevealSpotCheck
+
+
+//  worksystem DataFormatting
+0xf716596d = register
+0x275c2590 = unregister
+0x354dae40 = TriggerNextEpoch
+0x9b07dbb9 = CommitFormatCheck
+0xf60e7381 = RevealFormatCCheck
