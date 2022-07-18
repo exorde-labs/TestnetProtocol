@@ -17,3 +17,6 @@
 0x354dae40 = TriggerNextEpoch
 0x9b07dbb9 = CommitFormatCheck
 0xf60e7381 = RevealFormatCCheck
+
+
+explore IPFS hashs from the protocol through the dedicated Exorde Labs Gateway: https://exorde-testnet.mypinata.cloud/ipfs/QmSighoxfFjbHy4N85CXjgNdtDu5c8GJsL2Vnm3CLT6zG7
