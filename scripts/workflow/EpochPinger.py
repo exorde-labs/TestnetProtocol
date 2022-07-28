@@ -6,7 +6,7 @@ import time
 
 ### DECODE PRIVATE KEY FOR STORAGE
 
-w3 = Web3(Web3.HTTPProvider("https://staging-v2.skalenodes.com/v1/whispering-turais"))
+w3 = Web3(Web3.HTTPProvider("https://staging-v2.skalenodes.com/v1/rapping-zuben-elakrab"))
 
 EXDT_token_address = "0x013121200dfcb362a55561d84A193c990c42706f"
 Private_key = "deaddead071899995fb92d83ed54dead1eb74e72a84ef980d42953caaa6db074"
@@ -15,10 +15,8 @@ pinger_address = w3.eth.account.from_key(Private_key).address
 print("EXDT Testnet token Address =",EXDT_token_address)
 print("Pinger address =", pinger_address)
 
-# spot_contract = '0x12BdF0CC2F0E5F68BECaED0EE985068505AaF970'
-# format_contract = '0xe29F7b707e26d706A91B43a4CE103454820adf19'
-spot_contract = '0xb3c3369E99217d4C35dDeD3fF32137D7334d5E13'
-format_contract = '0x0B461759fe878A5EFBBD9d1D75995AB24975f884'
+spot_contract = '0xf7b2f1fB641151e8369a0d91E6B634B6527F18BD'
+format_contract = '0x2a6b5715bB02934fCe0e1FA41976F59f334B3c6E'
 
 print("\nSpot_contract  =",spot_contract)
 print("Format_contract  =",format_contract)
@@ -55,7 +53,7 @@ while(True):
             'from': pinger_address,
             'nonce': w3.eth.get_transaction_count(pinger_address),
             'value': 0,
-            'gas': 1000000,
+            'gas': 100000000,
             'gasPrice': w3.eth.gas_price,
     })
 
@@ -69,7 +67,7 @@ while(True):
             'from': pinger_address,
             'nonce': w3.eth.get_transaction_count(pinger_address),
             'value': 0,
-            'gas': 1000000,
+            'gas': 100000000,
             'gasPrice': w3.eth.gas_price,
     })
 
@@ -78,4 +76,4 @@ while(True):
     tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
     print(f'Format Pinging Tx successful with hash: { tx_receipt.transactionHash.hex() }')
 
-    time.sleep(10)
+    time.sleep(30)
