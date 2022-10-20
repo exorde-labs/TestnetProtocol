@@ -1,1 +1,6 @@
-{"_urlPinata":"https://exorde-testnet.mypinata.cloud/ipfs/","_urlSkale":"https://staging-v2.skalenodes.com/v1/rapping-zuben-elakrab","_chainID": "1305754875840118", "_blockExplorer":"https://rapping-zuben-elakrab.explorer.staging-v2.skalenodes.com/"}
+{
+  "_urlPinata": "https://exorde-testnet.mypinata.cloud/ipfs/",
+  "_urlSkale": "https://staging-v2.skalenodes.com/v1/rapping-zuben-elakrab",
+  "_chainID": "1305754875840118",
+  "_blockExplorer": "https://rapping-zuben-elakrab.explorer.staging-v2.skalenodes.com/"
+}
