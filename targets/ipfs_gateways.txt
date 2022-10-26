@@ -1,6 +1,5 @@
 https://exorde-1.myfilebase.com/ipfs/
 https://exorde-2.myfilebase.com/ipfs/
-https://cloudflare-ipfs.com/ipfs/
 https://w3s.link/ipfs/
 https://gateway.ipfs.io/ipfs/
 https://ipfs.io/ipfs/
