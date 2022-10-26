@@ -4,3 +4,4 @@ https://cloudflare-ipfs.com/ipfs/
 https://w3s.link/ipfs/
 https://gateway.ipfs.io/ipfs/
 https://ipfs.io/ipfs/
+https://exorde-private.myfilebase.com/ipfs/
