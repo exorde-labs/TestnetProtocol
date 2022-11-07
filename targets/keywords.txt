@@ -30,6 +30,7 @@ SHIB, Shiba Inu,
 TRX, Tron network,
 UNI, Uniswap,
 Elon Musk, twitter, Musk,
+Sorare, DeFi, Web3, Play2Earn,
 Dogecoin, DOGE,
 LUNA, LUNC
 Non fungible token, NFT,
@@ -38,4 +39,4 @@ surges, surge, plunges, crash, buy, sell,
 nasdaq100, dow jones, finance, liquidity, token
 euro, dollar, fear, greed, liquidation,
 bullrun, bulls, bull market,
-bearrun, bears, bear market, crypto winter
+bears, bear market, crypto winter,
