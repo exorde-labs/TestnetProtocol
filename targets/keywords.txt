@@ -40,3 +40,6 @@ nasdaq100, dow jones, finance, liquidity, token
 euro, dollar, fear, greed, liquidation,
 bullrun, bulls, bull market,
 bears, bear market, crypto winter,
+Facebook, Meta, Mark Zuckerberg,
+Apple, Microsoft, Google, Alphabet, Amazon, Tesla, Mastercard, Visa,
+Fifa, world cup,
