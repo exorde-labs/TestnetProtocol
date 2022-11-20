@@ -1,6 +1,6 @@
 {
-   "_moduleHashContracts_cli":"https://bafybeifqxkcdizq3b5yvgpf7pntbpz4z5ai3dp7pxjz7upli6x6xjs46ou.ipfs.w3s.link/Transaction.py",
-   "_moduleHashSpotting_cli":"https://bafybeiecijnmxhcguorioqpzqo66fwoc5ruopmafglshdbj446xk2hdumq.ipfs.w3s.link/Scraper.py",
-   "_moduleHashSpotChecking_cli":"https://bafybeidpkdffmjghw23mjrtd7ow6tp5rmtfukx4mac5qdcnjffgfxvft5a.ipfs.w3s.link/Validator.py",
-   "_moduleHashApp_cli":"https://bafybeigtsi3pmaft5dajyykekqnax2jkxn4vdxvut3xxkupsv4res6pmkq.ipfs.w3s.link/App.py"
+   "_moduleHashContracts_cli":"https://bafybeihhq2hfe2tzqzkltrfytsfxamsysuri4dlqul6tlql7jqfqf2foci.ipfs.w3s.link/Transaction.py",
+   "_moduleHashSpotting_cli":"https://bafybeiaxac77yqfzjwvk3xfiulmsjctujtl4qfhtsssglzbrqilfjps5ea.ipfs.w3s.link/Scraper.py",
+   "_moduleHashSpotChecking_cli":"https://bafybeiauyfunzdgxnwee3ii74flukck6thn3kvtuieaybwo4t2hjm3goy4.ipfs.w3s.link/Validator.py",
+   "_moduleHashApp_cli":"https://bafybeifh7ekgbxijjfmwkovpeer2otc236hcj36cjtzfnpmchfqol3xwry.ipfs.w3s.link/App.py"
 }
