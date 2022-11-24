@@ -1,0 +1,93 @@
+{
+	"compiler": {
+		"version": "0.8.0+commit.c7dfd78e"
+	},
+	"language": "Solidity",
+	"output": {
+		"abi": [],
+		"devdoc": {
+			"kind": "dev",
+			"methods": {},
+			"version": 1
+		},
+		"userdoc": {
+			"kind": "user",
+			"methods": {},
+			"version": 1
+		}
+	},
+	"settings": {
+		"compilationTarget": {
+			"contracts/worksystems/DataFormatting.sol": "AttributeStore2"
+		},
+		"evmVersion": "istanbul",
+		"libraries": {},
+		"metadata": {
+			"bytecodeHash": "ipfs"
+		},
+		"optimizer": {
+			"enabled": true,
+			"runs": 200
+		},
+		"remappings": []
+	},
+	"sources": {
+		"@openzeppelin/contracts/access/Ownable.sol": {
+			"keccak256": "0xa1b27b3f44ff825974e5268e8f63ad3b03add5b464880d860fbb8cae043e17f7",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://ad0fb4425453220f15bdb8c4e009052839804bb725797b6d8c02ee2271bc3c23",
+				"dweb:/ipfs/QmPtjdMxzEifPUEUa6cKX1yfTWjaZV6QtdwMdN6bEL9FBM"
+			]
+		},
+		"@openzeppelin/contracts/token/ERC20/IERC20.sol": {
+			"keccak256": "0xc1452b054778f1926419196ef12ae200758a4ee728df69ae1cd13e5c16ca7df7",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://4cb252ec7657ba7a91be688cbd263090aa5379e504f488a62d06198e0d630322",
+				"dweb:/ipfs/QmW56fDiDirhWfWiKrycXE5UY6tTNtFrYx39ipnSs8mkYb"
+			]
+		},
+		"@openzeppelin/contracts/utils/Context.sol": {
+			"keccak256": "0x7736c187e6f1358c1ea9350a2a21aa8528dec1c2f43b374a9067465a3a51f5d3",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://4fd625dca17657403af518cc6c8ab5c54c58898cf6e912ca2e1b0f3194ad0405",
+				"dweb:/ipfs/QmQVv7YeeKmaS11bg7YDTeeGDk6i7sV8LMMfohaLM4SiRu"
+			]
+		},
+		"@openzeppelin/contracts/utils/math/Math.sol": {
+			"keccak256": "0xe936fc79332de2ca7b1c06a70f81345aa2466958aab00f463e312ca0585e85cf",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://1308706a315fce707f34bb974e08c8e8f8a5674123890d5c67f495be4e539081",
+				"dweb:/ipfs/QmTk2mgRyHkq238Qm75Uc3EF3s76yG3kSsxdgTJWgLjitE"
+			]
+		},
+		"@openzeppelin/contracts/utils/math/SafeMath.sol": {
+			"keccak256": "0x29c462775f5b4c76dce400f120f3530aa3f81da42c839f975dc2b64784d22434",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://063db5d664d3d5bae10d0056c9d00339265229532d06b53d5f2e91778b2e428d",
+				"dweb:/ipfs/QmWM92rU59t6BcZSj4w6ikoPL32R9hyTMb9Msg5X8vvu1s"
+			]
+		},
+		"contracts/worksystems/DataFormatting.sol": {
+			"keccak256": "0x17ca136949a9aeee7721a0fd1e82b84738f5182495f297dc6035995c27b8856a",
+			"license": "GPL-3.0",
+			"urls": [
+				"bzz-raw://3ebeba7c028db3b2bc430825fede1ab1791395d351c0a82b7f3e06c13d87a69d",
+				"dweb:/ipfs/Qmdz1nC4SfD912E11Q3qck9AbPBcqYo5BQP3tAHBA41kWp"
+			]
+		},
+		"contracts/worksystems/RandomAllocator.sol": {
+			"keccak256": "0x4b175edc3d28d899b233190a6b6fbcf8b988dc5333a35bfeb87301138542e189",
+			"license": "GPL-3.0",
+			"urls": [
+				"bzz-raw://b1ff9cb4e713f3b1ab402284e6e1b25f0b50d42ada527770a04948fccde35a9a",
+				"dweb:/ipfs/QmX633sfZ7s9HUiyYLCgrqECoAbHDPd69m735RJXeH3isQ"
+			]
+		}
+	},
+	"version": 1
+}

@@ -1,0 +1,166 @@
+{
+	"deploy": {
+		"VM:-": {
+			"linkReferences": {},
+			"autoDeployLib": true
+		},
+		"main:1": {
+			"linkReferences": {},
+			"autoDeployLib": true
+		},
+		"ropsten:3": {
+			"linkReferences": {},
+			"autoDeployLib": true
+		},
+		"rinkeby:4": {
+			"linkReferences": {},
+			"autoDeployLib": true
+		},
+		"kovan:42": {
+			"linkReferences": {},
+			"autoDeployLib": true
+		},
+		"görli:5": {
+			"linkReferences": {},
+			"autoDeployLib": true
+		},
+		"Custom": {
+			"linkReferences": {},
+			"autoDeployLib": true
+		}
+	},
+	"data": {
+		"bytecode": {
+			"generatedSources": [],
+			"linkReferences": {},
+			"object": "",
+			"opcodes": "",
+			"sourceMap": ""
+		},
+		"deployedBytecode": {
+			"generatedSources": [],
+			"immutableReferences": {},
+			"linkReferences": {},
+			"object": "",
+			"opcodes": "",
+			"sourceMap": ""
+		},
+		"gasEstimates": null,
+		"methodIdentifiers": {
+			"DataExists(uint256)": "f721de4a",
+			"getBatchByID(uint256)": "d9845fb8"
+		}
+	},
+	"abi": [
+		{
+			"inputs": [
+				{
+					"internalType": "uint256",
+					"name": "_DataBatchId",
+					"type": "uint256"
+				}
+			],
+			"name": "DataExists",
+			"outputs": [
+				{
+					"internalType": "bool",
+					"name": "exists",
+					"type": "bool"
+				}
+			],
+			"stateMutability": "nonpayable",
+			"type": "function"
+		},
+		{
+			"inputs": [
+				{
+					"internalType": "uint256",
+					"name": "_DataBatchId",
+					"type": "uint256"
+				}
+			],
+			"name": "getBatchByID",
+			"outputs": [
+				{
+					"components": [
+						{
+							"internalType": "uint256",
+							"name": "start_idx",
+							"type": "uint256"
+						},
+						{
+							"internalType": "uint256",
+							"name": "counter",
+							"type": "uint256"
+						},
+						{
+							"internalType": "uint256",
+							"name": "uncommited_workers",
+							"type": "uint256"
+						},
+						{
+							"internalType": "uint256",
+							"name": "unrevealed_workers",
+							"type": "uint256"
+						},
+						{
+							"internalType": "bool",
+							"name": "complete",
+							"type": "bool"
+						},
+						{
+							"internalType": "bool",
+							"name": "checked",
+							"type": "bool"
+						},
+						{
+							"internalType": "bool",
+							"name": "allocated_to_work",
+							"type": "bool"
+						},
+						{
+							"internalType": "uint256",
+							"name": "commitEndDate",
+							"type": "uint256"
+						},
+						{
+							"internalType": "uint256",
+							"name": "revealEndDate",
+							"type": "uint256"
+						},
+						{
+							"internalType": "uint256",
+							"name": "votesFor",
+							"type": "uint256"
+						},
+						{
+							"internalType": "uint256",
+							"name": "votesAgainst",
+							"type": "uint256"
+						},
+						{
+							"internalType": "string",
+							"name": "batchIPFSfile",
+							"type": "string"
+						},
+						{
+							"internalType": "uint256",
+							"name": "item_count",
+							"type": "uint256"
+						},
+						{
+							"internalType": "enum ISpottingSystem.DataStatus",
+							"name": "status",
+							"type": "uint8"
+						}
+					],
+					"internalType": "struct ISpottingSystem.BatchMetadata",
+					"name": "batch",
+					"type": "tuple"
+				}
+			],
+			"stateMutability": "nonpayable",
+			"type": "function"
+		}
+	]
+}

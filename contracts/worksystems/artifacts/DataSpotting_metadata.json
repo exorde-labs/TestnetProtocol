@@ -1,0 +1,3034 @@
+{
+	"compiler": {
+		"version": "0.8.0+commit.c7dfd78e"
+	},
+	"language": "Solidity",
+	"output": {
+		"abi": [
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "EXDT_token_",
+						"type": "address"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "constructor"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": false,
+						"internalType": "bytes",
+						"name": "bytesFailure",
+						"type": "bytes"
+					}
+				],
+				"name": "BytesFailure",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "previousOwner",
+						"type": "address"
+					},
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "newOwner",
+						"type": "address"
+					}
+				],
+				"name": "OwnershipTransferred",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "uint256",
+						"name": "batchID",
+						"type": "uint256"
+					}
+				],
+				"name": "_DataBatchDeleted",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": false,
+						"internalType": "string",
+						"name": "hash",
+						"type": "string"
+					},
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "creator",
+						"type": "address"
+					}
+				],
+				"name": "_SpotAccepted",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "uint256",
+						"name": "DataID",
+						"type": "uint256"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "numTokens",
+						"type": "uint256"
+					},
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "voter",
+						"type": "address"
+					}
+				],
+				"name": "_SpotCheckCommitted",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "uint256",
+						"name": "DataID",
+						"type": "uint256"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "numTokens",
+						"type": "uint256"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "votesFor",
+						"type": "uint256"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "votesAgainst",
+						"type": "uint256"
+					},
+					{
+						"indexed": true,
+						"internalType": "uint256",
+						"name": "choice",
+						"type": "uint256"
+					},
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "voter",
+						"type": "address"
+					}
+				],
+				"name": "_SpotCheckRevealed",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "uint256",
+						"name": "DataID",
+						"type": "uint256"
+					},
+					{
+						"indexed": false,
+						"internalType": "string",
+						"name": "file_hash",
+						"type": "string"
+					},
+					{
+						"indexed": false,
+						"internalType": "string",
+						"name": "URL_domain",
+						"type": "string"
+					},
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "sender",
+						"type": "address"
+					}
+				],
+				"name": "_SpotSubmitted",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "numTokens",
+						"type": "uint256"
+					},
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "voter",
+						"type": "address"
+					}
+				],
+				"name": "_StakeAllocated",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "uint256",
+						"name": "DataID",
+						"type": "uint256"
+					},
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "voter",
+						"type": "address"
+					}
+				],
+				"name": "_TokensRescued",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "numTokens",
+						"type": "uint256"
+					},
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "voter",
+						"type": "address"
+					}
+				],
+				"name": "_VotingRightsWithdrawn",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "uint256",
+						"name": "batchID",
+						"type": "uint256"
+					},
+					{
+						"indexed": false,
+						"internalType": "address",
+						"name": "worker",
+						"type": "address"
+					}
+				],
+				"name": "_WorkAllocated",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "worker",
+						"type": "address"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "timestamp",
+						"type": "uint256"
+					}
+				],
+				"name": "_WorkerRegistered",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "worker",
+						"type": "address"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "timestamp",
+						"type": "uint256"
+					}
+				],
+				"name": "_WorkerUnregistered",
+				"type": "event"
+			},
+			{
+				"inputs": [],
+				"name": "AcceptedBatchsCounter",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "AllTxsCounter",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "AllocatedBatchCursor",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "AmIRegistered",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "passed",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "string",
+						"name": "_a",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "_b",
+						"type": "string"
+					}
+				],
+				"name": "AreStringsEqual",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "pure",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "BatchCheckingCursor",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "BatchDeletionCursor",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"name": "DataBatch",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "start_idx",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "counter",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "uncommited_workers",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "unrevealed_workers",
+						"type": "uint256"
+					},
+					{
+						"internalType": "bool",
+						"name": "complete",
+						"type": "bool"
+					},
+					{
+						"internalType": "bool",
+						"name": "checked",
+						"type": "bool"
+					},
+					{
+						"internalType": "bool",
+						"name": "allocated_to_work",
+						"type": "bool"
+					},
+					{
+						"internalType": "uint256",
+						"name": "commitEndDate",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "revealEndDate",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "votesFor",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "votesAgainst",
+						"type": "uint256"
+					},
+					{
+						"internalType": "string",
+						"name": "batchIPFSfile",
+						"type": "string"
+					},
+					{
+						"internalType": "uint256",
+						"name": "item_count",
+						"type": "uint256"
+					},
+					{
+						"internalType": "enum DataSpotting.DataStatus",
+						"name": "status",
+						"type": "uint8"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "_DataBatchId",
+						"type": "uint256"
+					}
+				],
+				"name": "DataCommitEndDate",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "commitEndDate",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "_DataBatchId",
+						"type": "uint256"
+					}
+				],
+				"name": "DataEnded",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "ended",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "_DataBatchId",
+						"type": "uint256"
+					}
+				],
+				"name": "DataExists",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "exists",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "DataNonce",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "_DataBatchId",
+						"type": "uint256"
+					}
+				],
+				"name": "DataRevealEndDate",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "revealEndDate",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "user_",
+						"type": "address"
+					}
+				],
+				"name": "GetCurrentWork",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"name": "GlobalSpotFlowManager",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "timestamp",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "counter",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "user_",
+						"type": "address"
+					}
+				],
+				"name": "IsNewWorkAvailable",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "LastAllocationTime",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "LastBatchCounter",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "",
+						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"name": "MasterWorkers",
+				"outputs": [
+					{
+						"internalType": "address",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "NotCommitedCounter",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "NotRevealedCounter",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "Parameters",
+				"outputs": [
+					{
+						"internalType": "contract IParametersManager",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "RegisterWorker",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "RejectedBatchsCounter",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "SPOT_TOGGLE_ENABLED",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "_worker",
+						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "_TokensAmountToAllocate",
+						"type": "uint256"
+					}
+				],
+				"name": "SelectAddressForUser",
+				"outputs": [
+					{
+						"internalType": "address",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "string[]",
+						"name": "file_hashs",
+						"type": "string[]"
+					},
+					{
+						"internalType": "string[]",
+						"name": "URL_domains",
+						"type": "string[]"
+					},
+					{
+						"internalType": "uint256",
+						"name": "item_count_",
+						"type": "uint256"
+					},
+					{
+						"internalType": "string",
+						"name": "extra_",
+						"type": "string"
+					}
+				],
+				"name": "SpotData",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "Dataid_",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"name": "SpotsMapping",
+				"outputs": [
+					{
+						"internalType": "string",
+						"name": "ipfs_hash",
+						"type": "string"
+					},
+					{
+						"internalType": "address",
+						"name": "author",
+						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "timestamp",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "item_count",
+						"type": "uint256"
+					},
+					{
+						"internalType": "string",
+						"name": "URL_domain",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "extra",
+						"type": "string"
+					},
+					{
+						"internalType": "enum DataSpotting.DataStatus",
+						"name": "status",
+						"type": "uint8"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"name": "SystemStakedTokenBalance",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "TriggerUpdate",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "UnregisterWorker",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					},
+					{
+						"internalType": "address",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"name": "UserBatchCounts",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					},
+					{
+						"internalType": "address",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"name": "UserBatchFrom",
+				"outputs": [
+					{
+						"internalType": "string",
+						"name": "",
+						"type": "string"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "",
+						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"name": "UserChecksCommits",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "",
+						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"name": "UserChecksReveals",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					},
+					{
+						"internalType": "address",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"name": "UserNewFiles",
+				"outputs": [
+					{
+						"internalType": "string",
+						"name": "",
+						"type": "string"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "",
+						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"name": "UserSubmissions",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					},
+					{
+						"internalType": "address",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"name": "UserVotes",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"name": "WorkersPerBatch",
+				"outputs": [
+					{
+						"internalType": "address",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "",
+						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"name": "WorkersSpotFlowManager",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "timestamp",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "counter",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"name": "WorkersState",
+				"outputs": [
+					{
+						"internalType": "address",
+						"name": "worker_address",
+						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "allocated_work_batch",
+						"type": "uint256"
+					},
+					{
+						"internalType": "bool",
+						"name": "has_completed_work",
+						"type": "bool"
+					},
+					{
+						"internalType": "uint256",
+						"name": "succeeding_novote_count",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "last_interaction_date",
+						"type": "uint256"
+					},
+					{
+						"internalType": "bool",
+						"name": "registered",
+						"type": "bool"
+					},
+					{
+						"internalType": "bool",
+						"name": "unregistration_request",
+						"type": "bool"
+					},
+					{
+						"internalType": "uint256",
+						"name": "registration_date",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "majority_counter",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "minority_counter",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "_user",
+						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "_DataBatchId",
+						"type": "uint256"
+					}
+				],
+				"name": "attrUUID",
+				"outputs": [
+					{
+						"internalType": "bytes32",
+						"name": "UUID",
+						"type": "bytes32"
+					}
+				],
+				"stateMutability": "pure",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"name": "availableWorkers",
+				"outputs": [
+					{
+						"internalType": "address",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"name": "busyWorkers",
+				"outputs": [
+					{
+						"internalType": "address",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "_DataBatchId",
+						"type": "uint256"
+					}
+				],
+				"name": "commitPeriodActive",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "active",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "_DataBatchId",
+						"type": "uint256"
+					}
+				],
+				"name": "commitPeriodOver",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "active",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "_DataBatchId",
+						"type": "uint256"
+					},
+					{
+						"internalType": "bytes32",
+						"name": "_encryptedHash",
+						"type": "bytes32"
+					},
+					{
+						"internalType": "bytes32",
+						"name": "_encryptedVote",
+						"type": "bytes32"
+					},
+					{
+						"internalType": "uint256",
+						"name": "_BatchCount",
+						"type": "uint256"
+					},
+					{
+						"internalType": "string",
+						"name": "_From",
+						"type": "string"
+					}
+				],
+				"name": "commitSpotCheck",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "_DataId",
+						"type": "uint256"
+					}
+				],
+				"name": "deleteData",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "_BatchId",
+						"type": "uint256"
+					}
+				],
+				"name": "deleteDataBatch",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "destroyContract",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "_voter",
+						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "_DataBatchId",
+						"type": "uint256"
+					}
+				],
+				"name": "didCommit",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "committed",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "_voter",
+						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "_DataBatchId",
+						"type": "uint256"
+					}
+				],
+				"name": "didReveal",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "revealed",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "_k",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "N_range",
+						"type": "uint256"
+					}
+				],
+				"name": "generateIntegers",
+				"outputs": [
+					{
+						"internalType": "uint256[]",
+						"name": "",
+						"type": "uint256[]"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "getAcceptedBatchesCount",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "count",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "getActiveWorkersCount",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "numWorkers",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "getAvailableWorkersCount",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "numWorkers",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "_DataBatchId",
+						"type": "uint256"
+					}
+				],
+				"name": "getBatchByID",
+				"outputs": [
+					{
+						"components": [
+							{
+								"internalType": "uint256",
+								"name": "start_idx",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "counter",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "uncommited_workers",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "unrevealed_workers",
+								"type": "uint256"
+							},
+							{
+								"internalType": "bool",
+								"name": "complete",
+								"type": "bool"
+							},
+							{
+								"internalType": "bool",
+								"name": "checked",
+								"type": "bool"
+							},
+							{
+								"internalType": "bool",
+								"name": "allocated_to_work",
+								"type": "bool"
+							},
+							{
+								"internalType": "uint256",
+								"name": "commitEndDate",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "revealEndDate",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "votesFor",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "votesAgainst",
+								"type": "uint256"
+							},
+							{
+								"internalType": "string",
+								"name": "batchIPFSfile",
+								"type": "string"
+							},
+							{
+								"internalType": "uint256",
+								"name": "item_count",
+								"type": "uint256"
+							},
+							{
+								"internalType": "enum DataSpotting.DataStatus",
+								"name": "status",
+								"type": "uint8"
+							}
+						],
+						"internalType": "struct DataSpotting.BatchMetadata",
+						"name": "batch",
+						"type": "tuple"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "_DataBatchId",
+						"type": "uint256"
+					}
+				],
+				"name": "getBatchIPFSFileByID",
+				"outputs": [
+					{
+						"internalType": "string",
+						"name": "batch",
+						"type": "string"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "getBusyWorkersCount",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "numWorkers",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "_voter",
+						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "_DataBatchId",
+						"type": "uint256"
+					}
+				],
+				"name": "getCommitIPFSHash",
+				"outputs": [
+					{
+						"internalType": "bytes32",
+						"name": "commitHash",
+						"type": "bytes32"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "_voter",
+						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "_DataBatchId",
+						"type": "uint256"
+					}
+				],
+				"name": "getCommitVoteHash",
+				"outputs": [
+					{
+						"internalType": "bytes32",
+						"name": "commitHash",
+						"type": "bytes32"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "_DataId",
+						"type": "uint256"
+					}
+				],
+				"name": "getDataByID",
+				"outputs": [
+					{
+						"components": [
+							{
+								"internalType": "string",
+								"name": "ipfs_hash",
+								"type": "string"
+							},
+							{
+								"internalType": "address",
+								"name": "author",
+								"type": "address"
+							},
+							{
+								"internalType": "uint256",
+								"name": "timestamp",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "item_count",
+								"type": "uint256"
+							},
+							{
+								"internalType": "string",
+								"name": "URL_domain",
+								"type": "string"
+							},
+							{
+								"internalType": "string",
+								"name": "extra",
+								"type": "string"
+							},
+							{
+								"internalType": "enum DataSpotting.DataStatus",
+								"name": "status",
+								"type": "uint8"
+							}
+						],
+						"internalType": "struct DataSpotting.SpottedData",
+						"name": "data",
+						"type": "tuple"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "_DataBatchId",
+						"type": "uint256"
+					}
+				],
+				"name": "getDomainsForBatch",
+				"outputs": [
+					{
+						"internalType": "string[]",
+						"name": "",
+						"type": "string[]"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "_clearVote",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "_salt",
+						"type": "uint256"
+					}
+				],
+				"name": "getEncryptedHash",
+				"outputs": [
+					{
+						"internalType": "bytes32",
+						"name": "keccak256hash",
+						"type": "bytes32"
+					}
+				],
+				"stateMutability": "pure",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "string",
+						"name": "_hash",
+						"type": "string"
+					},
+					{
+						"internalType": "uint256",
+						"name": "_salt",
+						"type": "uint256"
+					}
+				],
+				"name": "getEncryptedStringHash",
+				"outputs": [
+					{
+						"internalType": "bytes32",
+						"name": "keccak256hash",
+						"type": "bytes32"
+					}
+				],
+				"stateMutability": "pure",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "_DataBatchId",
+						"type": "uint256"
+					}
+				],
+				"name": "getFromsForBatch",
+				"outputs": [
+					{
+						"internalType": "string[]",
+						"name": "",
+						"type": "string[]"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "getGlobalPeriodSpotCount",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "_DataBatchId",
+						"type": "uint256"
+					}
+				],
+				"name": "getIPFShashesForBatch",
+				"outputs": [
+					{
+						"internalType": "string[]",
+						"name": "",
+						"type": "string[]"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "_voter",
+						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "_numTokens",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "_DataBatchId",
+						"type": "uint256"
+					}
+				],
+				"name": "getInsertPointForNumTokens",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "prevNode",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "getLastAllocatedBatchId",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "LastAllocatedBatchId",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "getLastBatchId",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "LastBatchId",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "getLastCheckedBatchId",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "LastCheckedBatchId",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "getLastDataId",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "DataId",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "_voter",
+						"type": "address"
+					}
+				],
+				"name": "getLastNode",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "DataID",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "_voter",
+						"type": "address"
+					}
+				],
+				"name": "getLockedTokens",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "numTokens",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "_DataBatchId_a",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "_DataBatchId_b",
+						"type": "uint256"
+					}
+				],
+				"name": "getMultiBatchIPFShashes",
+				"outputs": [
+					{
+						"internalType": "string[]",
+						"name": "",
+						"type": "string[]"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "_voter",
+						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "_DataBatchId",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "_salt",
+						"type": "uint256"
+					}
+				],
+				"name": "getNumPassingTokens",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "correctSpotChecks",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "_voter",
+						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "_DataBatchId",
+						"type": "uint256"
+					}
+				],
+				"name": "getNumTokens",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "numTokens",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "getRandom",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "getRejectedBatchesCount",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "count",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "getSeed",
+				"outputs": [
+					{
+						"internalType": "bytes32",
+						"name": "addr",
+						"type": "bytes32"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "_DataBatchId",
+						"type": "uint256"
+					}
+				],
+				"name": "getSubmittedFilesForBatch",
+				"outputs": [
+					{
+						"internalType": "string[]",
+						"name": "",
+						"type": "string[]"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "_user",
+						"type": "address"
+					}
+				],
+				"name": "getSystemTokenBalance",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "tokens",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "getTxCounter",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "Counter",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "user",
+						"type": "address"
+					}
+				],
+				"name": "getUserDatas",
+				"outputs": [
+					{
+						"internalType": "uint256[]",
+						"name": "user_Datas",
+						"type": "uint256[]"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "user_",
+						"type": "address"
+					}
+				],
+				"name": "getUserPeriodSpotCount",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "_DataBatchId",
+						"type": "uint256"
+					}
+				],
+				"name": "getVotesForBatch",
+				"outputs": [
+					{
+						"internalType": "uint256[]",
+						"name": "",
+						"type": "uint256[]"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "_terminationDate",
+						"type": "uint256"
+					}
+				],
+				"name": "isExpired",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "expired",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "_DataBatchId",
+						"type": "uint256"
+					}
+				],
+				"name": "isPassed",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "passed",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "_DataBatchId",
+						"type": "uint256"
+					},
+					{
+						"internalType": "address",
+						"name": "_worker",
+						"type": "address"
+					}
+				],
+				"name": "isWorkerAllocatedToBatch",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "_worker",
+						"type": "address"
+					}
+				],
+				"name": "isWorkerRegistered",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "passed",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "owner",
+				"outputs": [
+					{
+						"internalType": "address",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "k",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "N",
+						"type": "uint256"
+					}
+				],
+				"name": "random_selection",
+				"outputs": [
+					{
+						"internalType": "uint256[]",
+						"name": "",
+						"type": "uint256[]"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "_DataBatchId",
+						"type": "uint256"
+					}
+				],
+				"name": "remainingCommitDuration",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "remainingTime",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "_DataBatchId",
+						"type": "uint256"
+					}
+				],
+				"name": "remainingRevealDuration",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "remainingTime",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "renounceOwnership",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "_DataBatchId",
+						"type": "uint256"
+					}
+				],
+				"name": "rescueTokens",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256[]",
+						"name": "_DataBatchIDs",
+						"type": "uint256[]"
+					}
+				],
+				"name": "rescueTokensInMultipleDatas",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "_DataBatchId",
+						"type": "uint256"
+					}
+				],
+				"name": "revealPeriodActive",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "active",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "_DataBatchId",
+						"type": "uint256"
+					}
+				],
+				"name": "revealPeriodOver",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "active",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "_DataBatchId",
+						"type": "uint256"
+					},
+					{
+						"internalType": "string",
+						"name": "_clearIPFSHash",
+						"type": "string"
+					},
+					{
+						"internalType": "uint256",
+						"name": "_clearVote",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "_salt",
+						"type": "uint256"
+					}
+				],
+				"name": "revealSpotCheck",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "N",
+						"type": "uint256"
+					}
+				],
+				"name": "shuffle_array",
+				"outputs": [
+					{
+						"internalType": "uint256[]",
+						"name": "",
+						"type": "uint256[]"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"name": "toUnregisterWorkers",
+				"outputs": [
+					{
+						"internalType": "address",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "token",
+				"outputs": [
+					{
+						"internalType": "contract IERC20",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "newOwner",
+						"type": "address"
+					}
+				],
+				"name": "transferOwnership",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "AllocatedBatchCursor_",
+						"type": "uint256"
+					}
+				],
+				"name": "updateAllocatedBatchCursor",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "BatchCheckingCursor_",
+						"type": "uint256"
+					}
+				],
+				"name": "updateBatchCheckingCursor",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "updateGlobalSpotFlow",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "addr",
+						"type": "address"
+					}
+				],
+				"name": "updateParametersManager",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "user_",
+						"type": "address"
+					}
+				],
+				"name": "updateUserSpotFlow",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "_prevID",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "_nextID",
+						"type": "uint256"
+					},
+					{
+						"internalType": "address",
+						"name": "_voter",
+						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "_numTokens",
+						"type": "uint256"
+					}
+				],
+				"name": "validPosition",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "APPROVED",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "_numTokens",
+						"type": "uint256"
+					}
+				],
+				"name": "withdrawVotingRights",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			}
+		],
+		"devdoc": {
+			"author": "Mathias Dail",
+			"kind": "dev",
+			"methods": {
+				"DataCommitEndDate(uint256)": {
+					"returns": {
+						"commitEndDate": "indication of whether Dataing period is over"
+					}
+				},
+				"DataEnded(uint256)": {
+					"details": "Checks isExpired for specified SpottedData's revealEndDate",
+					"returns": {
+						"ended": "Boolean indication of whether Dataing period is over"
+					}
+				},
+				"DataExists(uint256)": {
+					"details": "Checks if a SpottedData exists",
+					"params": {
+						"_DataBatchId": "The DataID whose existance is to be evaluated."
+					},
+					"returns": {
+						"exists": "Boolean Indicates whether a SpottedData exists for the provided DataID"
+					}
+				},
+				"DataRevealEndDate(uint256)": {
+					"returns": {
+						"revealEndDate": "indication of whether Dataing period is over"
+					}
+				},
+				"attrUUID(address,uint256)": {
+					"details": "Generates an identifier which associates a user and a SpottedData together",
+					"params": {
+						"_DataBatchId": "Integer identifier associated with target SpottedData"
+					},
+					"returns": {
+						"UUID": "Hash which is deterministic from _user and _DataBatchId"
+					}
+				},
+				"commitPeriodActive(uint256)": {
+					"details": "Checks isExpired for the specified SpottedData's commitEndDate",
+					"params": {
+						"_DataBatchId": "Integer identifier associated with target SpottedData"
+					},
+					"returns": {
+						"active": "Boolean indication of isCommitPeriodActive for target SpottedData"
+					}
+				},
+				"commitPeriodOver(uint256)": {
+					"details": "Checks isExpired for the specified SpottedData's commitEndDate",
+					"params": {
+						"_DataBatchId": "Integer identifier associated with target SpottedData"
+					},
+					"returns": {
+						"active": "Boolean indication of isCommitPeriodActive for target SpottedData"
+					}
+				},
+				"commitSpotCheck(uint256,bytes32,bytes32,uint256,string)": {
+					"params": {
+						"_DataBatchId": "Integer identifier associated with target SpottedData",
+						"_encryptedHash": "Commit keccak256 hash of voter's choice and salt (tightly packed in this order) _prevDataID The ID of the SpottedData that the user has voted the maximum number of tokens in which is still less than or equal to numTokens"
+					}
+				},
+				"constructor": {
+					"details": "Initializer. Can only be called once."
+				},
+				"didCommit(address,uint256)": {
+					"details": "Checks if user has committed for specified SpottedData",
+					"params": {
+						"_DataBatchId": "Integer identifier associated with target SpottedData",
+						"_voter": "Address of user to check against"
+					},
+					"returns": {
+						"committed": "Boolean indication of whether user has committed"
+					}
+				},
+				"didReveal(address,uint256)": {
+					"details": "Checks if user has revealed for specified SpottedData",
+					"params": {
+						"_DataBatchId": "Integer identifier associated with target SpottedData",
+						"_voter": "Address of user to check against"
+					},
+					"returns": {
+						"revealed": "Boolean indication of whether user has revealed"
+					}
+				},
+				"generateIntegers(uint256,uint256)": {
+					"details": "Return value",
+					"returns": {
+						"_0": "value of 'number'"
+					}
+				},
+				"getBatchByID(uint256)": {
+					"returns": {
+						"batch": "of the last Dataed a user started"
+					}
+				},
+				"getBatchIPFSFileByID(uint256)": {
+					"returns": {
+						"batch": "of the last Dataed a user started"
+					}
+				},
+				"getCommitIPFSHash(address,uint256)": {
+					"details": "Gets the bytes32 commitHash property of target SpottedData",
+					"params": {
+						"_DataBatchId": "Integer identifier associated with target SpottedData",
+						"_voter": "Address of user to check against"
+					},
+					"returns": {
+						"commitHash": "Bytes32 hash property attached to target SpottedData"
+					}
+				},
+				"getCommitVoteHash(address,uint256)": {
+					"details": "Gets the bytes32 commitHash property of target SpottedData",
+					"params": {
+						"_DataBatchId": "Integer identifier associated with target SpottedData",
+						"_voter": "Address of user to check against"
+					},
+					"returns": {
+						"commitHash": "Bytes32 hash property attached to target SpottedData"
+					}
+				},
+				"getDataByID(uint256)": {
+					"returns": {
+						"data": "of the last Dataed a user started"
+					}
+				},
+				"getEncryptedHash(uint256,uint256)": {
+					"details": "Gets the bytes32 commitHash property of target SpottedData",
+					"params": {
+						"_clearVote": "vote Option",
+						"_salt": "is the salt"
+					},
+					"returns": {
+						"keccak256hash": "Bytes32 hash property attached to target SpottedData"
+					}
+				},
+				"getEncryptedStringHash(string,uint256)": {
+					"details": "Gets the bytes32 commitHash property of target FormattedData",
+					"params": {
+						"_hash": "ipfs hash of aggregated data in a string",
+						"_salt": "is the salt"
+					},
+					"returns": {
+						"keccak256hash": "Bytes32 hash property attached to target FormattedData"
+					}
+				},
+				"getLastAllocatedBatchId()": {
+					"returns": {
+						"LastAllocatedBatchId": "of the last Dataed a user started"
+					}
+				},
+				"getLastBatchId()": {
+					"returns": {
+						"LastBatchId": "of the last Dataed a user started"
+					}
+				},
+				"getLastCheckedBatchId()": {
+					"returns": {
+						"LastCheckedBatchId": "of the last Dataed a user started"
+					}
+				},
+				"getLastDataId()": {
+					"returns": {
+						"DataId": "of the last Dataed a user started"
+					}
+				},
+				"getLastNode(address)": {
+					"details": "Gets top element of sorted SpottedData-linked-list",
+					"params": {
+						"_voter": "Address of user to check against"
+					},
+					"returns": {
+						"DataID": "Integer identifier to SpottedData with maximum number of tokens committed to it"
+					}
+				},
+				"getLockedTokens(address)": {
+					"details": "Gets the numTokens property of getLastNode",
+					"params": {
+						"_voter": "Address of user to check against"
+					},
+					"returns": {
+						"numTokens": "Maximum number of tokens committed in SpottedData specified"
+					}
+				},
+				"getNumPassingTokens(address,uint256,uint256)": {
+					"params": {
+						"_DataBatchId": "Integer identifier associated with target SpottedData",
+						"_salt": "Arbitrarily chosen integer used to generate secretHash"
+					},
+					"returns": {
+						"correctSpotChecks": "Number of tokens voted for winning option"
+					}
+				},
+				"getNumTokens(address,uint256)": {
+					"details": "Wrapper for getAttribute with attrName=\"numTokens\"",
+					"params": {
+						"_DataBatchId": "Integer identifier associated with target SpottedData",
+						"_voter": "Address of user to check against"
+					},
+					"returns": {
+						"numTokens": "Number of tokens committed to SpottedData in sorted SpottedData-linked-list"
+					}
+				},
+				"getRandom()": {
+					"details": "Return value",
+					"returns": {
+						"_0": "value of 'number'"
+					}
+				},
+				"getSeed()": {
+					"details": "Initializer. Can only be called once."
+				},
+				"getTxCounter()": {
+					"returns": {
+						"Counter": "of the last Dataed a user started"
+					}
+				},
+				"getUserDatas(address)": {
+					"returns": {
+						"user_Datas": "the array of Datas started by the user"
+					}
+				},
+				"isExpired(uint256)": {
+					"details": "Checks if an expiration date has been reached",
+					"params": {
+						"_terminationDate": "Integer timestamp of date to compare current timestamp with"
+					},
+					"returns": {
+						"expired": "Boolean indication of whether the terminationDate has passed"
+					}
+				},
+				"isPassed(uint256)": {
+					"details": "Check if votesFor out of totalSpotChecks exceeds votesQuorum (requires DataEnded)",
+					"params": {
+						"_DataBatchId": "Integer identifier associated with target SpottedData"
+					}
+				},
+				"owner()": {
+					"details": "Returns the address of the current owner."
+				},
+				"remainingCommitDuration(uint256)": {
+					"details": "Checks isExpired for the specified SpottedData's commitEndDate",
+					"params": {
+						"_DataBatchId": "Integer identifier associated with target SpottedData"
+					},
+					"returns": {
+						"remainingTime": "Integer"
+					}
+				},
+				"remainingRevealDuration(uint256)": {
+					"details": "Checks isExpired for the specified SpottedData's commitEndDate",
+					"params": {
+						"_DataBatchId": "Integer identifier associated with target SpottedData"
+					},
+					"returns": {
+						"remainingTime": "Integer indication of isCommitPeriodActive for target SpottedData"
+					}
+				},
+				"renounceOwnership()": {
+					"details": "Leaves the contract without owner. It will not be possible to call `onlyOwner` functions anymore. Can only be called by the current owner. NOTE: Renouncing ownership will leave the contract without an owner, thereby removing any functionality that is only available to the owner."
+				},
+				"rescueTokens(uint256)": {
+					"details": "Unlocks tokens locked in unrevealed spot-check-vote where SpottedData has ended",
+					"params": {
+						"_DataBatchId": "Integer identifier associated with the target SpottedData"
+					}
+				},
+				"rescueTokensInMultipleDatas(uint256[])": {
+					"details": "Unlocks tokens locked in unrevealed spot-check-votes where Datas have ended",
+					"params": {
+						"_DataBatchIDs": "Array of integer identifiers associated with the target Datas"
+					}
+				},
+				"revealPeriodActive(uint256)": {
+					"details": "Checks isExpired for the specified SpottedData's revealEndDate",
+					"params": {
+						"_DataBatchId": "Integer identifier associated with target SpottedData"
+					}
+				},
+				"revealPeriodOver(uint256)": {
+					"details": "Checks isExpired for the specified SpottedData's revealEndDate",
+					"params": {
+						"_DataBatchId": "Integer identifier associated with target SpottedData"
+					}
+				},
+				"revealSpotCheck(uint256,string,uint256,uint256)": {
+					"params": {
+						"_DataBatchId": "Integer identifier associated with target SpottedData",
+						"_clearVote": "SpotCheck choice used to generate commitHash for associated SpottedData",
+						"_salt": "Secret number used to generate commitHash for associated SpottedData"
+					}
+				},
+				"transferOwnership(address)": {
+					"details": "Transfers ownership of the contract to a new account (`newOwner`). Can only be called by the current owner."
+				},
+				"validPosition(uint256,uint256,address,uint256)": {
+					"details": "Compares previous and next SpottedData's committed tokens for sorting purposes",
+					"params": {
+						"_nextID": "Integer identifier associated with next SpottedData in sorted order",
+						"_numTokens": "The number of tokens to be committed towards the SpottedData (used for sorting)",
+						"_prevID": "Integer identifier associated with previous SpottedData in sorted order",
+						"_voter": "Address of user to check DLL position for"
+					},
+					"returns": {
+						"APPROVED": "Boolean indication of if the specified position maintains the sort"
+					}
+				},
+				"withdrawVotingRights(uint256)": {
+					"params": {
+						"_numTokens": "The number of ERC20 tokens desired in exchange for voting rights"
+					}
+				}
+			},
+			"title": "WorkSystem Spot v0.2",
+			"version": 1
+		},
+		"userdoc": {
+			"kind": "user",
+			"methods": {
+				"DataCommitEndDate(uint256)": {
+					"notice": "Determines DataCommitEndDate"
+				},
+				"DataEnded(uint256)": {
+					"notice": "Determines if SpottedData is over"
+				},
+				"DataRevealEndDate(uint256)": {
+					"notice": "Determines DataRevealEndDate"
+				},
+				"commitPeriodActive(uint256)": {
+					"notice": "Checks if the commit period is still active for the specified SpottedData"
+				},
+				"commitPeriodOver(uint256)": {
+					"notice": "Checks if the commit period is over"
+				},
+				"commitSpotCheck(uint256,bytes32,bytes32,uint256,string)": {
+					"notice": "Commits spot-check-vote using hash of choice and secret salt to conceal spot-check-vote until reveal"
+				},
+				"getBatchByID(uint256)": {
+					"notice": "getLastBachDataId"
+				},
+				"getBatchIPFSFileByID(uint256)": {
+					"notice": "getLastBachDataId"
+				},
+				"getDataByID(uint256)": {
+					"notice": "getLastBachDataId"
+				},
+				"getLastAllocatedBatchId()": {
+					"notice": "getLastAllocatedBatchId"
+				},
+				"getLastBatchId()": {
+					"notice": "getLastBatchId"
+				},
+				"getLastCheckedBatchId()": {
+					"notice": "getLastBachDataId"
+				},
+				"getLastDataId()": {
+					"notice": "getLastDataId"
+				},
+				"getTxCounter()": {
+					"notice": "getCounter"
+				},
+				"getUserDatas(address)": {
+					"notice": "getUserDatas"
+				},
+				"isPassed(uint256)": {
+					"notice": "Determines if proposal has passed"
+				},
+				"remainingCommitDuration(uint256)": {
+					"notice": "Checks if the commit period is still active for the specified SpottedData"
+				},
+				"remainingRevealDuration(uint256)": {
+					"notice": "Checks if the commit period is still active for the specified SpottedData"
+				},
+				"revealPeriodActive(uint256)": {
+					"notice": "Checks if the reveal period is still active for the specified SpottedData"
+				},
+				"revealPeriodOver(uint256)": {
+					"notice": "Checks if the reveal period is over"
+				},
+				"revealSpotCheck(uint256,string,uint256,uint256)": {
+					"notice": "Reveals spot-check-vote with choice and secret salt used in generating commitHash to attribute committed tokens"
+				},
+				"withdrawVotingRights(uint256)": {
+					"notice": "Withdraw _numTokens ERC20 tokens from the voting contract, revoking these voting rights"
+				}
+			},
+			"version": 1
+		}
+	},
+	"settings": {
+		"compilationTarget": {
+			"worksystems/DataSpotting.sol": "DataSpotting"
+		},
+		"evmVersion": "istanbul",
+		"libraries": {},
+		"metadata": {
+			"bytecodeHash": "ipfs"
+		},
+		"optimizer": {
+			"enabled": true,
+			"runs": 200
+		},
+		"remappings": []
+	},
+	"sources": {
+		"@openzeppelin/contracts/access/Ownable.sol": {
+			"keccak256": "0xa94b34880e3c1b0b931662cb1c09e5dfa6662f31cba80e07c5ee71cd135c9673",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://40fb1b5102468f783961d0af743f91b9980cf66b50d1d12009f6bb1869cea4d2",
+				"dweb:/ipfs/QmYqEbJML4jB1GHbzD4cUZDtJg5wVwNm3vDJq1GbyDus8y"
+			]
+		},
+		"@openzeppelin/contracts/token/ERC20/IERC20.sol": {
+			"keccak256": "0x9750c6b834f7b43000631af5cc30001c5f547b3ceb3635488f140f60e897ea6b",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://5a7d5b1ef5d8d5889ad2ed89d8619c09383b80b72ab226e0fe7bde1636481e34",
+				"dweb:/ipfs/QmebXWgtEfumQGBdVeM6c71McLixYXQP5Bk6kKXuoY4Bmr"
+			]
+		},
+		"@openzeppelin/contracts/utils/Context.sol": {
+			"keccak256": "0xe2e337e6dde9ef6b680e07338c493ebea1b5fd09b43424112868e9cc1706bca7",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://6df0ddf21ce9f58271bdfaa85cde98b200ef242a05a3f85c2bc10a8294800a92",
+				"dweb:/ipfs/QmRK2Y5Yc6BK7tGKkgsgn3aJEQGi5aakeSPZvS65PV8Xp3"
+			]
+		},
+		"@openzeppelin/contracts/utils/math/Math.sol": {
+			"keccak256": "0xd15c3e400531f00203839159b2b8e7209c5158b35618f570c695b7e47f12e9f0",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://b600b852e0597aa69989cc263111f02097e2827edc1bdc70306303e3af5e9929",
+				"dweb:/ipfs/QmU4WfM28A1nDqghuuGeFmN3CnVrk6opWtiF65K4vhFPeC"
+			]
+		},
+		"@openzeppelin/contracts/utils/math/SafeMath.sol": {
+			"keccak256": "0x0f633a0223d9a1dcccfcf38a64c9de0874dfcbfac0c6941ccf074d63a2ce0e1e",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://864a40efcffdf408044c332a5aa38ec5618ed7b4eecb8f65faf45671bd6cdc65",
+				"dweb:/ipfs/QmQJquTMtc6fgm5JQzGdsGpA2fqBe3MHWEdt2qzaLySMdN"
+			]
+		},
+		"worksystems/DataSpotting.sol": {
+			"keccak256": "0xdb5eca802f4a58105dc2ca65e5578071d04f63c5759a02cfce57d657f03c94d0",
+			"license": "GPL-3.0",
+			"urls": [
+				"bzz-raw://ccde4e659786585af7bad73870b62f68f4eb9a35b004faec3cf8fe288e3b5474",
+				"dweb:/ipfs/QmPt4wJeJJb9K8YCGp8wFW1UjquyBRNYYHvoSsLvZCeX5C"
+			]
+		},
+		"worksystems/RandomAllocator.sol": {
+			"keccak256": "0x333b76f41a76fdd261a26f512c936818f519a7e6bda176c0418aa57562df5ead",
+			"license": "GPL-3.0",
+			"urls": [
+				"bzz-raw://e9a6f795b97f4a4a5cb1c9ba580b9a7d8ac45326bf5292a665fdbd5bef827ab6",
+				"dweb:/ipfs/QmZr6TkDwGobry4rPJhG7z9LXfkxZ71JfEdGE36mT4ARqQ"
+			]
+		}
+	},
+	"version": 1
+}
