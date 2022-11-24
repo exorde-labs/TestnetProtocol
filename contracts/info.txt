@@ -1,0 +1,3 @@
+Ongoing development of the Exorde Protocol
+built on top of DAOStack for Governance, without GEN, Token is not mintable
++ Worksystems (Exorde specificity)
