@@ -1,0 +1,696 @@
+{
+	"deploy": {
+		"VM:-": {
+			"linkReferences": {},
+			"autoDeployLib": true
+		},
+		"main:1": {
+			"linkReferences": {},
+			"autoDeployLib": true
+		},
+		"ropsten:3": {
+			"linkReferences": {},
+			"autoDeployLib": true
+		},
+		"rinkeby:4": {
+			"linkReferences": {},
+			"autoDeployLib": true
+		},
+		"kovan:42": {
+			"linkReferences": {},
+			"autoDeployLib": true
+		},
+		"goerli:5": {
+			"linkReferences": {},
+			"autoDeployLib": true
+		},
+		"Custom": {
+			"linkReferences": {},
+			"autoDeployLib": true
+		}
+	},
+	"data": {
+		"bytecode": {
+			"functionDebugData": {},
+			"generatedSources": [],
+			"linkReferences": {},
+			"object": "",
+			"opcodes": "",
+			"sourceMap": ""
+		},
+		"deployedBytecode": {
+			"functionDebugData": {},
+			"generatedSources": [],
+			"immutableReferences": {},
+			"linkReferences": {},
+			"object": "",
+			"opcodes": "",
+			"sourceMap": ""
+		},
+		"gasEstimates": null,
+		"methodIdentifiers": {
+			"addGlobalConstraint(address,bytes32,address)": "e4537a74",
+			"burnReputation(uint256,address,address)": "6e94d278",
+			"externalTokenApproval(address,address,uint256,address)": "51803cd8",
+			"externalTokenTransfer(address,address,uint256,address)": "b9a04cdd",
+			"externalTokenTransferFrom(address,address,address,uint256,address)": "fb4856a2",
+			"genericCall(address,bytes,address,uint256)": "d1b7089a",
+			"getGlobalConstraintParameters(address,address)": "e08738da",
+			"getNativeReputation(address)": "8da03997",
+			"getSchemeParameters(address,address)": "1c4d5608",
+			"getSchemePermissions(address,address)": "9b51e35a",
+			"globalConstraintsCount(address)": "824f2f1f",
+			"isGlobalConstraintRegistered(address,address)": "f76488be",
+			"isSchemeRegistered(address,address)": "9be2faed",
+			"isStakingManagerRegistered(address,address)": "3132511b",
+			"metaData(string,address)": "c9b62eb1",
+			"mintReputation(uint256,address,address)": "eaf994b2",
+			"registerScheme(address,bytes32,bytes4,address)": "e869d45f",
+			"removeGlobalConstraint(address,address)": "4f52b5be",
+			"sendEther(uint256,address,address)": "634965da",
+			"unregisterScheme(address,address)": "039de01d",
+			"unregisterSelf(address)": "6c525b13",
+			"upgradeController(address,address)": "42427bf8",
+			"upgradeStakingManager(address)": "d22be043"
+		}
+	},
+	"abi": [
+		{
+			"inputs": [
+				{
+					"internalType": "address",
+					"name": "_globalConstraint",
+					"type": "address"
+				},
+				{
+					"internalType": "bytes32",
+					"name": "_params",
+					"type": "bytes32"
+				},
+				{
+					"internalType": "address",
+					"name": "_avatar",
+					"type": "address"
+				}
+			],
+			"name": "addGlobalConstraint",
+			"outputs": [
+				{
+					"internalType": "bool",
+					"name": "",
+					"type": "bool"
+				}
+			],
+			"stateMutability": "nonpayable",
+			"type": "function"
+		},
+		{
+			"inputs": [
+				{
+					"internalType": "uint256",
+					"name": "_amount",
+					"type": "uint256"
+				},
+				{
+					"internalType": "address",
+					"name": "_from",
+					"type": "address"
+				},
+				{
+					"internalType": "address",
+					"name": "_avatar",
+					"type": "address"
+				}
+			],
+			"name": "burnReputation",
+			"outputs": [
+				{
+					"internalType": "bool",
+					"name": "",
+					"type": "bool"
+				}
+			],
+			"stateMutability": "nonpayable",
+			"type": "function"
+		},
+		{
+			"inputs": [
+				{
+					"internalType": "contract IERC20",
+					"name": "_externalToken",
+					"type": "address"
+				},
+				{
+					"internalType": "address",
+					"name": "_spender",
+					"type": "address"
+				},
+				{
+					"internalType": "uint256",
+					"name": "_value",
+					"type": "uint256"
+				},
+				{
+					"internalType": "contract Avatar",
+					"name": "_avatar",
+					"type": "address"
+				}
+			],
+			"name": "externalTokenApproval",
+			"outputs": [
+				{
+					"internalType": "bool",
+					"name": "",
+					"type": "bool"
+				}
+			],
+			"stateMutability": "nonpayable",
+			"type": "function"
+		},
+		{
+			"inputs": [
+				{
+					"internalType": "contract IERC20",
+					"name": "_externalToken",
+					"type": "address"
+				},
+				{
+					"internalType": "address",
+					"name": "_to",
+					"type": "address"
+				},
+				{
+					"internalType": "uint256",
+					"name": "_value",
+					"type": "uint256"
+				},
+				{
+					"internalType": "contract Avatar",
+					"name": "_avatar",
+					"type": "address"
+				}
+			],
+			"name": "externalTokenTransfer",
+			"outputs": [
+				{
+					"internalType": "bool",
+					"name": "",
+					"type": "bool"
+				}
+			],
+			"stateMutability": "nonpayable",
+			"type": "function"
+		},
+		{
+			"inputs": [
+				{
+					"internalType": "contract IERC20",
+					"name": "_externalToken",
+					"type": "address"
+				},
+				{
+					"internalType": "address",
+					"name": "_from",
+					"type": "address"
+				},
+				{
+					"internalType": "address",
+					"name": "_to",
+					"type": "address"
+				},
+				{
+					"internalType": "uint256",
+					"name": "_value",
+					"type": "uint256"
+				},
+				{
+					"internalType": "contract Avatar",
+					"name": "_avatar",
+					"type": "address"
+				}
+			],
+			"name": "externalTokenTransferFrom",
+			"outputs": [
+				{
+					"internalType": "bool",
+					"name": "",
+					"type": "bool"
+				}
+			],
+			"stateMutability": "nonpayable",
+			"type": "function"
+		},
+		{
+			"inputs": [
+				{
+					"internalType": "address",
+					"name": "_contract",
+					"type": "address"
+				},
+				{
+					"internalType": "bytes",
+					"name": "_data",
+					"type": "bytes"
+				},
+				{
+					"internalType": "contract Avatar",
+					"name": "_avatar",
+					"type": "address"
+				},
+				{
+					"internalType": "uint256",
+					"name": "_value",
+					"type": "uint256"
+				}
+			],
+			"name": "genericCall",
+			"outputs": [
+				{
+					"internalType": "bool",
+					"name": "",
+					"type": "bool"
+				},
+				{
+					"internalType": "bytes",
+					"name": "",
+					"type": "bytes"
+				}
+			],
+			"stateMutability": "nonpayable",
+			"type": "function"
+		},
+		{
+			"inputs": [
+				{
+					"internalType": "address",
+					"name": "_globalConstraint",
+					"type": "address"
+				},
+				{
+					"internalType": "address",
+					"name": "_avatar",
+					"type": "address"
+				}
+			],
+			"name": "getGlobalConstraintParameters",
+			"outputs": [
+				{
+					"internalType": "bytes32",
+					"name": "",
+					"type": "bytes32"
+				}
+			],
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"inputs": [
+				{
+					"internalType": "address",
+					"name": "_avatar",
+					"type": "address"
+				}
+			],
+			"name": "getNativeReputation",
+			"outputs": [
+				{
+					"internalType": "address",
+					"name": "",
+					"type": "address"
+				}
+			],
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"inputs": [
+				{
+					"internalType": "address",
+					"name": "_scheme",
+					"type": "address"
+				},
+				{
+					"internalType": "address",
+					"name": "_avatar",
+					"type": "address"
+				}
+			],
+			"name": "getSchemeParameters",
+			"outputs": [
+				{
+					"internalType": "bytes32",
+					"name": "",
+					"type": "bytes32"
+				}
+			],
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"inputs": [
+				{
+					"internalType": "address",
+					"name": "_scheme",
+					"type": "address"
+				},
+				{
+					"internalType": "address",
+					"name": "_avatar",
+					"type": "address"
+				}
+			],
+			"name": "getSchemePermissions",
+			"outputs": [
+				{
+					"internalType": "bytes4",
+					"name": "",
+					"type": "bytes4"
+				}
+			],
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"inputs": [
+				{
+					"internalType": "address",
+					"name": "_avatar",
+					"type": "address"
+				}
+			],
+			"name": "globalConstraintsCount",
+			"outputs": [
+				{
+					"internalType": "uint256",
+					"name": "",
+					"type": "uint256"
+				},
+				{
+					"internalType": "uint256",
+					"name": "",
+					"type": "uint256"
+				}
+			],
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"inputs": [
+				{
+					"internalType": "address",
+					"name": "_globalConstraint",
+					"type": "address"
+				},
+				{
+					"internalType": "address",
+					"name": "_avatar",
+					"type": "address"
+				}
+			],
+			"name": "isGlobalConstraintRegistered",
+			"outputs": [
+				{
+					"internalType": "bool",
+					"name": "",
+					"type": "bool"
+				}
+			],
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"inputs": [
+				{
+					"internalType": "address",
+					"name": "_scheme",
+					"type": "address"
+				},
+				{
+					"internalType": "address",
+					"name": "_avatar",
+					"type": "address"
+				}
+			],
+			"name": "isSchemeRegistered",
+			"outputs": [
+				{
+					"internalType": "bool",
+					"name": "",
+					"type": "bool"
+				}
+			],
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"inputs": [
+				{
+					"internalType": "address",
+					"name": "_stakingManagerAddress",
+					"type": "address"
+				},
+				{
+					"internalType": "address",
+					"name": "_avatar",
+					"type": "address"
+				}
+			],
+			"name": "isStakingManagerRegistered",
+			"outputs": [
+				{
+					"internalType": "bool",
+					"name": "",
+					"type": "bool"
+				}
+			],
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"inputs": [
+				{
+					"internalType": "string",
+					"name": "_metaData",
+					"type": "string"
+				},
+				{
+					"internalType": "contract Avatar",
+					"name": "_avatar",
+					"type": "address"
+				}
+			],
+			"name": "metaData",
+			"outputs": [
+				{
+					"internalType": "bool",
+					"name": "",
+					"type": "bool"
+				}
+			],
+			"stateMutability": "nonpayable",
+			"type": "function"
+		},
+		{
+			"inputs": [
+				{
+					"internalType": "uint256",
+					"name": "_amount",
+					"type": "uint256"
+				},
+				{
+					"internalType": "address",
+					"name": "_to",
+					"type": "address"
+				},
+				{
+					"internalType": "address",
+					"name": "_avatar",
+					"type": "address"
+				}
+			],
+			"name": "mintReputation",
+			"outputs": [
+				{
+					"internalType": "bool",
+					"name": "",
+					"type": "bool"
+				}
+			],
+			"stateMutability": "nonpayable",
+			"type": "function"
+		},
+		{
+			"inputs": [
+				{
+					"internalType": "address",
+					"name": "_scheme",
+					"type": "address"
+				},
+				{
+					"internalType": "bytes32",
+					"name": "_paramsHash",
+					"type": "bytes32"
+				},
+				{
+					"internalType": "bytes4",
+					"name": "_permissions",
+					"type": "bytes4"
+				},
+				{
+					"internalType": "address",
+					"name": "_avatar",
+					"type": "address"
+				}
+			],
+			"name": "registerScheme",
+			"outputs": [
+				{
+					"internalType": "bool",
+					"name": "",
+					"type": "bool"
+				}
+			],
+			"stateMutability": "nonpayable",
+			"type": "function"
+		},
+		{
+			"inputs": [
+				{
+					"internalType": "address",
+					"name": "_globalConstraint",
+					"type": "address"
+				},
+				{
+					"internalType": "address",
+					"name": "_avatar",
+					"type": "address"
+				}
+			],
+			"name": "removeGlobalConstraint",
+			"outputs": [
+				{
+					"internalType": "bool",
+					"name": "",
+					"type": "bool"
+				}
+			],
+			"stateMutability": "nonpayable",
+			"type": "function"
+		},
+		{
+			"inputs": [
+				{
+					"internalType": "uint256",
+					"name": "_amountInWei",
+					"type": "uint256"
+				},
+				{
+					"internalType": "address payable",
+					"name": "_to",
+					"type": "address"
+				},
+				{
+					"internalType": "contract Avatar",
+					"name": "_avatar",
+					"type": "address"
+				}
+			],
+			"name": "sendEther",
+			"outputs": [
+				{
+					"internalType": "bool",
+					"name": "",
+					"type": "bool"
+				}
+			],
+			"stateMutability": "nonpayable",
+			"type": "function"
+		},
+		{
+			"inputs": [
+				{
+					"internalType": "address",
+					"name": "_scheme",
+					"type": "address"
+				},
+				{
+					"internalType": "address",
+					"name": "_avatar",
+					"type": "address"
+				}
+			],
+			"name": "unregisterScheme",
+			"outputs": [
+				{
+					"internalType": "bool",
+					"name": "",
+					"type": "bool"
+				}
+			],
+			"stateMutability": "nonpayable",
+			"type": "function"
+		},
+		{
+			"inputs": [
+				{
+					"internalType": "address",
+					"name": "_avatar",
+					"type": "address"
+				}
+			],
+			"name": "unregisterSelf",
+			"outputs": [
+				{
+					"internalType": "bool",
+					"name": "",
+					"type": "bool"
+				}
+			],
+			"stateMutability": "nonpayable",
+			"type": "function"
+		},
+		{
+			"inputs": [
+				{
+					"internalType": "address",
+					"name": "_newController",
+					"type": "address"
+				},
+				{
+					"internalType": "contract Avatar",
+					"name": "_avatar",
+					"type": "address"
+				}
+			],
+			"name": "upgradeController",
+			"outputs": [
+				{
+					"internalType": "bool",
+					"name": "",
+					"type": "bool"
+				}
+			],
+			"stateMutability": "nonpayable",
+			"type": "function"
+		},
+		{
+			"inputs": [
+				{
+					"internalType": "address",
+					"name": "_stakingManager",
+					"type": "address"
+				}
+			],
+			"name": "upgradeStakingManager",
+			"outputs": [
+				{
+					"internalType": "bool",
+					"name": "",
+					"type": "bool"
+				}
+			],
+			"stateMutability": "nonpayable",
+			"type": "function"
+		}
+	]
+}

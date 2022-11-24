@@ -1,0 +1,1333 @@
+{
+	"compiler": {
+		"version": "0.8.8+commit.dddeac2f"
+	},
+	"language": "Solidity",
+	"output": {
+		"abi": [
+			{
+				"inputs": [
+					{
+						"internalType": "contract Avatar",
+						"name": "_avatar",
+						"type": "address"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "constructor"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "_globalConstraint",
+						"type": "address"
+					},
+					{
+						"indexed": false,
+						"internalType": "bytes32",
+						"name": "_params",
+						"type": "bytes32"
+					},
+					{
+						"indexed": false,
+						"internalType": "enum GlobalConstraintInterface.CallPhase",
+						"name": "_when",
+						"type": "uint8"
+					}
+				],
+				"name": "AddGlobalConstraint",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "_sender",
+						"type": "address"
+					},
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "_from",
+						"type": "address"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "_amount",
+						"type": "uint256"
+					}
+				],
+				"name": "BurnReputation",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "_sender",
+						"type": "address"
+					},
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "_to",
+						"type": "address"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "_amount",
+						"type": "uint256"
+					}
+				],
+				"name": "MintReputation",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "_sender",
+						"type": "address"
+					},
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "_scheme",
+						"type": "address"
+					}
+				],
+				"name": "RegisterScheme",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "_globalConstraint",
+						"type": "address"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "_index",
+						"type": "uint256"
+					},
+					{
+						"indexed": false,
+						"internalType": "bool",
+						"name": "_isPre",
+						"type": "bool"
+					}
+				],
+				"name": "RemoveGlobalConstraint",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "_sender",
+						"type": "address"
+					},
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "_scheme",
+						"type": "address"
+					}
+				],
+				"name": "UnregisterScheme",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "_oldController",
+						"type": "address"
+					},
+					{
+						"indexed": false,
+						"internalType": "address",
+						"name": "_newController",
+						"type": "address"
+					}
+				],
+				"name": "UpgradeController",
+				"type": "event"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "_globalConstraint",
+						"type": "address"
+					},
+					{
+						"internalType": "bytes32",
+						"name": "_params",
+						"type": "bytes32"
+					},
+					{
+						"internalType": "address",
+						"name": "_avatar",
+						"type": "address"
+					}
+				],
+				"name": "addGlobalConstraint",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "avatar",
+				"outputs": [
+					{
+						"internalType": "contract Avatar",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "_amount",
+						"type": "uint256"
+					},
+					{
+						"internalType": "address",
+						"name": "_from",
+						"type": "address"
+					},
+					{
+						"internalType": "address",
+						"name": "_avatar",
+						"type": "address"
+					}
+				],
+				"name": "burnReputation",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "contract IERC20",
+						"name": "_externalToken",
+						"type": "address"
+					},
+					{
+						"internalType": "address",
+						"name": "_spender",
+						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "_value",
+						"type": "uint256"
+					},
+					{
+						"internalType": "contract Avatar",
+						"name": "_avatar",
+						"type": "address"
+					}
+				],
+				"name": "externalTokenApproval",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "contract IERC20",
+						"name": "_externalToken",
+						"type": "address"
+					},
+					{
+						"internalType": "address",
+						"name": "_to",
+						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "_value",
+						"type": "uint256"
+					},
+					{
+						"internalType": "contract Avatar",
+						"name": "_avatar",
+						"type": "address"
+					}
+				],
+				"name": "externalTokenTransfer",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "contract IERC20",
+						"name": "_externalToken",
+						"type": "address"
+					},
+					{
+						"internalType": "address",
+						"name": "_from",
+						"type": "address"
+					},
+					{
+						"internalType": "address",
+						"name": "_to",
+						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "_value",
+						"type": "uint256"
+					},
+					{
+						"internalType": "contract Avatar",
+						"name": "_avatar",
+						"type": "address"
+					}
+				],
+				"name": "externalTokenTransferFrom",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "_contract",
+						"type": "address"
+					},
+					{
+						"internalType": "bytes",
+						"name": "_data",
+						"type": "bytes"
+					},
+					{
+						"internalType": "contract Avatar",
+						"name": "_avatar",
+						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "_value",
+						"type": "uint256"
+					}
+				],
+				"name": "genericCall",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					},
+					{
+						"internalType": "bytes",
+						"name": "",
+						"type": "bytes"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "_globalConstraint",
+						"type": "address"
+					},
+					{
+						"internalType": "address",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"name": "getGlobalConstraintParameters",
+				"outputs": [
+					{
+						"internalType": "bytes32",
+						"name": "",
+						"type": "bytes32"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "_avatar",
+						"type": "address"
+					}
+				],
+				"name": "getNativeReputation",
+				"outputs": [
+					{
+						"internalType": "address",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "_scheme",
+						"type": "address"
+					},
+					{
+						"internalType": "address",
+						"name": "_avatar",
+						"type": "address"
+					}
+				],
+				"name": "getSchemeParameters",
+				"outputs": [
+					{
+						"internalType": "bytes32",
+						"name": "",
+						"type": "bytes32"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "_scheme",
+						"type": "address"
+					},
+					{
+						"internalType": "address",
+						"name": "_avatar",
+						"type": "address"
+					}
+				],
+				"name": "getSchemePermissions",
+				"outputs": [
+					{
+						"internalType": "bytes4",
+						"name": "",
+						"type": "bytes4"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "_avatar",
+						"type": "address"
+					}
+				],
+				"name": "globalConstraintsCount",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"name": "globalConstraintsPost",
+				"outputs": [
+					{
+						"internalType": "address",
+						"name": "gcAddress",
+						"type": "address"
+					},
+					{
+						"internalType": "bytes32",
+						"name": "params",
+						"type": "bytes32"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"name": "globalConstraintsPre",
+				"outputs": [
+					{
+						"internalType": "address",
+						"name": "gcAddress",
+						"type": "address"
+					},
+					{
+						"internalType": "bytes32",
+						"name": "params",
+						"type": "bytes32"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"name": "globalConstraintsRegisterPost",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "isRegistered",
+						"type": "bool"
+					},
+					{
+						"internalType": "uint256",
+						"name": "index",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"name": "globalConstraintsRegisterPre",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "isRegistered",
+						"type": "bool"
+					},
+					{
+						"internalType": "uint256",
+						"name": "index",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "_globalConstraint",
+						"type": "address"
+					},
+					{
+						"internalType": "address",
+						"name": "_avatar",
+						"type": "address"
+					}
+				],
+				"name": "isGlobalConstraintRegistered",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "_scheme",
+						"type": "address"
+					},
+					{
+						"internalType": "address",
+						"name": "_avatar",
+						"type": "address"
+					}
+				],
+				"name": "isSchemeRegistered",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "_stakingManagerAddress",
+						"type": "address"
+					},
+					{
+						"internalType": "address",
+						"name": "_avatar",
+						"type": "address"
+					}
+				],
+				"name": "isStakingManagerRegistered",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "string",
+						"name": "_metaData",
+						"type": "string"
+					},
+					{
+						"internalType": "contract Avatar",
+						"name": "_avatar",
+						"type": "address"
+					}
+				],
+				"name": "metaData",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "_amount",
+						"type": "uint256"
+					},
+					{
+						"internalType": "address",
+						"name": "_to",
+						"type": "address"
+					},
+					{
+						"internalType": "address",
+						"name": "_avatar",
+						"type": "address"
+					}
+				],
+				"name": "mintReputation",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "nativeReputation",
+				"outputs": [
+					{
+						"internalType": "contract Reputation",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "nativeToken",
+				"outputs": [
+					{
+						"internalType": "contract DAOToken",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "newController",
+				"outputs": [
+					{
+						"internalType": "address",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "_scheme",
+						"type": "address"
+					},
+					{
+						"internalType": "bytes32",
+						"name": "_paramsHash",
+						"type": "bytes32"
+					},
+					{
+						"internalType": "bytes4",
+						"name": "_permissions",
+						"type": "bytes4"
+					},
+					{
+						"internalType": "address",
+						"name": "_avatar",
+						"type": "address"
+					}
+				],
+				"name": "registerScheme",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "_globalConstraint",
+						"type": "address"
+					},
+					{
+						"internalType": "address",
+						"name": "_avatar",
+						"type": "address"
+					}
+				],
+				"name": "removeGlobalConstraint",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"name": "schemes",
+				"outputs": [
+					{
+						"internalType": "bytes32",
+						"name": "paramsHash",
+						"type": "bytes32"
+					},
+					{
+						"internalType": "bytes4",
+						"name": "permissions",
+						"type": "bytes4"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "_amountInWei",
+						"type": "uint256"
+					},
+					{
+						"internalType": "address payable",
+						"name": "_to",
+						"type": "address"
+					},
+					{
+						"internalType": "contract Avatar",
+						"name": "_avatar",
+						"type": "address"
+					}
+				],
+				"name": "sendEther",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "stakingManagerAddress",
+				"outputs": [
+					{
+						"internalType": "address",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "_scheme",
+						"type": "address"
+					},
+					{
+						"internalType": "address",
+						"name": "_avatar",
+						"type": "address"
+					}
+				],
+				"name": "unregisterScheme",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "_avatar",
+						"type": "address"
+					}
+				],
+				"name": "unregisterSelf",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "_newController",
+						"type": "address"
+					},
+					{
+						"internalType": "contract Avatar",
+						"name": "_avatar",
+						"type": "address"
+					}
+				],
+				"name": "upgradeController",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "_newController",
+						"type": "address"
+					},
+					{
+						"internalType": "contract Avatar",
+						"name": "_avatar",
+						"type": "address"
+					}
+				],
+				"name": "upgradeRewardsManager",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "_stakingManager",
+						"type": "address"
+					}
+				],
+				"name": "upgradeStakingManager",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"stateMutability": "payable",
+				"type": "receive"
+			}
+		],
+		"devdoc": {
+			"details": "A controller controls the organizations tokens, reputation and avatar. It is subject to a set of schemes and constraints that determine its behavior. Each scheme has it own parameters and operation permissions.",
+			"kind": "dev",
+			"methods": {
+				"addGlobalConstraint(address,bytes32,address)": {
+					"details": "add or update Global Constraint",
+					"params": {
+						"_globalConstraint": "the address of the global constraint to be added.",
+						"_params": "the constraint parameters hash."
+					},
+					"returns": {
+						"_0": "bool which represents a success"
+					}
+				},
+				"burnReputation(uint256,address,address)": {
+					"details": "Burns `_amount` of reputation from `_from`",
+					"params": {
+						"_amount": "amount of reputation to burn",
+						"_from": "The address that will lose the reputation"
+					},
+					"returns": {
+						"_0": "bool which represents a success"
+					}
+				},
+				"externalTokenApproval(address,address,uint256,address)": {
+					"details": "externalTokenApproval approve the spender address to spend a specified amount of tokens      on behalf of msg.sender.",
+					"params": {
+						"_externalToken": "the address of the Token Contract",
+						"_spender": "address",
+						"_value": "the amount of ether (in Wei) which the approval is referring to."
+					},
+					"returns": {
+						"_0": "bool which represents a success"
+					}
+				},
+				"externalTokenTransfer(address,address,uint256,address)": {
+					"details": "send some amount of arbitrary ERC20 Tokens",
+					"params": {
+						"_externalToken": "the address of the Token Contract",
+						"_to": "address of the beneficiary",
+						"_value": "the amount of ether (in Wei) to send"
+					},
+					"returns": {
+						"_0": "bool which represents a success"
+					}
+				},
+				"externalTokenTransferFrom(address,address,address,uint256,address)": {
+					"details": "transfer token \"from\" address \"to\" address      One must to approve the amount of tokens which can be spend from the      \"from\" account.This can be done using externalTokenApprove.",
+					"params": {
+						"_externalToken": "the address of the Token Contract",
+						"_from": "address of the account to send from",
+						"_to": "address of the beneficiary",
+						"_value": "the amount of ether (in Wei) to send"
+					},
+					"returns": {
+						"_0": "bool which represents a success"
+					}
+				},
+				"genericCall(address,bytes,address,uint256)": {
+					"details": "perform a generic call to an arbitrary contract",
+					"params": {
+						"_avatar": "the controller's avatar address",
+						"_contract": "the contract's address to call",
+						"_data": "ABI-encoded contract call to call `_contract` address.",
+						"_value": "value (ETH) to transfer with the transaction"
+					},
+					"returns": {
+						"_0": "bool -success         bytes  - the return value of the called _contract's function."
+					}
+				},
+				"getNativeReputation(address)": {
+					"details": "getNativeReputation",
+					"params": {
+						"_avatar": "the organization avatar."
+					},
+					"returns": {
+						"_0": "organization native reputation"
+					}
+				},
+				"globalConstraintsCount(address)": {
+					"details": "globalConstraintsCount return the global constraint pre and post count",
+					"returns": {
+						"_0": "uint256 globalConstraintsPre count.",
+						"_1": "uint256 globalConstraintsPost count."
+					}
+				},
+				"metaData(string,address)": {
+					"details": "metaData emits an event with a string, should contain the hash of some meta data.",
+					"params": {
+						"_avatar": "Avatar",
+						"_metaData": "a string representing a hash of the meta data"
+					},
+					"returns": {
+						"_0": "bool which represents a success"
+					}
+				},
+				"mintReputation(uint256,address,address)": {
+					"details": "Mint `_amount` of reputation that are assigned to `_to` .",
+					"params": {
+						"_amount": "amount of reputation to mint",
+						"_to": "beneficiary address"
+					},
+					"returns": {
+						"_0": "bool which represents a success"
+					}
+				},
+				"registerScheme(address,bytes32,bytes4,address)": {
+					"details": "register a scheme",
+					"params": {
+						"_paramsHash": "a hashed configuration of the usage of the scheme",
+						"_permissions": "the permissions the new scheme will have",
+						"_scheme": "the address of the scheme"
+					},
+					"returns": {
+						"_0": "bool which represents a success"
+					}
+				},
+				"removeGlobalConstraint(address,address)": {
+					"details": "remove Global Constraint",
+					"params": {
+						"_globalConstraint": "the address of the global constraint to be remove."
+					},
+					"returns": {
+						"_0": "bool which represents a success"
+					}
+				},
+				"sendEther(uint256,address,address)": {
+					"details": "send some ether",
+					"params": {
+						"_amountInWei": "the amount of ether (in Wei) to send",
+						"_to": "address of the beneficiary"
+					},
+					"returns": {
+						"_0": "bool which represents a success"
+					}
+				},
+				"unregisterScheme(address,address)": {
+					"details": "unregister a scheme",
+					"params": {
+						"_scheme": "the address of the scheme"
+					},
+					"returns": {
+						"_0": "bool which represents a success"
+					}
+				},
+				"unregisterSelf(address)": {
+					"details": "unregister the caller's scheme",
+					"returns": {
+						"_0": "bool which represents a success"
+					}
+				},
+				"upgradeController(address,address)": {
+					"details": "upgrade the Controller      The function will trigger an event 'UpgradeController'.",
+					"params": {
+						"_newController": "the address of the new controller."
+					},
+					"returns": {
+						"_0": "bool which represents a success"
+					}
+				},
+				"upgradeRewardsManager(address,address)": {
+					"details": "upgrade the Controller      The function will trigger an event 'UpgradeController'.",
+					"params": {
+						"_newController": "the address of the new controller."
+					},
+					"returns": {
+						"_0": "bool which represents a success"
+					}
+				},
+				"upgradeStakingManager(address)": {
+					"details": "upgrade the Controller      The function will trigger an event '_stakingManager'.",
+					"params": {
+						"_stakingManager": "the address of the new controller."
+					},
+					"returns": {
+						"_0": "bool which represents a success"
+					}
+				}
+			},
+			"title": "Controller contract",
+			"version": 1
+		},
+		"userdoc": {
+			"kind": "user",
+			"methods": {},
+			"version": 1
+		}
+	},
+	"settings": {
+		"compilationTarget": {
+			"daostack/controller/Controller.sol": "Controller"
+		},
+		"evmVersion": "london",
+		"libraries": {},
+		"metadata": {
+			"bytecodeHash": "ipfs"
+		},
+		"optimizer": {
+			"enabled": true,
+			"runs": 200
+		},
+		"remappings": []
+	},
+	"sources": {
+		"@openzeppelin/contracts/access/Ownable.sol": {
+			"keccak256": "0xa94b34880e3c1b0b931662cb1c09e5dfa6662f31cba80e07c5ee71cd135c9673",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://40fb1b5102468f783961d0af743f91b9980cf66b50d1d12009f6bb1869cea4d2",
+				"dweb:/ipfs/QmYqEbJML4jB1GHbzD4cUZDtJg5wVwNm3vDJq1GbyDus8y"
+			]
+		},
+		"@openzeppelin/contracts/token/ERC20/ERC20.sol": {
+			"keccak256": "0x4ffc0547c02ad22925310c585c0f166f8759e2648a09e9b489100c42f15dd98d",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://15f52f51413a9de1ff191e2f6367c62178e1df7806d7880fe857a98b0b66253d",
+				"dweb:/ipfs/QmaQG1fwfgUt5E9nu2cccFiV47B2V78MM1tCy1qB7n4MsH"
+			]
+		},
+		"@openzeppelin/contracts/token/ERC20/IERC20.sol": {
+			"keccak256": "0x9750c6b834f7b43000631af5cc30001c5f547b3ceb3635488f140f60e897ea6b",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://5a7d5b1ef5d8d5889ad2ed89d8619c09383b80b72ab226e0fe7bde1636481e34",
+				"dweb:/ipfs/QmebXWgtEfumQGBdVeM6c71McLixYXQP5Bk6kKXuoY4Bmr"
+			]
+		},
+		"@openzeppelin/contracts/token/ERC20/extensions/ERC20Capped.sol": {
+			"keccak256": "0x3fe04ed1daf0f12454333fde982a25b103860d8a010dd5d8479b83ebf1dfb788",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://8322152771e94c9e28a3bd9e7c9d5dd4fdd00ae214f95915962a6638d8dfc7d6",
+				"dweb:/ipfs/QmaXJvF3UjRHacx3nPgt94DwAuXCkEoz6fS7MLr2jbuJyW"
+			]
+		},
+		"@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol": {
+			"keccak256": "0x8de418a5503946cabe331f35fe242d3201a73f67f77aaeb7110acb1f30423aca",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://5a376d3dda2cb70536c0a45c208b29b34ac560c4cb4f513a42079f96ba47d2dd",
+				"dweb:/ipfs/QmZQg6gn1sUpM8wHzwNvSnihumUCAhxD119MpXeKp8B9s8"
+			]
+		},
+		"@openzeppelin/contracts/token/ERC20/extensions/draft-IERC20Permit.sol": {
+			"keccak256": "0xf41ca991f30855bf80ffd11e9347856a517b977f0a6c2d52e6421a99b7840329",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://b2717fd2bdac99daa960a6de500754ea1b932093c946388c381da48658234b95",
+				"dweb:/ipfs/QmP6QVMn6UeA3ByahyJbYQr5M6coHKBKsf3ySZSfbyA8R7"
+			]
+		},
+		"@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol": {
+			"keccak256": "0x9b72f93be69ca894d8492c244259615c4a742afc8d63720dbc8bb81087d9b238",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://f5a7b96e511be78d5cdf635c784e6ab8cdd38625bb8cafb8a80914a1c89cf0f6",
+				"dweb:/ipfs/QmVzTCwJxQAkjRQHboT5QrvsVJGWQHgfEjeTbvyxoKBrds"
+			]
+		},
+		"@openzeppelin/contracts/utils/Address.sol": {
+			"keccak256": "0xf96f969e24029d43d0df89e59d365f277021dac62b48e1c1e3ebe0acdd7f1ca1",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://ec772b45a624be516f1c81970caa8a2e144301e9d0921cbc1a2789fef39a1269",
+				"dweb:/ipfs/QmNyjwxCrGhQMyzLD93oUobJXVe9ceJvRvfXwbEtuxPiEj"
+			]
+		},
+		"@openzeppelin/contracts/utils/Context.sol": {
+			"keccak256": "0xe2e337e6dde9ef6b680e07338c493ebea1b5fd09b43424112868e9cc1706bca7",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://6df0ddf21ce9f58271bdfaa85cde98b200ef242a05a3f85c2bc10a8294800a92",
+				"dweb:/ipfs/QmRK2Y5Yc6BK7tGKkgsgn3aJEQGi5aakeSPZvS65PV8Xp3"
+			]
+		},
+		"daostack/controller/Avatar.sol": {
+			"keccak256": "0xb120a01aee4e23a11ee03680a6b17776b50f7fe91a00d98c7168e9994dbe1354",
+			"license": "GPL-3.0",
+			"urls": [
+				"bzz-raw://9d47a72e669996c5245504c27dfd2659d9fcf8344ef2973a77fdf25963defaea",
+				"dweb:/ipfs/QmUSjnwSeCdv96PUzn66m8HoQF1fWuffv5kxPyjUs8JgzX"
+			]
+		},
+		"daostack/controller/Controller.sol": {
+			"keccak256": "0x664d8b013e973e74b69864fad727f2d2e47405121f4c6d388502c2ec02cf6795",
+			"license": "GPL-3.0",
+			"urls": [
+				"bzz-raw://c7eb79a0f21d1cefa1e7e19bdef04a3d59535c947de3a7f6961e406ba0d35f4b",
+				"dweb:/ipfs/QmXnfhvtferKkG9QaEFEUsqKfinmrSJhMkwXyP8m7ULWnj"
+			]
+		},
+		"daostack/controller/ControllerInterface.sol": {
+			"keccak256": "0xd860d6d4f1fed50f702aa780d5f4bbecd0d9972d229bc66c5eba5c8cbcbd85b4",
+			"license": "GPL-3.0",
+			"urls": [
+				"bzz-raw://184d28f2b13cbc724af655b89b0fde0b2a836d16b74c70f4966040171218f083",
+				"dweb:/ipfs/QmPsA8bv9CrzDCznUFoMh9PpJbuXanwVo7PD1L4BbnVK2i"
+			]
+		},
+		"daostack/controller/DAOToken.sol": {
+			"keccak256": "0xb1d50c18dab88520d6f4f6ded7e8ceaeb12c622fcad0248dcdc6d398c0b67d7d",
+			"license": "GPL-3.0",
+			"urls": [
+				"bzz-raw://59a4c262dab9aabcad1a058a53689a086edff1397a8d58499eed8d5ff0d9e379",
+				"dweb:/ipfs/QmPhpgLp8tL7zeHuLT4KiT9PzD71E8jeSw4P6sccuTfmZs"
+			]
+		},
+		"daostack/controller/Reputation.sol": {
+			"keccak256": "0xa787c21722b2f41d420d709bf43042f8dd32dc276d1c980cdf053d2e2e808b20",
+			"license": "GPL-3.0",
+			"urls": [
+				"bzz-raw://83c08a980366cf9c1b7e137689a37d82cb3aa384522705a805555c89bf810c33",
+				"dweb:/ipfs/QmbR9gRGj67R1AuJWiQABHuPXgRsF4T9qG5oPD31pFnQZf"
+			]
+		},
+		"daostack/globalConstraints/GlobalConstraintInterface.sol": {
+			"keccak256": "0xe96e195668b565b19f0bf7d23b848869a1b093264c397a13987edb4002ca0548",
+			"license": "GPL-3.0",
+			"urls": [
+				"bzz-raw://560ad7ada90ddcf8ffa4ad40784cec572daebaeda7c6a438eb73a152f7d7488e",
+				"dweb:/ipfs/QmPwofWqQo2P9YMaDxksXTdzPbAJwagmVbZmXG5BMhGwYK"
+			]
+		}
+	},
+	"version": 1
+}

@@ -1,0 +1,124 @@
+{
+	"compiler": {
+		"version": "0.8.8+commit.dddeac2f"
+	},
+	"language": "Solidity",
+	"output": {
+		"abi": [
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "_scheme",
+						"type": "address"
+					},
+					{
+						"internalType": "bytes32",
+						"name": "_params",
+						"type": "bytes32"
+					},
+					{
+						"internalType": "bytes32",
+						"name": "_method",
+						"type": "bytes32"
+					}
+				],
+				"name": "post",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "_scheme",
+						"type": "address"
+					},
+					{
+						"internalType": "bytes32",
+						"name": "_params",
+						"type": "bytes32"
+					},
+					{
+						"internalType": "bytes32",
+						"name": "_method",
+						"type": "bytes32"
+					}
+				],
+				"name": "pre",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "when",
+				"outputs": [
+					{
+						"internalType": "enum GlobalConstraintInterface.CallPhase",
+						"name": "",
+						"type": "uint8"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			}
+		],
+		"devdoc": {
+			"kind": "dev",
+			"methods": {
+				"when()": {
+					"details": "when return if this globalConstraints is pre, post or both.",
+					"returns": {
+						"_0": "CallPhase enum indication  Pre, Post or PreAndPost."
+					}
+				}
+			},
+			"version": 1
+		},
+		"userdoc": {
+			"kind": "user",
+			"methods": {},
+			"version": 1
+		}
+	},
+	"settings": {
+		"compilationTarget": {
+			"daostack/globalConstraints/GlobalConstraintInterface.sol": "GlobalConstraintInterface"
+		},
+		"evmVersion": "london",
+		"libraries": {},
+		"metadata": {
+			"bytecodeHash": "ipfs"
+		},
+		"optimizer": {
+			"enabled": true,
+			"runs": 200
+		},
+		"remappings": []
+	},
+	"sources": {
+		"daostack/globalConstraints/GlobalConstraintInterface.sol": {
+			"keccak256": "0xe96e195668b565b19f0bf7d23b848869a1b093264c397a13987edb4002ca0548",
+			"license": "GPL-3.0",
+			"urls": [
+				"bzz-raw://560ad7ada90ddcf8ffa4ad40784cec572daebaeda7c6a438eb73a152f7d7488e",
+				"dweb:/ipfs/QmPwofWqQo2P9YMaDxksXTdzPbAJwagmVbZmXG5BMhGwYK"
+			]
+		}
+	},
+	"version": 1
+}

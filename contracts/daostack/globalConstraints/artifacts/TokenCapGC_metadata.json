@@ -1,0 +1,249 @@
+{
+	"compiler": {
+		"version": "0.8.8+commit.dddeac2f"
+	},
+	"language": "Solidity",
+	"output": {
+		"abi": [
+			{
+				"inputs": [
+					{
+						"internalType": "contract IERC20",
+						"name": "_token",
+						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "_cap",
+						"type": "uint256"
+					}
+				],
+				"name": "getParametersHash",
+				"outputs": [
+					{
+						"internalType": "bytes32",
+						"name": "",
+						"type": "bytes32"
+					}
+				],
+				"stateMutability": "pure",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "bytes32",
+						"name": "",
+						"type": "bytes32"
+					}
+				],
+				"name": "parameters",
+				"outputs": [
+					{
+						"internalType": "contract IERC20",
+						"name": "token",
+						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "cap",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "",
+						"type": "address"
+					},
+					{
+						"internalType": "bytes32",
+						"name": "_paramsHash",
+						"type": "bytes32"
+					},
+					{
+						"internalType": "bytes32",
+						"name": "",
+						"type": "bytes32"
+					}
+				],
+				"name": "post",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "",
+						"type": "address"
+					},
+					{
+						"internalType": "bytes32",
+						"name": "",
+						"type": "bytes32"
+					},
+					{
+						"internalType": "bytes32",
+						"name": "",
+						"type": "bytes32"
+					}
+				],
+				"name": "pre",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "pure",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "contract IERC20",
+						"name": "_token",
+						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "_cap",
+						"type": "uint256"
+					}
+				],
+				"name": "setParameters",
+				"outputs": [
+					{
+						"internalType": "bytes32",
+						"name": "",
+						"type": "bytes32"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "when",
+				"outputs": [
+					{
+						"internalType": "enum GlobalConstraintInterface.CallPhase",
+						"name": "",
+						"type": "uint8"
+					}
+				],
+				"stateMutability": "pure",
+				"type": "function"
+			}
+		],
+		"devdoc": {
+			"details": "A simple global constraint to cap the number of tokens.",
+			"kind": "dev",
+			"methods": {
+				"getParametersHash(address,uint256)": {
+					"details": "calculate and returns the hash of the given parameters",
+					"params": {
+						"_cap": "the cap to check the total supply against.",
+						"_token": "the token to add to the params."
+					},
+					"returns": {
+						"_0": "the calculated parameters hash"
+					}
+				},
+				"post(address,bytes32,bytes32)": {
+					"details": "check the total supply cap.",
+					"params": {
+						"_paramsHash": "the parameters hash to check the total supply cap against."
+					},
+					"returns": {
+						"_0": "bool which represents a success"
+					}
+				},
+				"pre(address,bytes32,bytes32)": {
+					"details": "check the constraint after the action. This global constraint only checks the state after the action, so here we just return true:",
+					"returns": {
+						"_0": "true"
+					}
+				},
+				"setParameters(address,uint256)": {
+					"details": "adding a new set of parameters",
+					"params": {
+						"_cap": "the cap to check the total supply against.",
+						"_token": "the token to add to the params."
+					},
+					"returns": {
+						"_0": "the calculated parameters hash"
+					}
+				},
+				"when()": {
+					"details": "when return if this globalConstraints is pre, post or both.",
+					"returns": {
+						"_0": "CallPhase enum indication  Pre, Post or PreAndPost."
+					}
+				}
+			},
+			"title": "Token Cap Global Constraint",
+			"version": 1
+		},
+		"userdoc": {
+			"kind": "user",
+			"methods": {},
+			"version": 1
+		}
+	},
+	"settings": {
+		"compilationTarget": {
+			"daostack/globalConstraints/TokenCapGC.sol": "TokenCapGC"
+		},
+		"evmVersion": "london",
+		"libraries": {},
+		"metadata": {
+			"bytecodeHash": "ipfs"
+		},
+		"optimizer": {
+			"enabled": true,
+			"runs": 200
+		},
+		"remappings": []
+	},
+	"sources": {
+		"@openzeppelin/contracts/token/ERC20/IERC20.sol": {
+			"keccak256": "0x9750c6b834f7b43000631af5cc30001c5f547b3ceb3635488f140f60e897ea6b",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://5a7d5b1ef5d8d5889ad2ed89d8619c09383b80b72ab226e0fe7bde1636481e34",
+				"dweb:/ipfs/QmebXWgtEfumQGBdVeM6c71McLixYXQP5Bk6kKXuoY4Bmr"
+			]
+		},
+		"daostack/globalConstraints/GlobalConstraintInterface.sol": {
+			"keccak256": "0xe96e195668b565b19f0bf7d23b848869a1b093264c397a13987edb4002ca0548",
+			"license": "GPL-3.0",
+			"urls": [
+				"bzz-raw://560ad7ada90ddcf8ffa4ad40784cec572daebaeda7c6a438eb73a152f7d7488e",
+				"dweb:/ipfs/QmPwofWqQo2P9YMaDxksXTdzPbAJwagmVbZmXG5BMhGwYK"
+			]
+		},
+		"daostack/globalConstraints/TokenCapGC.sol": {
+			"keccak256": "0xa09b2cffd1734ee4e5de1dfc5c309f594d0c8e3a513a7a014191a0cd5a923d6a",
+			"license": "GPL-3.0",
+			"urls": [
+				"bzz-raw://d1b21db3bfff65dc3218dfe64983f86df6e03e3b54363db60fe6ac58d763312c",
+				"dweb:/ipfs/QmcUSZtPczcLGA5Dy8s66hgfTyQZfWCCnH5zaMA4s81yuY"
+			]
+		}
+	},
+	"version": 1
+}
