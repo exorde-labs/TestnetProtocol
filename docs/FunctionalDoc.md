@@ -5,6 +5,7 @@
 Exorde Protocol, and especially its WorkSystem (DataSpotting) is a parallelized data-processing pipeline, where 2 types of participations are possible:
 
  **1. Submit Data to the Protocol (SpotData())
+ 
  2. Validate data by getting randomly allocated on a DataBatch**
 
 # Network information
