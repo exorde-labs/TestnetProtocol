@@ -482,7 +482,7 @@ _Initializer. Can only be called once._
 function destroyContract() public
 ```
 
-Destroy Contract, important to release storage space if critical
+_Destroy Contract, important to release storage space if critical_
 
 ### updateParametersManager
 
@@ -491,7 +491,12 @@ function updateParametersManager(address addr) public
 ```
 
 Updates Parameters Manager
-  @param addr address of the Parameter Contract
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| addr | address | address of the Parameter Contract |
 
 ### toggleRequiredStaking
 
@@ -1170,6 +1175,7 @@ function getBatchsFilesByID(uint256 _DataBatchId_a, uint256 _DataBatchId_b) publ
 get all Output Batch IPFS Files (hashes),between batch indices A and B (a < B)
   @param _DataBatchId_a ID of the starting batch
   @param _DataBatchId_b ID of the ending batch (included)
+  @return array of Batch File ID between index A and B (excluded), example getBatchsFilesByID(0,10) -> 0,9
 
 ### getDataByID
 
