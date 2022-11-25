@@ -70,12 +70,17 @@ A user can do two things on DataSpotting (currently the only WorkSystem):
  
 Spotting Data (the input of the system) is as follows:
 **SpotData(string[] memory file_hashs, string[] calldata URL_domains, uint256 item_count_, string memory extra_)**
+
 -- file_hashs is a list of hashes, but can be a list of 1 file (currently that is what is done, spotting N files is not necessary at once)
+
 -- URL_domains is a list of the main domain being spotted in the respective file, file_hashs and URL_domains must have same length
+
 -- item_count_ is the number of item in the file (will be a list later)
 
 Participating in the Validation is done with a commit-reveal scheme.
+
  - **commitSpotCheck(uint256  _DataBatchId, bytes32  _encryptedHash, bytes32  _encryptedVote, uint256  _BatchCount, string  memory  _From)**
+ - 
 - **revealSpotCheck(uint256  _DataBatchId, string  memory  _clearIPFSHash, uint256  _clearVote, uint256  _salt)**
 
 ## **Staking requirements**
