@@ -1,29 +1,31 @@
 {
   "_format": "hh-sol-artifact-1",
-  "contractName": "IRewardManager",
+  "contractName": "IFollowingSystem",
   "sourceName": "contracts/worksystems/DataSpotting.sol",
   "abi": [
     {
       "inputs": [
         {
           "internalType": "uint256",
-          "name": "_RewardsAllocation",
+          "name": "CheckedBatchId",
           "type": "uint256"
-        },
-        {
-          "internalType": "address",
-          "name": "user_",
-          "type": "address"
         }
       ],
-      "name": "ProxyAddReward",
-      "outputs": [
+      "name": "Ping",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
         {
-          "internalType": "bool",
-          "name": "",
-          "type": "bool"
+          "internalType": "uint256",
+          "name": "iter",
+          "type": "uint256"
         }
       ],
+      "name": "TriggerUpdate",
+      "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
     }
