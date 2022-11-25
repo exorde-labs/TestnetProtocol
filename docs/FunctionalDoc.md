@@ -138,6 +138,8 @@ Both systems are capping the amount of spots per hours. The period is a sliding 
 
 The protocol structures the stream in Data Batches, made of N spots. This N is dynamically adjusted over time. Data batches are identified by an integer (>= 1). There is no Batch 0, it is used only to represent the "no work" situation, or equivalent.
 
+**Each SpotData represent a submission of N (with N >= 1) IPFS files (composed of N items, tweets/posts/comments of some web source, formatted according to a specification outside of the scope of this document). Each IPFS file has a mandatory item count of 100. (100 tweets, 100 reddit posts, 100 news articles, ...). **
+
 ## DataSpotting Validator Worker LifeCycle
 
 ### Protocol Validation System
