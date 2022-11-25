@@ -79,9 +79,13 @@ Spotting Data (the input of the system) is as follows:
 
 Participating in the Validation is done with a commit-reveal scheme.
 
- - **commitSpotCheck(uint256  _DataBatchId, bytes32  _encryptedHash, bytes32  _encryptedVote, uint256  _BatchCount, string  memory  _From)**
- - 
-- **revealSpotCheck(uint256  _DataBatchId, string  memory  _clearIPFSHash, uint256  _clearVote, uint256  _salt)**
+1. **commitSpotCheck(uint256  _DataBatchId, bytes32  _encryptedHash, bytes32  _encryptedVote, uint256  _BatchCount, string  memory  _From)**
+
+2. **revealSpotCheck(uint256  _DataBatchId, string  memory  _clearIPFSHash, uint256  _clearVote, uint256  _salt)**
+
+
+**During the vote, the selected validator workers submit 2 things: a vote (acting like a status/flag, in case the batch is to be rejected) and a submitted IPFS file, produced from off-chain data aggregation algorithms (where data is deterministically filtered, curated and organized). A batch is composed of N files (usually 10-15), and workers aggregate this data (while applyong some rules on it) in one output file, the Batch IPFS File.**
+
 
 ## **Staking requirements**
 
