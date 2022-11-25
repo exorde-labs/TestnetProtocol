@@ -504,8 +504,13 @@ Updates Parameters Manager
 function toggleRequiredStaking(bool toggle_) public
 ```
 
-Enable or disable Required Staking for participation 
-  @param toggle_ boolean
+Enable or disable Required Staking for participation
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| toggle_ | bool | boolean |
 
 ### toggleTriggerSpotData
 
@@ -514,7 +519,12 @@ function toggleTriggerSpotData(bool toggle_) public
 ```
 
 Enable or disable Triggering Updates when Spotting Data
-  @param toggle_ boolean
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| toggle_ | bool | boolean |
 
 ### toggleStrictRandomness
 
@@ -523,7 +533,12 @@ function toggleStrictRandomness(bool toggle_) public
 ```
 
 Enable or disable Strict Randomness
-  @param toggle_ boolean
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| toggle_ | bool | boolean |
 
 ### toggleValidateLastReveal
 
@@ -532,7 +547,12 @@ function toggleValidateLastReveal(bool toggle_) public
 ```
 
 Enable or disable Automatic Batch Validation when last to reveal
-  @param toggle_ boolean
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| toggle_ | bool | boolean |
 
 ### toggleForceValidateBatchFile
 
@@ -541,7 +561,12 @@ function toggleForceValidateBatchFile(bool toggle_) public
 ```
 
 Enable or disable Forcing the Validation of a Batch File in some conditions
-  @param toggle_ boolean
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| toggle_ | bool | boolean |
 
 ### updateInstantSpotRewards
 
@@ -550,8 +575,13 @@ function updateInstantSpotRewards(bool state_, uint256 divider_) public
 ```
 
 Enable or disable instant rewards when SpottingData (Testnet)
-  @param state_ boolean
-  @param divider_ base rewards divider
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| state_ | bool | boolean |
+| divider_ | uint256 | base rewards divider |
 
 ### updateInstantRevealRewards
 
@@ -560,8 +590,13 @@ function updateInstantRevealRewards(bool state_, uint256 divider_) public
 ```
 
 Enable or disable instant rewards when Revealing (Testnet)
-  @param state_ boolean
-  @param divider_ base rewards divider
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| state_ | bool | boolean |
+| divider_ | uint256 | base rewards divider |
 
 ### updateMaxPendingDataBatch
 
@@ -570,7 +605,12 @@ function updateMaxPendingDataBatch(uint256 MaxPendingDataBatchCount_) public
 ```
 
 update MaxPendingDataBatchCount, limiting the queue of data to validate
-  @param MaxPendingDataBatchCount_ max queue size
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| MaxPendingDataBatchCount_ | uint256 | max queue size |
 
 ### updateSpotFileSize
 
@@ -579,7 +619,12 @@ function updateSpotFileSize(uint256 file_size_) public
 ```
 
 update file_size_, the spot atomic file size
-  @param file_size_ spot atomic file size
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| file_size_ | uint256 | spot atomic file size |
 
 ### updateGasLeftLimit
 
@@ -588,7 +633,12 @@ function updateGasLeftLimit(uint256 new_limit_) public
 ```
 
 update Gas Left limit, limiting the validation loops iterations
-  @param new_limit_ gas limit in wei
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| new_limit_ | uint256 | gas limit in wei |
 
 ### getAttribute
 
@@ -597,8 +647,13 @@ function getAttribute(bytes32 _UUID, string _attrName) public view returns (uint
 ```
 
 getAttribute from UUID and attrName
-  @param _UUID unique identifier
-  @param _attrName name of the attribute
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| _UUID | bytes32 | unique identifier |
+| _attrName | string | name of the attribute |
 
 ### setAttribute
 
@@ -607,9 +662,14 @@ function setAttribute(bytes32 _UUID, string _attrName, uint256 _attrVal) interna
 ```
 
 setAttribute from UUID , attrName & attrVal
-  @param _UUID unique identifier
-  @param _attrName name of the attribute
-  @param _attrVal value of the attribute
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| _UUID | bytes32 | unique identifier |
+| _attrName | string | name of the attribute |
+| _attrVal | uint256 | value of the attribute |
 
 ### _retrieveSFuel
 
@@ -626,7 +686,12 @@ function isInAvailableWorkers(address _worker) public view returns (bool)
 ```
 
 Checks if Worker is Available
-  @param _worker worker address
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| _worker | address | worker address |
 
 ### isInBusyWorkers
 
@@ -635,7 +700,12 @@ function isInBusyWorkers(address _worker) public view returns (bool)
 ```
 
 Checks if Worker is Busy
-  @param _worker worker address
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| _worker | address | worker address |
 
 ### IsInLogoffList
 
@@ -722,7 +792,12 @@ function deleteData(uint256 _DataId) public
 ```
 
 Delete Spotted Data with ID _DataId
-  @param _DataId index of the data to delete
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| _DataId | uint256 | index of the data to delete |
 
 ### deleteDataBatch
 
@@ -731,7 +806,12 @@ function deleteDataBatch(uint256 _BatchId) public
 ```
 
 Delete DataBatch with ID _BatchId
-  @param _BatchId index of the batch to delete
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| _BatchId | uint256 | index of the batch to delete |
 
 ### deleteOldData
 
@@ -748,7 +828,12 @@ function TriggerUpdate(uint256 iteration_count) public
 ```
 
 Trigger potential Data Batches Validations & Work Allocations
-  @param iteration_count max number of iterations
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| iteration_count | uint256 | max number of iterations |
 
 ### TriggerAllocations
 
@@ -757,7 +842,12 @@ function TriggerAllocations(uint256 iteration_count) public
 ```
 
 Trigger at most iteration_count Work Allocations (N workers on a Batch)
-  @param iteration_count max number of iterations
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| iteration_count | uint256 | max number of iterations |
 
 ### TriggerValidation
 
@@ -766,7 +856,12 @@ function TriggerValidation(uint256 iteration_count) public
 ```
 
 Trigger at most iteration_count Ended DataBatch validations
-  @param iteration_count max number of iterations
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| iteration_count | uint256 | max number of iterations |
 
 ### AreStringsEqual
 
@@ -775,8 +870,13 @@ function AreStringsEqual(string _a, string _b) public pure returns (bool)
 ```
 
 Checks if two strings are equal
-  @param _a string
-  @param _b string
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| _a | string | string |
+| _b | string | string |
 
 ### ValidateDataBatch
 
@@ -785,7 +885,12 @@ function ValidateDataBatch(uint256 _DataBatchId) internal
 ```
 
 Trigger the validation of DataBatch
-  @param _DataBatchId Integer identifier associated with target SpottedData
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| _DataBatchId | uint256 | Integer identifier associated with target SpottedData |
 
 ### AllocateWork
 
@@ -802,7 +907,12 @@ function IsNewWorkAvailable(address user_) public view returns (bool)
 ```
 
 To know if new work is available for worker's address user_
-  @param user_ user
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| user_ | address | user |
 
 ### GetCurrentWork
 
@@ -811,7 +921,12 @@ function GetCurrentWork(address user_) public view returns (uint256)
 ```
 
 Get newest work for user
-  @param user_ user
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| user_ | address | user |
 
 ### updateGlobalSpotFlow
 
@@ -852,7 +967,12 @@ function updateUserSpotFlow(address user_) public
 ```
 
 Update the total spots per TIMEFRAME (hour) per USER
-  @param user_ user
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| user_ | address | user |
 
 ### getUserPeriodSpotCount
 
@@ -861,7 +981,12 @@ function getUserPeriodSpotCount(address user_) public view returns (uint256)
 ```
 
 Count the total spots per TIMEFRAME (hour) per USER
-  @param user_ user
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| user_ | address | user |
 
 ### SpotData
 
@@ -871,10 +996,15 @@ function SpotData(string[] file_hashs_, string[] URL_domains_, uint256[] item_co
 
 Submit new data to the protocol, in the stream, which will be added to the latest batch
             file_hashs_, URL_domains_ & item_counts_ must be of same length
-  @param file_hashs_ array of IPFS hashes, json format
-  @param URL_domains_ array of URL top domain per file (for statistics purpose)
-  @param item_counts_ array of size (in number of json items)
-  @param extra_ extra information (for indexing / archival purpose)
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| file_hashs_ | string[] | array of IPFS hashes, json format |
+| URL_domains_ | string[] | array of URL top domain per file (for statistics purpose) |
+| item_counts_ | uint256[] | array of size (in number of json items) |
+| extra_ | string | extra information (for indexing / archival purpose) |
 
 ### commitSpotCheck
 
@@ -883,11 +1013,16 @@ function commitSpotCheck(uint256 _DataBatchId, bytes32 _encryptedHash, bytes32 _
 ```
 
 Commits spot-check-vote on a DataBatch
-  @param _DataBatchId DataBatch ID
-  @param _encryptedHash encrypted hash of the submitted IPFS file (json format)
-  @param _encryptedVote encrypted hash of the submitted IPFS vote
-  @param _BatchCount Batch Count in number of items (in the aggregated IPFS hash)
-  @param _From extra information (for indexing / archival purpose)
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| _DataBatchId | uint256 | DataBatch ID |
+| _encryptedHash | bytes32 | encrypted hash of the submitted IPFS file (json format) |
+| _encryptedVote | bytes32 | encrypted hash of the submitted IPFS vote |
+| _BatchCount | uint256 | Batch Count in number of items (in the aggregated IPFS hash) |
+| _From | string | extra information (for indexing / archival purpose) |
 
 ### revealSpotCheck
 
@@ -896,10 +1031,15 @@ function revealSpotCheck(uint256 _DataBatchId, string _clearIPFSHash, uint256 _c
 ```
 
 Reveals spot-check-vote on a DataBatch
-  @param _DataBatchId DataBatch ID
-  @param _clearIPFSHash clear hash of the submitted IPFS file (json format)
-  @param _clearVote clear hash of the submitted IPFS vote
-  @param _salt arbitraty integer used to hash the previous commit & verify the reveal
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| _DataBatchId | uint256 | DataBatch ID |
+| _clearIPFSHash | string | clear hash of the submitted IPFS file (json format) |
+| _clearVote | uint256 | clear hash of the submitted IPFS vote |
+| _salt | uint256 | arbitraty integer used to hash the previous commit & verify the reveal |
 
 ### requestAllocatedStake
 
@@ -908,9 +1048,15 @@ function requestAllocatedStake(uint256 _numTokens, address user_) internal
 ```
 
 Loads _numTokens ERC20 tokens into the voting contract for one-to-one voting rights
-  @dev Assumes that msg.sender has approved voting contract to spend on their behalf
-  @param _numTokens The number of votingTokens desired in exchange for ERC20 tokens
-  @param user_ The user address
+
+_Assumes that msg.sender has approved voting contract to spend on their behalf_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| _numTokens | uint256 | The number of votingTokens desired in exchange for ERC20 tokens |
+| user_ | address | The user address |
 
 ### withdrawVotingRights
 
@@ -919,8 +1065,13 @@ function withdrawVotingRights(uint256 _numTokens, address user_) public
 ```
 
 Withdraw _numTokens ERC20 tokens from the voting contract, revoking these voting rights
-  @param _numTokens The number of ERC20 tokens desired in exchange for voting rights
-  @param user_ The user address
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| _numTokens | uint256 | The number of ERC20 tokens desired in exchange for voting rights |
+| user_ | address | The user address |
 
 ### getSystemTokenBalance
 
@@ -929,7 +1080,12 @@ function getSystemTokenBalance(address user_) public view returns (uint256 token
 ```
 
 get Locked Token for the current Contract (WorkSystem)
-  @param user_ The user address
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| user_ | address | The user address |
 
 ### getAcceptedBatchesCount
 
@@ -953,8 +1109,13 @@ Get Total Rejected Batches
 function rescueTokens(uint256 _DataBatchId) public
 ```
 
-_Unlocks tokens locked in unrevealed spot-check-vote where SpottedData has ended
-  @param _DataBatchId Integer identifier associated with the target SpottedData_
+_Unlocks tokens locked in unrevealed spot-check-vote where SpottedData has ended_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| _DataBatchId | uint256 | Integer identifier associated with the target SpottedData |
 
 ### rescueTokensInMultipleDatas
 
@@ -962,8 +1123,13 @@ _Unlocks tokens locked in unrevealed spot-check-vote where SpottedData has ended
 function rescueTokensInMultipleDatas(uint256[] _DataBatchIDs) public
 ```
 
-_Unlocks tokens locked in unrevealed spot-check-votes where Datas have ended
-  @param _DataBatchIDs Array of integer identifiers associated with the target Datas_
+_Unlocks tokens locked in unrevealed spot-check-votes where Datas have ended_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| _DataBatchIDs | uint256[] | Array of integer identifiers associated with the target Datas |
 
 ### getIPFShashesForBatch
 
@@ -971,8 +1137,13 @@ _Unlocks tokens locked in unrevealed spot-check-votes where Datas have ended
 function getIPFShashesForBatch(uint256 _DataBatchId) public view returns (string[])
 ```
 
-get all IPFS hashes, input of the batch 
-  @param _DataBatchId ID of the batch
+get all IPFS hashes, input of the batch
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| _DataBatchId | uint256 | ID of the batch |
 
 ### getMultiBatchIPFShashes
 
@@ -981,8 +1152,13 @@ function getMultiBatchIPFShashes(uint256 _DataBatchId_a, uint256 _DataBatchId_b)
 ```
 
 get all IPFS hashes, input of batchs, between batch indices A and B (a < B)
-  @param _DataBatchId_a ID of the starting batch
-  @param _DataBatchId_b ID of the ending batch (included)
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| _DataBatchId_a | uint256 | ID of the starting batch |
+| _DataBatchId_b | uint256 | ID of the ending batch (included) |
 
 ### getBatchCountForBatch
 
@@ -991,8 +1167,13 @@ function getBatchCountForBatch(uint256 _DataBatchId_a, uint256 _DataBatchId_b) p
 ```
 
 get all item counts for all batches between batch indices A and B (a < B)
-  @param _DataBatchId_a ID of the starting batch
-  @param _DataBatchId_b ID of the ending batch (included)
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| _DataBatchId_a | uint256 | ID of the starting batch |
+| _DataBatchId_b | uint256 | ID of the ending batch (included) |
 
 ### getDomainsForBatch
 
@@ -1001,7 +1182,12 @@ function getDomainsForBatch(uint256 _DataBatchId) public view returns (string[])
 ```
 
 get top domain URL for a given batch
-  @param _DataBatchId ID of the batch
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| _DataBatchId | uint256 | ID of the batch |
 
 ### getFromsForBatch
 
@@ -1010,7 +1196,12 @@ function getFromsForBatch(uint256 _DataBatchId) public view returns (string[])
 ```
 
 get the From information for a given batch
-  @param _DataBatchId ID of the batch
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| _DataBatchId | uint256 | ID of the batch |
 
 ### getVotesForBatch
 
@@ -1019,7 +1210,12 @@ function getVotesForBatch(uint256 _DataBatchId) public view returns (uint256[])
 ```
 
 get all Votes on a given batch
-  @param _DataBatchId ID of the batch
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| _DataBatchId | uint256 | ID of the batch |
 
 ### getSubmittedFilesForBatch
 
@@ -1028,7 +1224,12 @@ function getSubmittedFilesForBatch(uint256 _DataBatchId) public view returns (st
 ```
 
 get all IPFS files submitted (during commit/reveal) on a given batch
-  @param _DataBatchId ID of the batch
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| _DataBatchId | uint256 | ID of the batch |
 
 ### getActiveWorkersCount
 
@@ -1060,12 +1261,22 @@ Get all busy workers
 function validPosition(uint256 _prevID, uint256 _nextID, address _voter, uint256 _numTokens) public view returns (bool APPROVED)
 ```
 
-_Compares previous and next SpottedData's committed tokens for sorting purposes
-  @param _prevID Integer identifier associated with previous SpottedData in sorted order
-  @param _nextID Integer identifier associated with next SpottedData in sorted order
-  @param _voter Address of user to check DLL position for
-  @param _numTokens The number of tokens to be committed towards the SpottedData (used for sorting)
-  @return APPROVED Boolean indication of if the specified position maintains the sort_
+_Compares previous and next SpottedData's committed tokens for sorting purposes_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| _prevID | uint256 | Integer identifier associated with previous SpottedData in sorted order |
+| _nextID | uint256 | Integer identifier associated with next SpottedData in sorted order |
+| _voter | address | Address of user to check DLL position for |
+| _numTokens | uint256 | The number of tokens to be committed towards the SpottedData (used for sorting) |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| APPROVED | bool | Boolean indication of if the specified position maintains the sort |
 
 ### isPassed
 
@@ -1074,8 +1285,14 @@ function isPassed(uint256 _DataBatchId) public view returns (bool passed)
 ```
 
 Determines if proposal has passed
-  @dev Check if votesFor out of totalSpotChecks exceeds votesQuorum (requires DataEnded)
-  @param _DataBatchId Integer identifier associated with target SpottedData
+
+_Check if votesFor out of totalSpotChecks exceeds votesQuorum (requires DataEnded)_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| _DataBatchId | uint256 | Integer identifier associated with target SpottedData |
 
 ### getNumPassingTokens
 
@@ -1088,10 +1305,14 @@ function getNumPassingTokens(address _voter, uint256 _DataBatchId, uint256 _salt
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 | _voter | address |  |
-| _DataBatchId | uint256 | Integer identifier associated with target SpottedData
-   @param _salt Arbitrarily chosen integer used to generate secretHash
-   @return correctSpotChecks Number of tokens voted for winning option |
-| _salt | uint256 |  |
+| _DataBatchId | uint256 | Integer identifier associated with target SpottedData |
+| _salt | uint256 | Arbitrarily chosen integer used to generate secretHash |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| correctSpotChecks | uint256 | Number of tokens voted for winning option |
 
 ### DataEnded
 
@@ -1100,8 +1321,14 @@ function DataEnded(uint256 _DataBatchId) public view returns (bool ended)
 ```
 
 Determines if SpottedData is over
-  @dev Checks isExpired for specified SpottedData's revealEndDate
-  @return ended Boolean indication of whether Dataing period is over
+
+_Checks isExpired for specified SpottedData's revealEndDate_
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| ended | bool | Boolean indication of whether Dataing period is over |
 
 ### getUserDatas
 
@@ -1110,7 +1337,12 @@ function getUserDatas(address user) public view returns (uint256[] user_Datas)
 ```
 
 Get User Submitted Data (Spots)
-  @return user_Datas the array of Data Spotted/Submitted by the user
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| user_Datas | uint256[] | the array of Data Spotted/Submitted by the user |
 
 ### getLastDataId
 
@@ -1119,7 +1351,12 @@ function getLastDataId() public view returns (uint256 DataId)
 ```
 
 get Last Data Id
-  @return DataId
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| DataId | uint256 |  |
 
 ### getLastBatchId
 
@@ -1128,7 +1365,12 @@ function getLastBatchId() public view returns (uint256 LastBatchId)
 ```
 
 get Last Batch Id
-  @return LastBatchId
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| LastBatchId | uint256 |  |
 
 ### getLastCheckedBatchId
 
@@ -1137,7 +1379,12 @@ function getLastCheckedBatchId() public view returns (uint256 LastCheckedBatchId
 ```
 
 get Last Checked Batch Id
-  @return LastCheckedBatchId
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| LastCheckedBatchId | uint256 |  |
 
 ### getLastAllocatedBatchId
 
@@ -1146,7 +1393,12 @@ function getLastAllocatedBatchId() public view returns (uint256 LastAllocatedBat
 ```
 
 getLastAllocatedBatchId
-  @return LastAllocatedBatchId
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| LastAllocatedBatchId | uint256 |  |
 
 ### getBatchByID
 
@@ -1155,7 +1407,12 @@ function getBatchByID(uint256 _DataBatchId) public view returns (struct DataSpot
 ```
 
 get DataBatch By ID
-  @return batch as BatchMetadata struct
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| batch | struct DataSpotting.BatchMetadata | as BatchMetadata struct |
 
 ### getBatchIPFSFileByID
 
@@ -1164,7 +1421,12 @@ function getBatchIPFSFileByID(uint256 _DataBatchId) public view returns (string 
 ```
 
 get Output Batch IPFS File By ID
-  @return batch IPFS File
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| batch | string | IPFS File |
 
 ### getBatchsFilesByID
 
@@ -1173,9 +1435,19 @@ function getBatchsFilesByID(uint256 _DataBatchId_a, uint256 _DataBatchId_b) publ
 ```
 
 get all Output Batch IPFS Files (hashes),between batch indices A and B (a < B)
-  @param _DataBatchId_a ID of the starting batch
-  @param _DataBatchId_b ID of the ending batch (included)
-  @return array of Batch File ID between index A and B (excluded), example getBatchsFilesByID(0,10) -> 0,9
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| _DataBatchId_a | uint256 | ID of the starting batch |
+| _DataBatchId_b | uint256 | ID of the ending batch (included) |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | string[] | array of Batch File ID between index A and B (excluded), example getBatchsFilesByID(0,10) -> 0,9 |
 
 ### getDataByID
 
@@ -1184,7 +1456,12 @@ function getDataByID(uint256 _DataId) public view returns (struct DataSpotting.S
 ```
 
 get Data By ID
-  @return data as SpottedData struct
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| data | struct DataSpotting.SpottedData | as SpottedData struct |
 
 ### getTxCounter
 
@@ -1193,7 +1470,12 @@ function getTxCounter() public view returns (uint256 Counter)
 ```
 
 getCounter
-  @return Counter of all "accepted transactions"
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| Counter | uint256 | of all "accepted transactions" |
 
 ### getItemCounter
 
@@ -1202,7 +1484,12 @@ function getItemCounter() public view returns (uint256 Counter)
 ```
 
 getCounter
-  @return Counter of the last Dataed a user started
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| Counter | uint256 | of the last Dataed a user started |
 
 ### DataCommitEndDate
 
@@ -1211,7 +1498,12 @@ function DataCommitEndDate(uint256 _DataBatchId) public view returns (uint256 co
 ```
 
 Determines DataCommitEndDate
-  @return commitEndDate indication of whether Dataing period is over
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| commitEndDate | uint256 | indication of whether Dataing period is over |
 
 ### DataRevealEndDate
 
@@ -1220,7 +1512,12 @@ function DataRevealEndDate(uint256 _DataBatchId) public view returns (uint256 re
 ```
 
 Determines DataRevealEndDate
-  @return revealEndDate indication of whether Dataing period is over
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| revealEndDate | uint256 | indication of whether Dataing period is over |
 
 ### commitPeriodActive
 
@@ -1229,9 +1526,20 @@ function commitPeriodActive(uint256 _DataBatchId) public view returns (bool acti
 ```
 
 Checks if the commit period is still active for the specified SpottedData
-  @dev Checks isExpired for the specified SpottedData's commitEndDate
-  @param _DataBatchId Integer identifier associated with target SpottedData
-  @return active Boolean indication of isCommitPeriodActive for target SpottedData
+
+_Checks isExpired for the specified SpottedData's commitEndDate_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| _DataBatchId | uint256 | Integer identifier associated with target SpottedData |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| active | bool | Boolean indication of isCommitPeriodActive for target SpottedData |
 
 ### commitPeriodOver
 
@@ -1240,9 +1548,20 @@ function commitPeriodOver(uint256 _DataBatchId) public view returns (bool active
 ```
 
 Checks if the commit period is over
-  @dev Checks isExpired for the specified SpottedData's commitEndDate
-  @param _DataBatchId Integer identifier associated with target SpottedData
-  @return active Boolean indication of isCommitPeriodActive for target SpottedData
+
+_Checks isExpired for the specified SpottedData's commitEndDate_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| _DataBatchId | uint256 | Integer identifier associated with target SpottedData |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| active | bool | Boolean indication of isCommitPeriodActive for target SpottedData |
 
 ### remainingCommitDuration
 
@@ -1251,9 +1570,20 @@ function remainingCommitDuration(uint256 _DataBatchId) public view returns (uint
 ```
 
 Checks if the commit period is still active for the specified SpottedData
-  @dev Checks isExpired for the specified SpottedData's commitEndDate
-  @param _DataBatchId Integer identifier associated with target SpottedData
-  @return remainingTime Integer
+
+_Checks isExpired for the specified SpottedData's commitEndDate_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| _DataBatchId | uint256 | Integer identifier associated with target SpottedData |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| remainingTime | uint256 | Integer |
 
 ### revealPeriodActive
 
@@ -1262,8 +1592,14 @@ function revealPeriodActive(uint256 _DataBatchId) public view returns (bool acti
 ```
 
 Checks if the reveal period is still active for the specified SpottedData
-  @dev Checks isExpired for the specified SpottedData's revealEndDate
-  @param _DataBatchId Integer identifier associated with target SpottedData
+
+_Checks isExpired for the specified SpottedData's revealEndDate_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| _DataBatchId | uint256 | Integer identifier associated with target SpottedData |
 
 ### revealPeriodOver
 
@@ -1272,8 +1608,14 @@ function revealPeriodOver(uint256 _DataBatchId) public view returns (bool active
 ```
 
 Checks if the reveal period is over
-  @dev Checks isExpired for the specified SpottedData's revealEndDate
-  @param _DataBatchId Integer identifier associated with target SpottedData
+
+_Checks isExpired for the specified SpottedData's revealEndDate_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| _DataBatchId | uint256 | Integer identifier associated with target SpottedData |
 
 ### remainingRevealDuration
 
@@ -1282,9 +1624,20 @@ function remainingRevealDuration(uint256 _DataBatchId) public view returns (uint
 ```
 
 Checks if the commit period is still active for the specified SpottedData
-  @dev Checks isExpired for the specified SpottedData's commitEndDate
-  @param _DataBatchId Integer identifier associated with target SpottedData
-  @return remainingTime Integer indication of isCommitPeriodActive for target SpottedData
+
+_Checks isExpired for the specified SpottedData's commitEndDate_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| _DataBatchId | uint256 | Integer identifier associated with target SpottedData |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| remainingTime | uint256 | Integer indication of isCommitPeriodActive for target SpottedData |
 
 ### didCommit
 
@@ -1292,10 +1645,20 @@ Checks if the commit period is still active for the specified SpottedData
 function didCommit(address _voter, uint256 _DataBatchId) public view returns (bool committed)
 ```
 
-_Checks if user has committed for specified SpottedData
-  @param _voter Address of user to check against
-  @param _DataBatchId Integer identifier associated with target SpottedData
-  @return committed Boolean indication of whether user has committed_
+_Checks if user has committed for specified SpottedData_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| _voter | address | Address of user to check against |
+| _DataBatchId | uint256 | Integer identifier associated with target SpottedData |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| committed | bool | Boolean indication of whether user has committed |
 
 ### didReveal
 
@@ -1303,10 +1666,20 @@ _Checks if user has committed for specified SpottedData
 function didReveal(address _voter, uint256 _DataBatchId) public view returns (bool revealed)
 ```
 
-_Checks if user has revealed for specified SpottedData
-  @param _voter Address of user to check against
-  @param _DataBatchId Integer identifier associated with target SpottedData
-  @return revealed Boolean indication of whether user has revealed_
+_Checks if user has revealed for specified SpottedData_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| _voter | address | Address of user to check against |
+| _DataBatchId | uint256 | Integer identifier associated with target SpottedData |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| revealed | bool | Boolean indication of whether user has revealed |
 
 ### DataExists
 
@@ -1314,9 +1687,19 @@ _Checks if user has revealed for specified SpottedData
 function DataExists(uint256 _DataBatchId) public view returns (bool exists)
 ```
 
-_Checks if a SpottedData exists
-  @param _DataBatchId The DataID whose existance is to be evaluated.
-  @return exists Boolean Indicates whether a SpottedData exists for the provided DataID_
+_Checks if a SpottedData exists_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| _DataBatchId | uint256 | The DataID whose existance is to be evaluated. |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| exists | bool | Boolean Indicates whether a SpottedData exists for the provided DataID |
 
 ### AmIRegistered
 
@@ -1336,10 +1719,20 @@ function isWorkerRegistered(address _worker) public view returns (bool passed)
 function getCommitVoteHash(address _voter, uint256 _DataBatchId) public view returns (bytes32 commitHash)
 ```
 
-_Gets the bytes32 commitHash property of target SpottedData
-  @param _voter Address of user to check against
-  @param _DataBatchId Integer identifier associated with target SpottedData
-  @return commitHash Bytes32 hash property attached to target SpottedData_
+_Gets the bytes32 commitHash property of target SpottedData_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| _voter | address | Address of user to check against |
+| _DataBatchId | uint256 | Integer identifier associated with target SpottedData |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| commitHash | bytes32 | Bytes32 hash property attached to target SpottedData |
 
 ### getCommitIPFSHash
 
@@ -1347,10 +1740,20 @@ _Gets the bytes32 commitHash property of target SpottedData
 function getCommitIPFSHash(address _voter, uint256 _DataBatchId) public view returns (bytes32 commitHash)
 ```
 
-_Gets the bytes32 commitHash property of target SpottedData
-  @param _voter Address of user to check against
-  @param _DataBatchId Integer identifier associated with target SpottedData
-  @return commitHash Bytes32 hash property attached to target SpottedData_
+_Gets the bytes32 commitHash property of target SpottedData_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| _voter | address | Address of user to check against |
+| _DataBatchId | uint256 | Integer identifier associated with target SpottedData |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| commitHash | bytes32 | Bytes32 hash property attached to target SpottedData |
 
 ### getEncryptedHash
 
@@ -1358,10 +1761,20 @@ _Gets the bytes32 commitHash property of target SpottedData
 function getEncryptedHash(uint256 _clearVote, uint256 _salt) public pure returns (bytes32 keccak256hash)
 ```
 
-_Gets the bytes32 commitHash property of target SpottedData
-  @param _clearVote vote Option
-  @param _salt is the salt
-  @return keccak256hash Bytes32 hash property attached to target SpottedData_
+_Gets the bytes32 commitHash property of target SpottedData_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| _clearVote | uint256 | vote Option |
+| _salt | uint256 | is the salt |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| keccak256hash | bytes32 | Bytes32 hash property attached to target SpottedData |
 
 ### getEncryptedStringHash
 
@@ -1369,10 +1782,20 @@ _Gets the bytes32 commitHash property of target SpottedData
 function getEncryptedStringHash(string _hash, uint256 _salt) public pure returns (bytes32 keccak256hash)
 ```
 
-_Gets the bytes32 commitHash property of target FormattedData
-  @param _hash ipfs hash of aggregated data in a string
-  @param _salt is the salt
-  @return keccak256hash Bytes32 hash property attached to target FormattedData_
+_Gets the bytes32 commitHash property of target FormattedData_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| _hash | string | ipfs hash of aggregated data in a string |
+| _salt | uint256 | is the salt |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| keccak256hash | bytes32 | Bytes32 hash property attached to target FormattedData |
 
 ### getNumTokens
 
@@ -1380,10 +1803,20 @@ _Gets the bytes32 commitHash property of target FormattedData
 function getNumTokens(address _voter, uint256 _DataBatchId) public view returns (uint256 numTokens)
 ```
 
-_Wrapper for getAttribute with attrName="numTokens"
-  @param _voter Address of user to check against
-  @param _DataBatchId Integer identifier associated with target SpottedData
-  @return numTokens Number of tokens committed to SpottedData in sorted SpottedData-linked-list_
+_Wrapper for getAttribute with attrName="numTokens"_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| _voter | address | Address of user to check against |
+| _DataBatchId | uint256 | Integer identifier associated with target SpottedData |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| numTokens | uint256 | Number of tokens committed to SpottedData in sorted SpottedData-linked-list |
 
 ### getLastNode
 
@@ -1391,9 +1824,19 @@ _Wrapper for getAttribute with attrName="numTokens"
 function getLastNode(address _voter) public view returns (uint256 DataID)
 ```
 
-_Gets top element of sorted SpottedData-linked-list
-  @param _voter Address of user to check against
-  @return DataID Integer identifier to SpottedData with maximum number of tokens committed to it_
+_Gets top element of sorted SpottedData-linked-list_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| _voter | address | Address of user to check against |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| DataID | uint256 | Integer identifier to SpottedData with maximum number of tokens committed to it |
 
 ### getLockedTokens
 
@@ -1401,9 +1844,19 @@ _Gets top element of sorted SpottedData-linked-list
 function getLockedTokens(address _voter) public view returns (uint256 numTokens)
 ```
 
-_Gets the numTokens property of getLastNode
-  @param _voter Address of user to check against
-  @return numTokens Maximum number of tokens committed in SpottedData specified_
+_Gets the numTokens property of getLastNode_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| _voter | address | Address of user to check against |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| numTokens | uint256 | Maximum number of tokens committed in SpottedData specified |
 
 ### getInsertPointForNumTokens
 
@@ -1417,9 +1870,19 @@ function getInsertPointForNumTokens(address _voter, uint256 _numTokens, uint256 
 function isExpired(uint256 _terminationDate) public view returns (bool expired)
 ```
 
-_Checks if an expiration date has been reached
-  @param _terminationDate Integer timestamp of date to compare current timestamp with
-  @return expired Boolean indication of whether the terminationDate has passed_
+_Checks if an expiration date has been reached_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| _terminationDate | uint256 | Integer timestamp of date to compare current timestamp with |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| expired | bool | Boolean indication of whether the terminationDate has passed |
 
 ### attrUUID
 
@@ -1427,6 +1890,17 @@ _Checks if an expiration date has been reached
 function attrUUID(address user_, uint256 _DataBatchId) public pure returns (bytes32 UUID)
 ```
 
-_Generates an identifier which associates a user and a SpottedData together
-  @param _DataBatchId Integer identifier associated with target SpottedData
-  @return UUID Hash which is deterministic from user_ and _DataBatchId_
+_Generates an identifier which associates a user and a SpottedData together_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| user_ | address |  |
+| _DataBatchId | uint256 | Integer identifier associated with target SpottedData |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| UUID | bytes32 | Hash which is deterministic from user_ and _DataBatchId |
