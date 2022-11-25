@@ -350,6 +350,12 @@ function TransferRepToMaster(address _worker) internal
 
 Transfer Current Reputation (REP) of address _worker to its master
 
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| _worker | address | address |
+
 ### TransferRewardsToMaster
 
 ```solidity
@@ -357,6 +363,12 @@ function TransferRewardsToMaster(address _worker) internal
 ```
 
 Transfer Current Rewards of address _worker to its master
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| _worker | address | address |
 
 ### ClaimMaster
 
@@ -366,6 +378,12 @@ function ClaimMaster(address _master) public
 
 Claim _master Address as master of msg.sender
 
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| _master | address | address |
+
 ### RemoveMaster
 
 ```solidity
@@ -373,3 +391,9 @@ function RemoveMaster(address _master) public
 ```
 
 Unclaim _master Address as master of msg.sender
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| _master | address | address |
