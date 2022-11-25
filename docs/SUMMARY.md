@@ -1,0 +1,17 @@
+# Summary
+* worksystems
+  * [AddressManager](docs/AddressManager.md)
+  * artifacts
+    * build-info
+  * [ConfigRegistry](docs/ConfigRegistry.md)
+  * [DataArchive](docs/DataArchive.md)
+  * [DataArchiving](docs/DataArchiving.md)
+  * [DataCompliance](docs/DataCompliance.md)
+  * [DataIndexing](docs/DataIndexing.md)
+  * [DataSpotting](docs/DataSpotting.md)
+  * [Parameters](docs/Parameters.md)
+  * [RandomAllocator](docs/RandomAllocator.md)
+  * [RewardsManager](docs/RewardsManager.md)
+  * [sfueldistribute](docs/sfueldistribute.md)
+  * [StakingManager](docs/StakingManager.md)
+  * [Statistics](docs/Statistics.md)
