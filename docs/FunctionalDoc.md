@@ -1,6 +1,6 @@
 
 
-# Exorde Protocol Documentation!
+# Exorde Protocol Documentation
 
 Exorde Protocol, and especially its WorkSystem (DataSpotting) is a parallelized data-processing pipeline, where 2 types of participations are possible:
 
