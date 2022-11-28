@@ -3,8 +3,8 @@
 pragma solidity 0.8.0;
 
 /**
-@title WorkSystem Spot v1.3.4a
-@author Mathias Dail - CTO @ Exorde Labs 2022
+* @title WorkSystem Spot v1.3.4a
+* @author Mathias Dail - CTO @ Exorde Labs 2022
 */
 
 // File: dll/DLL.sol
@@ -52,11 +52,11 @@ library DLL {
     }
 
     /**
-  @dev Inserts a new node between _prev and _next. When inserting a node already existing in 
+  * @dev Inserts a new node between _prev and _next. When inserting a node already existing in 
   the list it will be automatically removed from the old position.
-  @param _prev the node which _new will be inserted after
-  @param _curr the id of the new node being inserted
-  @param _next the node which _new will be inserted before
+  * @param _prev the node which _new will be inserted after
+  * @param _curr the id of the new node being inserted
+  * @param _next the node which _new will be inserted before
   */
     function insert(
         SpottedData storage self,
@@ -220,8 +220,8 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "./RandomAllocator.sol";
 
 /**
-@title WorkSystem Spot v1.3.4a
-@author Mathias Dail - CTO @ Exorde Labs
+* @title WorkSystem Spot v1.3.4a
+* @author Mathias Dail - CTO @ Exorde Labs
 */
 contract DataSpotting is Ownable, RandomAllocator {
     // ============ EVENTS ============
@@ -403,7 +403,7 @@ contract DataSpotting is Ownable, RandomAllocator {
     // ================================================================================
     
     /**
-  @dev Initializer. Can only be called once.
+  * @dev Initializer. Can only be called once.
   */
     constructor(address EXDT_token_) {
         require(address(EXDT_token_) != address(0));
@@ -415,15 +415,15 @@ contract DataSpotting is Ownable, RandomAllocator {
     // ================================================================================
 
     /**
-  @notice Destroy Contract, important to release storage space if critical
-  */
+     * @dev Destroy Contract, important to release storage space if critical
+     */
     function destroyContract() public onlyOwner {
         selfdestruct(payable(owner()));
     }
 
     /**
-  @notice Updates Parameters Manager
-  @param addr address of the Parameter Contract
+   * @notice Updates Parameters Manager
+   * @param addr address of the Parameter Contract
   */
     function updateParametersManager(address addr) public onlyOwner {
         Parameters = IParametersManager(addr);
@@ -431,40 +431,40 @@ contract DataSpotting is Ownable, RandomAllocator {
 
 
     /**
-  @notice Enable or disable Required Staking for participation 
-  @param toggle_ boolean
+  * @notice Enable or disable Required Staking for participation 
+  * @param toggle_ boolean
   */
     function toggleRequiredStaking(bool toggle_) public onlyOwner {
         STAKING_REQUIREMENT_TOGGLE_ENABLED = toggle_;
     }
 
     /**
-  @notice Enable or disable Triggering Updates when Spotting Data
-  @param toggle_ boolean
+  * @notice Enable or disable Triggering Updates when Spotting Data
+  * @param toggle_ boolean
   */
     function toggleTriggerSpotData(bool toggle_) public onlyOwner {
         TRIGGER_WITH_SPOTDATA_TOGGLE_ENABLED = toggle_;
     }
 
     /**
-  @notice Enable or disable Strict Randomness
-  @param toggle_ boolean
+  * @notice Enable or disable Strict Randomness
+  * @param toggle_ boolean
   */
     function toggleStrictRandomness(bool toggle_) public onlyOwner {
         STRICT_RANDOMNESS_REQUIREMENT = toggle_;
     }
 
     /**
-  @notice Enable or disable Automatic Batch Validation when last to reveal
-  @param toggle_ boolean
+  * @notice Enable or disable Automatic Batch Validation when last to reveal
+  * @param toggle_ boolean
   */
     function toggleValidateLastReveal(bool toggle_) public onlyOwner {
         VALIDATE_ON_LAST_REVEAL = toggle_;
     }
 
     /**
-  @notice Enable or disable Forcing the Validation of a Batch File in some conditions
-  @param toggle_ boolean
+  * @notice Enable or disable Forcing the Validation of a Batch File in some conditions
+  * @param toggle_ boolean
   */
     function toggleForceValidateBatchFile(bool toggle_) public onlyOwner {
         FORCE_VALIDATE_BATCH_FILE = toggle_;
@@ -475,9 +475,9 @@ contract DataSpotting is Ownable, RandomAllocator {
     // ================================================================================
 
     /**
-  @notice Enable or disable instant rewards when SpottingData (Testnet)
-  @param state_ boolean
-  @param divider_ base rewards divider
+  * @notice Enable or disable instant rewards when SpottingData (Testnet)
+  * @param state_ boolean
+  * @param divider_ base rewards divider
   */
     function updateInstantSpotRewards(bool state_, uint256 divider_) public onlyOwner {
         InstantSpotRewards = state_;
@@ -485,9 +485,9 @@ contract DataSpotting is Ownable, RandomAllocator {
     }
 
     /**
-  @notice Enable or disable instant rewards when Revealing (Testnet)
-  @param state_ boolean
-  @param divider_ base rewards divider
+  * @notice Enable or disable instant rewards when Revealing (Testnet)
+  * @param state_ boolean
+  * @param divider_ base rewards divider
   */
     function updateInstantRevealRewards(bool state_, uint256 divider_) public onlyOwner {
         InstantRevealRewards = state_;
@@ -495,8 +495,8 @@ contract DataSpotting is Ownable, RandomAllocator {
     }
 
     /**
-  @notice update MaxPendingDataBatchCount, limiting the queue of data to validate
-  @param MaxPendingDataBatchCount_ max queue size
+  * @notice update MaxPendingDataBatchCount, limiting the queue of data to validate
+  * @param MaxPendingDataBatchCount_ max queue size
   */
     function updateMaxPendingDataBatch(uint256 MaxPendingDataBatchCount_) public onlyOwner {
         MaxPendingDataBatchCount = MaxPendingDataBatchCount_;
@@ -504,16 +504,16 @@ contract DataSpotting is Ownable, RandomAllocator {
 
 
     /**
-  @notice update file_size_, the spot atomic file size
-  @param file_size_ spot atomic file size
+  * @notice update file_size_, the spot atomic file size
+  * @param file_size_ spot atomic file size
   */
     function updateSpotFileSize(uint256 file_size_) public onlyOwner {
         SPOT_FILE_SIZE = file_size_;
     }
 
     /**
-  @notice update Gas Left limit, limiting the validation loops iterations
-  @param new_limit_ gas limit in wei
+  * @notice update Gas Left limit, limiting the validation loops iterations
+  * @param new_limit_ gas limit in wei
   */
     function updateGasLeftLimit(uint256 new_limit_) public onlyOwner {
         GAS_LEFT_LIMIT = new_limit_;
@@ -524,9 +524,9 @@ contract DataSpotting is Ownable, RandomAllocator {
     // ================================================================================
 
     /**
-  @notice getAttribute from UUID and attrName
-  @param _UUID unique identifier
-  @param _attrName name of the attribute
+  * @notice getAttribute from UUID and attrName
+  * @param _UUID unique identifier
+  * @param _attrName name of the attribute
   */
     function getAttribute(bytes32 _UUID, string memory _attrName) public view returns (uint256) {
         bytes32 key = keccak256(abi.encodePacked(_UUID, _attrName));
@@ -534,10 +534,10 @@ contract DataSpotting is Ownable, RandomAllocator {
     }
 
     /**
-  @notice setAttribute from UUID , attrName & attrVal
-  @param _UUID unique identifier
-  @param _attrName name of the attribute
-  @param _attrVal value of the attribute
+  * @notice setAttribute from UUID , attrName & attrVal
+  * @param _UUID unique identifier
+  * @param _attrName name of the attribute
+  * @param _attrVal value of the attribute
   */
     function setAttribute(
         bytes32 _UUID,
@@ -553,7 +553,7 @@ contract DataSpotting is Ownable, RandomAllocator {
     // ================================================================================
 
     /**
-  @notice Refill the msg.sender with sFuel. Skale gasless "gas station network" equivalent
+  * @notice Refill the msg.sender with sFuel. Skale gasless "gas station network" equivalent
   */
     function _retrieveSFuel() internal {
         address sFuelAddress;
@@ -574,23 +574,23 @@ contract DataSpotting is Ownable, RandomAllocator {
     // ================================================================================
 
     /**
-  @notice Checks if Worker is Available
-  @param _worker worker address
+  * @notice Checks if Worker is Available
+  * @param _worker worker address
   */
     function isInAvailableWorkers(address _worker) public view returns (bool) {
         return isAvailableWorker[_worker];
     }
 
     /**
-  @notice Checks if Worker is Busy
-  @param _worker worker address
+  * @notice Checks if Worker is Busy
+  * @param _worker worker address
   */
     function isInBusyWorkers(address _worker) public view returns (bool) {
         return isBusyWorker[_worker];
     }
 
     /**
-  @notice Checks if Worker in the "to log off" list
+  * @notice Checks if Worker in the "to log off" list
   */
     function IsInLogoffList(address _worker) public view returns (bool) {
         return isToUnregisterWorker[_worker];
@@ -599,7 +599,7 @@ contract DataSpotting is Ownable, RandomAllocator {
     uint256 REMOVED_WORKER_INDEX_VALUE = 9999999999;
 
     /**
-  @notice Pop _worker from the Busy workers
+  * @notice Pop _worker from the Busy workers
   */
     function PopFromAvailableWorkers(address _worker) internal {
         if (isAvailableWorker[_worker]) {
@@ -621,7 +621,7 @@ contract DataSpotting is Ownable, RandomAllocator {
     }
 
     /**
-  @notice Pop worker from the Busy workers
+  * @notice Pop worker from the Busy workers
   */
     function PopFromBusyWorkers(address _worker) internal {
         if (isBusyWorker[_worker]) {
@@ -842,23 +842,23 @@ contract DataSpotting is Ownable, RandomAllocator {
     // ================================================================================
 
     /**
-  @notice Delete Spotted Data with ID _DataId
-  @param _DataId index of the data to delete
+  * @notice Delete Spotted Data with ID _DataId
+  * @param _DataId index of the data to delete
   */
     function deleteData(uint256 _DataId) public onlyOwner {
         delete SpotsMapping[_DataId];
     }
 
     /**
-  @notice Delete DataBatch with ID _BatchId
-  @param _BatchId index of the batch to delete
+  * @notice Delete DataBatch with ID _BatchId
+  * @param _BatchId index of the batch to delete
   */
     function deleteDataBatch(uint256 _BatchId) public onlyOwner {
         delete DataBatch[_BatchId];
     }
 
     /**
-  @notice Delete Data in a rolling window
+  * @notice Delete Data in a rolling window
   */
     function deleteOldData() internal {
         // Rolling delete of previous data
@@ -885,8 +885,8 @@ contract DataSpotting is Ownable, RandomAllocator {
 
 
     /**
-  @notice Trigger potential Data Batches Validations & Work Allocations
-  @param iteration_count max number of iterations
+  * @notice Trigger potential Data Batches Validations & Work Allocations
+  * @param iteration_count max number of iterations
   */
     function TriggerUpdate(uint256 iteration_count) public {
         require(IParametersManager(address(0)) != Parameters, "Parameters Manager must be set.");
@@ -903,8 +903,8 @@ contract DataSpotting is Ownable, RandomAllocator {
     }
 
     /**
-  @notice Trigger at most iteration_count Work Allocations (N workers on a Batch)
-  @param iteration_count max number of iterations
+  * @notice Trigger at most iteration_count Work Allocations (N workers on a Batch)
+  * @param iteration_count max number of iterations
   */
     function TriggerAllocations(uint256 iteration_count) public {
         require(IParametersManager(address(0)) != Parameters, "Parameters Manager must be set.");
@@ -937,8 +937,8 @@ contract DataSpotting is Ownable, RandomAllocator {
     }
 
     /**
-  @notice Trigger at most iteration_count Ended DataBatch validations
-  @param iteration_count max number of iterations
+  * @notice Trigger at most iteration_count Ended DataBatch validations
+  * @param iteration_count max number of iterations
   */
     function TriggerValidation(uint256 iteration_count) public {
         require(IParametersManager(address(0)) != Parameters, "Parameters Manager must be set.");
@@ -967,9 +967,9 @@ contract DataSpotting is Ownable, RandomAllocator {
     }
 
     /**
-  @notice Checks if two strings are equal
-  @param _a string
-  @param _b string
+  * @notice Checks if two strings are equal
+  * @param _a string
+  * @param _b string
   */
     function AreStringsEqual(string memory _a, string memory _b) public pure returns (bool) {
         if (keccak256(abi.encodePacked(_a)) == keccak256(abi.encodePacked(_b))) {
@@ -986,8 +986,8 @@ contract DataSpotting is Ownable, RandomAllocator {
 
 
     /**
-  @notice Trigger the validation of DataBatch
-  @param _DataBatchId Integer identifier associated with target SpottedData
+  * @notice Trigger the validation of DataBatch
+  * @param _DataBatchId Integer identifier associated with target SpottedData
   */
     function ValidateDataBatch(uint256 _DataBatchId) internal {
         require(IParametersManager(address(0)) != Parameters, "Parameters Manager must be set.");
@@ -1242,7 +1242,7 @@ contract DataSpotting is Ownable, RandomAllocator {
     }
 
     /**
-  @notice Allocate last data batch to be checked by K out N currently available workers.
+  * @notice Allocate last data batch to be checked by K out N currently available workers.
   */
     function AllocateWork() internal {
         require(DataBatch[AllocatedBatchCursor].complete, "Can't allocate work, the current batch is not complete");
@@ -1296,8 +1296,8 @@ contract DataSpotting is Ownable, RandomAllocator {
     }
 
     /**
-  @notice To know if new work is available for worker's address user_
-  @param user_ user
+  * @notice To know if new work is available for worker's address user_
+  * @param user_ user
   */
     function IsNewWorkAvailable(address user_) public view returns (bool) {
         bool new_work_available = false;
@@ -1314,8 +1314,8 @@ contract DataSpotting is Ownable, RandomAllocator {
     }
 
     /**
-  @notice Get newest work for user
-  @param user_ user
+  * @notice Get newest work for user
+  * @param user_ user
   */
     function GetCurrentWork(address user_) public view returns (uint256) {
         WorkerState memory user_state = WorkersState[user_];
@@ -1333,7 +1333,7 @@ contract DataSpotting is Ownable, RandomAllocator {
     // ================================================================================
 
     /**
-  @notice Update the global sliding counter of spotted data, measuring the spots per TIMEFRAME (hour)
+  * @notice Update the global sliding counter of spotted data, measuring the spots per TIMEFRAME (hour)
   */
     function updateGlobalSpotFlow() public {
         require(IParametersManager(address(0)) != Parameters, "Parameters Manager must be set.");
@@ -1351,7 +1351,7 @@ contract DataSpotting is Ownable, RandomAllocator {
     }
 
     /**
-  @notice Count the total spots per TIMEFRAME (hour)
+  * @notice Count the total spots per TIMEFRAME (hour)
   */
     function getGlobalPeriodSpotCount() public view returns (uint256) {
         uint256 total = 0;
@@ -1363,7 +1363,7 @@ contract DataSpotting is Ownable, RandomAllocator {
 
 
     /**
-  @notice Update the global sliding counter of validated data, measuring the URL per TIMEFRAME (hour)
+  * @notice Update the global sliding counter of validated data, measuring the URL per TIMEFRAME (hour)
   */
     function updateItemCount() public {
         require(IParametersManager(address(0)) != Parameters, "Parameters Manager must be set.");
@@ -1381,7 +1381,7 @@ contract DataSpotting is Ownable, RandomAllocator {
     }
 
     /**
-  @notice Count the total spots per TIMEFRAME (hour)
+  * @notice Count the total spots per TIMEFRAME (hour)
   */
     function getPeriodItemCount() public view returns (uint256) {
         uint256 total = 0;
@@ -1392,8 +1392,8 @@ contract DataSpotting is Ownable, RandomAllocator {
     }
 
     /**
-  @notice Update the total spots per TIMEFRAME (hour) per USER
-  @param user_ user
+  * @notice Update the total spots per TIMEFRAME (hour) per USER
+  * @param user_ user
   */
     function updateUserSpotFlow(address user_) public {
         require(IParametersManager(address(0)) != Parameters, "Parameters Manager must be set.");
@@ -1415,8 +1415,8 @@ contract DataSpotting is Ownable, RandomAllocator {
     }
 
     /**
-  @notice Count the total spots per TIMEFRAME (hour) per USER
-  @param user_ user
+  * @notice Count the total spots per TIMEFRAME (hour) per USER
+  * @param user_ user
   */
     function getUserPeriodSpotCount(address user_) public view returns (uint256) {
         TimeframeCounter[NB_TIMEFRAMES] storage UserSpotFlowManager = WorkersSpotFlowManager[user_];
@@ -1432,12 +1432,12 @@ contract DataSpotting is Ownable, RandomAllocator {
     // ================================================================================
 
     /**
-  @notice Submit new data to the protocol, in the stream, which will be added to the latest batch
+  * @notice Submit new data to the protocol, in the stream, which will be added to the latest batch
             file_hashs_, URL_domains_ & item_counts_ must be of same length
-  @param file_hashs_ array of IPFS hashes, json format
-  @param URL_domains_ array of URL top domain per file (for statistics purpose)
-  @param item_counts_ array of size (in number of json items)
-  @param extra_ extra information (for indexing / archival purpose)
+  * @param file_hashs_ array of IPFS hashes, json format
+  * @param URL_domains_ array of URL top domain per file (for statistics purpose)
+  * @param item_counts_ array of size (in number of json items)
+  * @param extra_ extra information (for indexing / archival purpose)
   */
     function SpotData(
         string[] memory file_hashs_,
@@ -1564,12 +1564,12 @@ contract DataSpotting is Ownable, RandomAllocator {
     }
 
     /**
-  @notice Commits spot-check-vote on a DataBatch
-  @param _DataBatchId DataBatch ID
-  @param _encryptedHash encrypted hash of the submitted IPFS file (json format)
-  @param _encryptedVote encrypted hash of the submitted IPFS vote
-  @param _BatchCount Batch Count in number of items (in the aggregated IPFS hash)
-  @param _From extra information (for indexing / archival purpose)
+  * @notice Commits spot-check-vote on a DataBatch
+  * @param _DataBatchId DataBatch ID
+  * @param _encryptedHash encrypted hash of the submitted IPFS file (json format)
+  * @param _encryptedVote encrypted hash of the submitted IPFS vote
+  * @param _BatchCount Batch Count in number of items (in the aggregated IPFS hash)
+  * @param _From extra information (for indexing / archival purpose)
   */
     function commitSpotCheck(
         uint256 _DataBatchId,
@@ -1639,11 +1639,11 @@ contract DataSpotting is Ownable, RandomAllocator {
     }
 
     /**
-  @notice Reveals spot-check-vote on a DataBatch
-  @param _DataBatchId DataBatch ID
-  @param _clearIPFSHash clear hash of the submitted IPFS file (json format)
-  @param _clearVote clear hash of the submitted IPFS vote
-  @param _salt arbitraty integer used to hash the previous commit & verify the reveal
+  * @notice Reveals spot-check-vote on a DataBatch
+  * @param _DataBatchId DataBatch ID
+  * @param _clearIPFSHash clear hash of the submitted IPFS file (json format)
+  * @param _clearVote clear hash of the submitted IPFS vote
+  * @param _salt arbitraty integer used to hash the previous commit & verify the reveal
   */
     function revealSpotCheck(
         uint256 _DataBatchId,
@@ -1733,10 +1733,10 @@ contract DataSpotting is Ownable, RandomAllocator {
     // ================================================================================
 
     /**
-  @notice Loads _numTokens ERC20 tokens into the voting contract for one-to-one voting rights
-  @dev Assumes that msg.sender has approved voting contract to spend on their behalf
-  @param _numTokens The number of votingTokens desired in exchange for ERC20 tokens
-  @param user_ The user address
+  * @notice Loads _numTokens ERC20 tokens into the voting contract for one-to-one voting rights
+  * @dev Assumes that msg.sender has approved voting contract to spend on their behalf
+  * @param _numTokens The number of votingTokens desired in exchange for ERC20 tokens
+  * @param user_ The user address
   */
     function requestAllocatedStake(uint256 _numTokens, address user_) internal {
         require(Parameters.getStakeManager() != address(0), "StakeManager is null in Parameters");
@@ -1750,9 +1750,9 @@ contract DataSpotting is Ownable, RandomAllocator {
     }
 
     /**
-  @notice Withdraw _numTokens ERC20 tokens from the voting contract, revoking these voting rights
-  @param _numTokens The number of ERC20 tokens desired in exchange for voting rights
-  @param user_ The user address
+  * @notice Withdraw _numTokens ERC20 tokens from the voting contract, revoking these voting rights
+  * @param _numTokens The number of ERC20 tokens desired in exchange for voting rights
+  * @param user_ The user address
   */
     function withdrawVotingRights(uint256 _numTokens, address user_) public {
         require(IParametersManager(address(0)) != Parameters, "Parameters Manager must be set.");
@@ -1770,30 +1770,30 @@ contract DataSpotting is Ownable, RandomAllocator {
     }
 
     /**
-  @notice get Locked Token for the current Contract (WorkSystem)
-  @param user_ The user address
+  * @notice get Locked Token for the current Contract (WorkSystem)
+  * @param user_ The user address
   */
     function getSystemTokenBalance(address user_) public view returns (uint256 tokens) {
         return (uint256(SystemStakedTokenBalance[user_]));
     }
 
     /**
-  @notice Get Total Accepted Batches
+  * @notice Get Total Accepted Batches
   */
     function getAcceptedBatchesCount() public view returns (uint256 count) {
         return (uint256(AcceptedBatchsCounter));
     }
 
     /**
-  @notice Get Total Rejected Batches
+  * @notice Get Total Rejected Batches
   */
     function getRejectedBatchesCount() public view returns (uint256 count) {
         return (uint256(RejectedBatchsCounter));
     }
 
     /**
-  @dev Unlocks tokens locked in unrevealed spot-check-vote where SpottedData has ended
-  @param _DataBatchId Integer identifier associated with the target SpottedData
+  * @dev Unlocks tokens locked in unrevealed spot-check-vote where SpottedData has ended
+  * @param _DataBatchId Integer identifier associated with the target SpottedData
   */
     function rescueTokens(uint256 _DataBatchId) public {
         require(
@@ -1808,8 +1808,8 @@ contract DataSpotting is Ownable, RandomAllocator {
     }
 
     /**
-  @dev Unlocks tokens locked in unrevealed spot-check-votes where Datas have ended
-  @param _DataBatchIDs Array of integer identifiers associated with the target Datas
+  * @dev Unlocks tokens locked in unrevealed spot-check-votes where Datas have ended
+  * @param _DataBatchIDs Array of integer identifiers associated with the target Datas
   */
     function rescueTokensInMultipleDatas(uint256[] memory _DataBatchIDs) public {
         // loop through arrays, rescuing tokens from all
@@ -1823,8 +1823,8 @@ contract DataSpotting is Ownable, RandomAllocator {
     // ================================================================================
 
     /**
-  @notice get all IPFS hashes, input of the batch 
-  @param _DataBatchId ID of the batch
+  * @notice get all IPFS hashes, input of the batch 
+  * @param _DataBatchId ID of the batch
   */
     function getIPFShashesForBatch(uint256 _DataBatchId) public view returns (string[] memory) {
         require(DataExists(_DataBatchId), "_DataBatchId must exist");
@@ -1843,9 +1843,9 @@ contract DataSpotting is Ownable, RandomAllocator {
     }
 
     /**
-  @notice get all IPFS hashes, input of batchs, between batch indices A and B (a < B)
-  @param _DataBatchId_a ID of the starting batch
-  @param _DataBatchId_b ID of the ending batch (included)
+  * @notice get all IPFS hashes, input of batchs, between batch indices A and B (a < B)
+  * @param _DataBatchId_a ID of the starting batch
+  * @param _DataBatchId_b ID of the ending batch (included)
   */
     function getMultiBatchIPFShashes(uint256 _DataBatchId_a, uint256 _DataBatchId_b)
         public
@@ -1877,9 +1877,9 @@ contract DataSpotting is Ownable, RandomAllocator {
 
 
     /**
-  @notice get all item counts for all batches between batch indices A and B (a < B)
-  @param _DataBatchId_a ID of the starting batch
-  @param _DataBatchId_b ID of the ending batch (included)
+  * @notice get all item counts for all batches between batch indices A and B (a < B)
+  * @param _DataBatchId_a ID of the starting batch
+  * @param _DataBatchId_b ID of the ending batch (included)
   */
     function getBatchCountForBatch(uint256 _DataBatchId_a, uint256 _DataBatchId_b)
         public
@@ -1904,8 +1904,8 @@ contract DataSpotting is Ownable, RandomAllocator {
     }
 
     /**
-  @notice get top domain URL for a given batch
-  @param _DataBatchId ID of the batch
+  * @notice get top domain URL for a given batch
+  * @param _DataBatchId ID of the batch
   */
     function getDomainsForBatch(uint256 _DataBatchId) public view returns (string[] memory) {
         require(DataExists(_DataBatchId), "_DataBatchId must exist");
@@ -1924,8 +1924,8 @@ contract DataSpotting is Ownable, RandomAllocator {
     }
 
     /**
-  @notice get the From information for a given batch
-  @param _DataBatchId ID of the batch
+  * @notice get the From information for a given batch
+  * @param _DataBatchId ID of the batch
   */
     function getFromsForBatch(uint256 _DataBatchId) public view returns (string[] memory) {
         require(DataExists(_DataBatchId), "_DataBatchId must exist");
@@ -1940,8 +1940,8 @@ contract DataSpotting is Ownable, RandomAllocator {
     }
 
     /**
-  @notice get all Votes on a given batch
-  @param _DataBatchId ID of the batch
+  * @notice get all Votes on a given batch
+  * @param _DataBatchId ID of the batch
   */
     function getVotesForBatch(uint256 _DataBatchId) public view returns (uint256[] memory) {
         require(DataExists(_DataBatchId), "_DataBatchId must exist");
@@ -1956,8 +1956,8 @@ contract DataSpotting is Ownable, RandomAllocator {
     }
 
     /**
-  @notice get all IPFS files submitted (during commit/reveal) on a given batch
-  @param _DataBatchId ID of the batch
+  * @notice get all IPFS files submitted (during commit/reveal) on a given batch
+  * @param _DataBatchId ID of the batch
   */
     function getSubmittedFilesForBatch(uint256 _DataBatchId) public view returns (string[] memory) {
         require(DataExists(_DataBatchId), "_DataBatchId must exist");
@@ -1972,21 +1972,21 @@ contract DataSpotting is Ownable, RandomAllocator {
     }
 
     /**
-  @notice Get all current workers
+  * @notice Get all current workers
   */
     function getActiveWorkersCount() public view returns (uint256 numWorkers) {
         return (uint256(availableWorkers.length + busyWorkers.length));
     }
 
     /**
-  @notice Get all available (idle) workers
+  * @notice Get all available (idle) workers
   */
     function getAvailableWorkersCount() public view returns (uint256 numWorkers) {
         return (uint256(availableWorkers.length));
     }
 
     /**
-  @notice Get all busy workers
+  * @notice Get all busy workers
   */
     function getBusyWorkersCount() public view returns (uint256 numWorkers) {
         return (uint256(busyWorkers.length));
@@ -2000,12 +2000,12 @@ contract DataSpotting is Ownable, RandomAllocator {
     // ----------------------------------------------------
 
     /**
-  @dev Compares previous and next SpottedData's committed tokens for sorting purposes
-  @param _prevID Integer identifier associated with previous SpottedData in sorted order
-  @param _nextID Integer identifier associated with next SpottedData in sorted order
-  @param _voter Address of user to check DLL position for
-  @param _numTokens The number of tokens to be committed towards the SpottedData (used for sorting)
-  @return APPROVED Boolean indication of if the specified position maintains the sort
+  * @dev Compares previous and next SpottedData's committed tokens for sorting purposes
+  * @param _prevID Integer identifier associated with previous SpottedData in sorted order
+  * @param _nextID Integer identifier associated with next SpottedData in sorted order
+  * @param _voter Address of user to check DLL position for
+  * @param _numTokens The number of tokens to be committed towards the SpottedData (used for sorting)
+  * @return APPROVED Boolean indication of if the specified position maintains the sort
   */
     function validPosition(
         uint256 _prevID,
@@ -2020,9 +2020,9 @@ contract DataSpotting is Ownable, RandomAllocator {
     }
 
     /**
-  @notice Determines if proposal has passed
-  @dev Check if votesFor out of totalSpotChecks exceeds votesQuorum (requires DataEnded)
-  @param _DataBatchId Integer identifier associated with target SpottedData
+  * @notice Determines if proposal has passed
+  * @dev Check if votesFor out of totalSpotChecks exceeds votesQuorum (requires DataEnded)
+  * @param _DataBatchId Integer identifier associated with target SpottedData
   */
     function isPassed(uint256 _DataBatchId) public view returns (bool passed) {
         BatchMetadata memory batch_ = DataBatch[_DataBatchId];
@@ -2030,9 +2030,9 @@ contract DataSpotting is Ownable, RandomAllocator {
     }
 
     /**
-  @param _DataBatchId Integer identifier associated with target SpottedData
-  @param _salt Arbitrarily chosen integer used to generate secretHash
-  @return correctSpotChecks Number of tokens voted for winning option
+  * @param _DataBatchId Integer identifier associated with target SpottedData
+  * @param _salt Arbitrarily chosen integer used to generate secretHash
+  * @return correctSpotChecks Number of tokens voted for winning option
   */
     function getNumPassingTokens(
         address _voter,
@@ -2052,9 +2052,9 @@ contract DataSpotting is Ownable, RandomAllocator {
     }
 
     /**
-  @notice Determines if SpottedData is over
-  @dev Checks isExpired for specified SpottedData's revealEndDate
-  @return ended Boolean indication of whether Dataing period is over
+  * @notice Determines if SpottedData is over
+  * @dev Checks isExpired for specified SpottedData's revealEndDate
+  * @return ended Boolean indication of whether Dataing period is over
   */
     function DataEnded(uint256 _DataBatchId) public view returns (bool ended) {
         require(DataExists(_DataBatchId), "Data must exist");
@@ -2063,48 +2063,48 @@ contract DataSpotting is Ownable, RandomAllocator {
     }
 
     /**
-  @notice Get User Submitted Data (Spots)
-  @return user_Datas the array of Data Spotted/Submitted by the user
+  * @notice Get User Submitted Data (Spots)
+  * @return user_Datas the array of Data Spotted/Submitted by the user
   */
     function getUserDatas(address user) public view returns (uint256[] memory user_Datas) {
         return UserSubmissions[user];
     }
 
     /**
-  @notice get Last Data Id
-  @return DataId
+  * @notice get Last Data Id
+  * @return DataId
   */
     function getLastDataId() public view returns (uint256 DataId) {
         return DataNonce;
     }
 
     /**
-  @notice get Last Batch Id
-  @return LastBatchId
+  * @notice get Last Batch Id
+  * @return LastBatchId
   */
     function getLastBatchId() public view returns (uint256 LastBatchId) {
         return LastBatchCounter;
     }
 
     /**
-  @notice get Last Checked Batch Id
-  @return LastCheckedBatchId
+  * @notice get Last Checked Batch Id
+  * @return LastCheckedBatchId
   */
     function getLastCheckedBatchId() public view returns (uint256 LastCheckedBatchId) {
         return BatchCheckingCursor;
     }
 
     /**
-  @notice getLastAllocatedBatchId
-  @return LastAllocatedBatchId
+  * @notice getLastAllocatedBatchId
+  * @return LastAllocatedBatchId
   */
     function getLastAllocatedBatchId() public view returns (uint256 LastAllocatedBatchId) {
         return AllocatedBatchCursor;
     }
 
     /**
-  @notice get DataBatch By ID
-  @return batch as BatchMetadata struct
+  * @notice get DataBatch By ID
+  * @return batch as BatchMetadata struct
   */
     function getBatchByID(uint256 _DataBatchId) public view returns (BatchMetadata memory batch) {
         require(DataExists(_DataBatchId));
@@ -2112,8 +2112,8 @@ contract DataSpotting is Ownable, RandomAllocator {
     }
 
     /**
-  @notice get Output Batch IPFS File By ID
-  @return batch IPFS File
+  * @notice get Output Batch IPFS File By ID
+  * @return batch IPFS File
   */
     function getBatchIPFSFileByID(uint256 _DataBatchId) public view returns (string memory batch) {
         require(DataExists(_DataBatchId));
@@ -2121,10 +2121,12 @@ contract DataSpotting is Ownable, RandomAllocator {
     }
     
     /**
-  @notice get all Output Batch IPFS Files (hashes),between batch indices A and B (a < B)
-  @param _DataBatchId_a ID of the starting batch
-  @param _DataBatchId_b ID of the ending batch (included)
+  * @notice get all Output Batch IPFS Files (hashes),between batch indices A and B (a < B)
+  * @param _DataBatchId_a ID of the starting batch
+  * @param _DataBatchId_b ID of the ending batch (included)
+  * @return array of Batch File ID between index A and B (excluded), example getBatchsFilesByID(0,10) -> 0,9
   */
+  
     function getBatchsFilesByID(uint256 _DataBatchId_a, uint256 _DataBatchId_b)
         public
         view
@@ -2140,32 +2142,32 @@ contract DataSpotting is Ownable, RandomAllocator {
     }
 
     /**
-  @notice get Data By ID
-  @return data as SpottedData struct
+  * @notice get Data By ID
+  * @return data as SpottedData struct
   */
     function getDataByID(uint256 _DataId) public view returns (SpottedData memory data) {
         return SpotsMapping[_DataId];
     }
 
     /**
-  @notice getCounter
-  @return Counter of all "accepted transactions"
+  * @notice getCounter
+  * @return Counter of all "accepted transactions"
   */
     function getTxCounter() public view returns (uint256 Counter) {
         return AllTxsCounter;
     }
 
     /**
-  @notice getCounter
-  @return Counter of the last Dataed a user started
+  * @notice getCounter
+  * @return Counter of the last Dataed a user started
   */
     function getItemCounter() public view returns (uint256 Counter) {
         return AllItemCounter;
     }
 
     /**
-  @notice Determines DataCommitEndDate
-  @return commitEndDate indication of whether Dataing period is over
+  * @notice Determines DataCommitEndDate
+  * @return commitEndDate indication of whether Dataing period is over
   */
     function DataCommitEndDate(uint256 _DataBatchId) public view returns (uint256 commitEndDate) {
         require(DataExists(_DataBatchId), "_DataBatchId must exist");
@@ -2174,8 +2176,8 @@ contract DataSpotting is Ownable, RandomAllocator {
     }
 
     /**
-  @notice Determines DataRevealEndDate
-  @return revealEndDate indication of whether Dataing period is over
+  * @notice Determines DataRevealEndDate
+  * @return revealEndDate indication of whether Dataing period is over
   */
     function DataRevealEndDate(uint256 _DataBatchId) public view returns (uint256 revealEndDate) {
         require(DataExists(_DataBatchId), "_DataBatchId must exist");
@@ -2184,10 +2186,10 @@ contract DataSpotting is Ownable, RandomAllocator {
     }
 
     /**
-  @notice Checks if the commit period is still active for the specified SpottedData
-  @dev Checks isExpired for the specified SpottedData's commitEndDate
-  @param _DataBatchId Integer identifier associated with target SpottedData
-  @return active Boolean indication of isCommitPeriodActive for target SpottedData
+  * @notice Checks if the commit period is still active for the specified SpottedData
+  * @dev Checks isExpired for the specified SpottedData's commitEndDate
+  * @param _DataBatchId Integer identifier associated with target SpottedData
+  * @return active Boolean indication of isCommitPeriodActive for target SpottedData
   */
     function commitPeriodActive(uint256 _DataBatchId) public view returns (bool active) {
         require(DataExists(_DataBatchId), "_DataBatchId must exist");
@@ -2196,10 +2198,10 @@ contract DataSpotting is Ownable, RandomAllocator {
     }
 
     /**
-  @notice Checks if the commit period is over
-  @dev Checks isExpired for the specified SpottedData's commitEndDate
-  @param _DataBatchId Integer identifier associated with target SpottedData
-  @return active Boolean indication of isCommitPeriodActive for target SpottedData
+  * @notice Checks if the commit period is over
+  * @dev Checks isExpired for the specified SpottedData's commitEndDate
+  * @param _DataBatchId Integer identifier associated with target SpottedData
+  * @return active Boolean indication of isCommitPeriodActive for target SpottedData
   */
     function commitPeriodOver(uint256 _DataBatchId) public view returns (bool active) {
         if (DataExists(_DataBatchId) == false) {
@@ -2211,10 +2213,10 @@ contract DataSpotting is Ownable, RandomAllocator {
     }
 
     /**
-  @notice Checks if the commit period is still active for the specified SpottedData
-  @dev Checks isExpired for the specified SpottedData's commitEndDate
-  @param _DataBatchId Integer identifier associated with target SpottedData
-  @return remainingTime Integer
+  * @notice Checks if the commit period is still active for the specified SpottedData
+  * @dev Checks isExpired for the specified SpottedData's commitEndDate
+  * @param _DataBatchId Integer identifier associated with target SpottedData
+  * @return remainingTime Integer
   */
     function remainingCommitDuration(uint256 _DataBatchId) public view returns (uint256 remainingTime) {
         require(DataExists(_DataBatchId), "_DataBatchId must exist");
@@ -2226,9 +2228,9 @@ contract DataSpotting is Ownable, RandomAllocator {
     }
 
     /**
-  @notice Checks if the reveal period is still active for the specified SpottedData
-  @dev Checks isExpired for the specified SpottedData's revealEndDate
-  @param _DataBatchId Integer identifier associated with target SpottedData
+  * @notice Checks if the reveal period is still active for the specified SpottedData
+  * @dev Checks isExpired for the specified SpottedData's revealEndDate
+  * @param _DataBatchId Integer identifier associated with target SpottedData
   */
     function revealPeriodActive(uint256 _DataBatchId) public view returns (bool active) {
         require(DataExists(_DataBatchId), "_DataBatchId must exist");
@@ -2237,9 +2239,9 @@ contract DataSpotting is Ownable, RandomAllocator {
     }
 
     /**
-  @notice Checks if the reveal period is over
-  @dev Checks isExpired for the specified SpottedData's revealEndDate
-  @param _DataBatchId Integer identifier associated with target SpottedData
+  * @notice Checks if the reveal period is over
+  * @dev Checks isExpired for the specified SpottedData's revealEndDate
+  * @param _DataBatchId Integer identifier associated with target SpottedData
   */
     function revealPeriodOver(uint256 _DataBatchId) public view returns (bool active) {
         if (DataExists(_DataBatchId) == false) {
@@ -2251,10 +2253,10 @@ contract DataSpotting is Ownable, RandomAllocator {
     }
 
     /**
-  @notice Checks if the commit period is still active for the specified SpottedData
-  @dev Checks isExpired for the specified SpottedData's commitEndDate
-  @param _DataBatchId Integer identifier associated with target SpottedData
-  @return remainingTime Integer indication of isCommitPeriodActive for target SpottedData
+  * @notice Checks if the commit period is still active for the specified SpottedData
+  * @dev Checks isExpired for the specified SpottedData's commitEndDate
+  * @param _DataBatchId Integer identifier associated with target SpottedData
+  * @return remainingTime Integer indication of isCommitPeriodActive for target SpottedData
   */
     function remainingRevealDuration(uint256 _DataBatchId) public view returns (uint256 remainingTime) {
         require(DataExists(_DataBatchId), "_DataBatchId must exist");
@@ -2266,10 +2268,10 @@ contract DataSpotting is Ownable, RandomAllocator {
     }
 
     /**
-  @dev Checks if user has committed for specified SpottedData
-  @param _voter Address of user to check against
-  @param _DataBatchId Integer identifier associated with target SpottedData
-  @return committed Boolean indication of whether user has committed
+  * @dev Checks if user has committed for specified SpottedData
+  * @param _voter Address of user to check against
+  * @param _DataBatchId Integer identifier associated with target SpottedData
+  * @return committed Boolean indication of whether user has committed
   */
     function didCommit(address _voter, uint256 _DataBatchId) public view returns (bool committed) {
         require(DataExists(_DataBatchId), "_DataBatchId must exist");
@@ -2279,10 +2281,10 @@ contract DataSpotting is Ownable, RandomAllocator {
     }
 
     /**
-  @dev Checks if user has revealed for specified SpottedData
-  @param _voter Address of user to check against
-  @param _DataBatchId Integer identifier associated with target SpottedData
-  @return revealed Boolean indication of whether user has revealed
+  * @dev Checks if user has revealed for specified SpottedData
+  * @param _voter Address of user to check against
+  * @param _DataBatchId Integer identifier associated with target SpottedData
+  * @return revealed Boolean indication of whether user has revealed
   */
     function didReveal(address _voter, uint256 _DataBatchId) public view returns (bool revealed) {
         require(DataExists(_DataBatchId), "_DataBatchId must exist");
@@ -2292,9 +2294,9 @@ contract DataSpotting is Ownable, RandomAllocator {
     }
 
     /**
-  @dev Checks if a SpottedData exists
-  @param _DataBatchId The DataID whose existance is to be evaluated.
-  @return exists Boolean Indicates whether a SpottedData exists for the provided DataID
+  * @dev Checks if a SpottedData exists
+  * @param _DataBatchId The DataID whose existance is to be evaluated.
+  * @return exists Boolean Indicates whether a SpottedData exists for the provided DataID
   */
     function DataExists(uint256 _DataBatchId) public view returns (bool exists) {
         return (_DataBatchId <= LastBatchCounter);
@@ -2313,82 +2315,82 @@ contract DataSpotting is Ownable, RandomAllocator {
     // ------------------------------------------------------------------------------------------------------------
 
     /**
-  @dev Gets the bytes32 commitHash property of target SpottedData
-  @param _voter Address of user to check against
-  @param _DataBatchId Integer identifier associated with target SpottedData
-  @return commitHash Bytes32 hash property attached to target SpottedData
+  * @dev Gets the bytes32 commitHash property of target SpottedData
+  * @param _voter Address of user to check against
+  * @param _DataBatchId Integer identifier associated with target SpottedData
+  * @return commitHash Bytes32 hash property attached to target SpottedData
   */
     function getCommitVoteHash(address _voter, uint256 _DataBatchId) public view returns (bytes32 commitHash) {
         return bytes32(getAttribute(attrUUID(_voter, _DataBatchId), "commitVote"));
     }
 
     /**
-  @dev Gets the bytes32 commitHash property of target SpottedData
-  @param _voter Address of user to check against
-  @param _DataBatchId Integer identifier associated with target SpottedData
-  @return commitHash Bytes32 hash property attached to target SpottedData
+  * @dev Gets the bytes32 commitHash property of target SpottedData
+  * @param _voter Address of user to check against
+  * @param _DataBatchId Integer identifier associated with target SpottedData
+  * @return commitHash Bytes32 hash property attached to target SpottedData
   */
     function getCommitIPFSHash(address _voter, uint256 _DataBatchId) public view returns (bytes32 commitHash) {
         return bytes32(getAttribute(attrUUID(_voter, _DataBatchId), "commitHash"));
     }
 
     /**
-  @dev Gets the bytes32 commitHash property of target SpottedData
-  @param _clearVote vote Option
-  @param _salt is the salt
-  @return keccak256hash Bytes32 hash property attached to target SpottedData
+  * @dev Gets the bytes32 commitHash property of target SpottedData
+  * @param _clearVote vote Option
+  * @param _salt is the salt
+  * @return keccak256hash Bytes32 hash property attached to target SpottedData
   */
     function getEncryptedHash(uint256 _clearVote, uint256 _salt) public pure returns (bytes32 keccak256hash) {
         return keccak256(abi.encodePacked(_clearVote, _salt));
     }
 
     /**
-  @dev Gets the bytes32 commitHash property of target FormattedData
-  @param _hash ipfs hash of aggregated data in a string
-  @param _salt is the salt
-  @return keccak256hash Bytes32 hash property attached to target FormattedData
+  * @dev Gets the bytes32 commitHash property of target FormattedData
+  * @param _hash ipfs hash of aggregated data in a string
+  * @param _salt is the salt
+  * @return keccak256hash Bytes32 hash property attached to target FormattedData
   */
     function getEncryptedStringHash(string memory _hash, uint256 _salt) public pure returns (bytes32 keccak256hash) {
         return keccak256(abi.encode(_hash, _salt));
     }
 
     /**
-  @dev Wrapper for getAttribute with attrName="numTokens"
-  @param _voter Address of user to check against
-  @param _DataBatchId Integer identifier associated with target SpottedData
-  @return numTokens Number of tokens committed to SpottedData in sorted SpottedData-linked-list
+  * @dev Wrapper for getAttribute with attrName="numTokens"
+  * @param _voter Address of user to check against
+  * @param _DataBatchId Integer identifier associated with target SpottedData
+  * @return numTokens Number of tokens committed to SpottedData in sorted SpottedData-linked-list
   */
     function getNumTokens(address _voter, uint256 _DataBatchId) public view returns (uint256 numTokens) {
         return getAttribute(attrUUID(_voter, _DataBatchId), "numTokens");
     }
 
     /**
-  @dev Gets top element of sorted SpottedData-linked-list
-  @param _voter Address of user to check against
-  @return DataID Integer identifier to SpottedData with maximum number of tokens committed to it
+  * @dev Gets top element of sorted SpottedData-linked-list
+  * @param _voter Address of user to check against
+  * @return DataID Integer identifier to SpottedData with maximum number of tokens committed to it
   */
     function getLastNode(address _voter) public view returns (uint256 DataID) {
         return dllMap[_voter].getPrev(0);
     }
 
     /**
-  @dev Gets the numTokens property of getLastNode
-  @param _voter Address of user to check against
-  @return numTokens Maximum number of tokens committed in SpottedData specified
+  * @dev Gets the numTokens property of getLastNode
+  * @param _voter Address of user to check against
+  * @return numTokens Maximum number of tokens committed in SpottedData specified
   */
     function getLockedTokens(address _voter) public view returns (uint256 numTokens) {
         return getNumTokens(_voter, getLastNode(_voter));
     }
 
     /*
-  @dev Takes the last node in the user's DLL and iterates backwards through the list searching
+  * @dev Takes the last node in the user's DLL and iterates backwards through the list searching
   for a node with a value less than or equal to the provided _numTokens value. When such a node
   is found, if the provided _DataBatchId matches the found nodeID, this operation is an in-place
   update. In that case, return the previous node of the node being updated. Otherwise return the
   first node that was found with a value less than or equal to the provided _numTokens.
-  @param _voter The voter whose DLL will be searched
-  @param _numTokens The value for the numTokens attribute in the node to be inserted
-  @return the node which the propoded node should be inserted after
+  * @param _voter The voter whose DLL will be searched
+  * @param _numTokens The value for the numTokens attribute in the node to be inserted
+  * @return the node which the propoded node should be inserted after
   */
     function getInsertPointForNumTokens(
         address _voter,
@@ -2425,18 +2427,18 @@ contract DataSpotting is Ownable, RandomAllocator {
     // ----------------
 
     /**
-  @dev Checks if an expiration date has been reached
-  @param _terminationDate Integer timestamp of date to compare current timestamp with
-  @return expired Boolean indication of whether the terminationDate has passed
+  * @dev Checks if an expiration date has been reached
+  * @param _terminationDate Integer timestamp of date to compare current timestamp with
+  * @return expired Boolean indication of whether the terminationDate has passed
   */
     function isExpired(uint256 _terminationDate) public view returns (bool expired) {
         return (block.timestamp > _terminationDate);
     }
 
     /**
-  @dev Generates an identifier which associates a user and a SpottedData together
-  @param _DataBatchId Integer identifier associated with target SpottedData
-  @return UUID Hash which is deterministic from user_ and _DataBatchId
+  * @dev Generates an identifier which associates a user and a SpottedData together
+  * @param _DataBatchId Integer identifier associated with target SpottedData
+  * @return UUID Hash which is deterministic from user_ and _DataBatchId
   */
     function attrUUID(address user_, uint256 _DataBatchId) public pure returns (bytes32 UUID) {
         return keccak256(abi.encodePacked(user_, _DataBatchId));
