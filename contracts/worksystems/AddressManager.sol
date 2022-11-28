@@ -79,6 +79,10 @@ contract AddressManager is Ownable {
 
     // ------------------------------------------------------------------------------------------
 
+    /**
+     * @notice Updates the Parameters Manager contract to use
+     * @param addr new address of the Parameters Manager contract
+     */
     function updateParametersManager(address addr) public onlyOwner {
         require(addr != address(0));
         Parameters = IParametersManager(addr);
@@ -86,28 +90,61 @@ contract AddressManager is Ownable {
 
     //// --------------------------- GETTERS FOR MASTERS
 
+    /**
+     * @notice Returns if _master is a master of msg.sender
+     * @param _master address
+     * @return bool true if _master is a Master of msg.sender
+     */
     function isMasterOfMe(address _master) public view returns (bool) {
         return MasterClaimingWorker[_master][msg.sender];
     }
 
+    /**
+     * @notice Returns if _master is a master of _address
+     * @param _master address
+     * @param _address address
+     * @return bool true if _master is a Master of _address
+     */
     function isMasterOf(address _master, address _address) public view returns (bool) {
         return MasterClaimingWorker[_master][_address];
     }
 
+    /**
+     * @notice Get all sub workers for a given Master address
+     * @param _master address
+     * @return array of addresses
+     */
     function getMasterSubs(address _master) public view returns (address[] memory) {
         return MasterToSubsMap[_master];
     }
 
     //// --------------------------- GETTERS FOR WORKERS
 
+    /**
+     * @notice Check if a worker is a sub address of the msg.sender
+     * @param _worker worker address
+     * @return bool true if _worker is a wub worker of msg.sender (master)
+     */
     function isSubWorkerOfMe(address _worker) public view returns (bool) {
         return MasterClaimingWorker[msg.sender][_worker];
     }
 
+    /**
+     * @notice Returns the master claimed by worker _worker
+     * @param _master address
+     * @param _address address
+     * @return bool true if _address is claimed by _master
+     */
     function isSubWorkerOf(address _master, address _address) public view returns (bool) {
         return MasterClaimingWorker[_master][_address];
     }
 
+    /**
+     * @notice Check if sub worker is in the MasterToSubsMap mapping of Master
+     * @param _worker address
+     * @param _master address
+     * @return bool true if _address is in the MasterToSubsMap mapping of _master
+     */
     function isSubInMasterArray(address _worker, address _master) public view returns (bool) {
         bool found = false;
         address[] memory sub_workers_ = MasterToSubsMap[_master];
@@ -120,10 +157,20 @@ contract AddressManager is Ownable {
         return found;
     }
 
+    /**
+     * @notice Returns the master claimed by worker _worker
+     * @param _worker address
+     * @return address of worker's master address
+     */
     function getMaster(address _worker) public view returns (address) {
         return SubToMasterMap[_worker];
     }
 
+    /**
+     * @notice Pops _worker from Master's MasterToSubsMap array
+     * @param _master address
+     * @param _worker address
+     */
     function PopFromSubsArray(address _master, address _worker) internal {
         uint256 index = 0;
         bool found = false;
@@ -142,6 +189,12 @@ contract AddressManager is Ownable {
     }
 
     //// --------------------------- // verify bidirectional link
+    /**
+     * @notice Checks if a _master and _address and mapped in both ways (master & sub worker of)
+     * @param _master address
+     * @param _address address
+     * @return bool true if both addresses are mapped to each other
+     */
     function AreMasterSubLinked(address _master, address _address) public view returns (bool) {
         return (isSubWorkerOf(_master, _address) && isMasterOf(_master, _address));
     }
@@ -150,12 +203,20 @@ contract AddressManager is Ownable {
     //// -------------------- MASTER FUNCTIONS ---------------------
     //// -------- ADD
 
+    /**
+     * @notice Add sub-worker addresses mapped to msg.sender
+     * @param _address address
+     */
     function MasterClaimSub(address _address) public {
         MasterClaimingWorker[msg.sender][_address] = true;
         MasterToSubsMap[msg.sender].push(_address);
         emit AddressAddedByMaster(msg.sender, _address);
     }
 
+    /**
+     * @notice Add mutliple sub-worker addresses to be mapped to msg.sender
+     * @param _addresses array of address
+     */
     function MasterClaimManySubs(address[] memory _addresses) public {
         for (uint256 i = 0; i < _addresses.length; i++) {
             if (MasterClaimingWorker[msg.sender][_addresses[i]] != true) {
@@ -168,6 +229,10 @@ contract AddressManager is Ownable {
 
     //// -------- REMOVE
 
+    /**
+     * @notice Remove sub-worker addresses mapped to msg.sender
+     * @param _address address
+     */
     function MasterRemoveSub(address _address) public {
         require(
             MasterClaimingWorker[msg.sender][_address] != false,
@@ -178,6 +243,10 @@ contract AddressManager is Ownable {
         emit AddressRemovedByMaster(msg.sender, _address);
     }
 
+    /**
+     * @notice Remove Multiple sub-worker addresses mapped to msg.sender
+     * @param _addresses array of addresses
+     */
     function MasterRemoveManySubs(address[] memory _addresses) public {
         for (uint256 i = 0; i < _addresses.length; i++) {
             if (MasterClaimingWorker[msg.sender][_addresses[i]] != false) {
@@ -191,6 +260,11 @@ contract AddressManager is Ownable {
     //// -----------------------------------------------------------
     //// -------------------- WORKER FUNCTIONS ---------------------
 
+    /**
+     * @notice Fetch the Highest Master on the graph starting from the _worker leaf
+     * @param _worker address
+     * @return The highest master of worker _worker, or _worker if no master found
+     */
     function FetchHighestMaster(address _worker) public view returns (address) {
         require(_worker != address(0), "FetchHighestMaster: input _worker needs to be non null address");
         address _master = SubToMasterMap[_worker];
@@ -205,6 +279,10 @@ contract AddressManager is Ownable {
         return (_highest_master);
     }
 
+    /**
+     * @notice Transfer Current Reputation (REP) of address _worker to its master
+     * @param _worker address
+     */
     function TransferRepToMaster(address _worker) internal {
         require(Parameters.getRepManager() != address(0), "RepManager is null in Parameters");
         require(Parameters.getReputationSystem() != address(0), "RepManager is null in Parameters");
@@ -231,6 +309,10 @@ contract AddressManager is Ownable {
         }
     }
 
+    /**
+     * @notice Transfer Current Rewards of address _worker to its master
+     * @param _worker address
+     */
     function TransferRewardsToMaster(address _worker) internal {
         require(Parameters.getRewardManager() != address(0), "RewardManager is null in Parameters");
         IRewardManager _RewardManager = IRewardManager(Parameters.getRewardManager());
@@ -250,6 +332,10 @@ contract AddressManager is Ownable {
         }
     }
 
+    /**
+     * @notice Claim _master Address as master of msg.sender
+     * @param _master address
+     */
     function ClaimMaster(address _master) public {
         WorkerClaimingMaster[_master][msg.sender] = true;
         SubToMasterMap[msg.sender] = _master; //overwrite, 1->1 link, Sub to Master
@@ -258,6 +344,10 @@ contract AddressManager is Ownable {
         emit AddressAddedByWorker(msg.sender, _master);
     }
 
+    /**
+     * @notice Unclaim _master Address as master of msg.sender
+     * @param _master address
+     */
     function RemoveMaster(address _master) public {
         require(WorkerClaimingMaster[_master][msg.sender] != false, "Can't remove Master: not claiming this address");
         WorkerClaimingMaster[_master][msg.sender] = false;

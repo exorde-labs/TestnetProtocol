@@ -2,6 +2,12 @@
 pragma solidity 0.8.0;
 
 contract RandomAllocator {
+
+    
+    /**
+     * @notice Get Native RNG Seed endpoint from SKALE chain
+     * @return addr bytes32 seed output
+     */
     function getSeed() public view returns (bytes32 addr) {
         assembly {
             let freemem := mload(0x40)
@@ -14,8 +20,8 @@ contract RandomAllocator {
     }
 
     /**
-     * @dev Return value
-     * @return value of 'number'
+     * @notice get Random Integer out of native seed
+     * @return randomly generated integer
      */
     function getRandom() public view returns (uint256) {
         uint256 r = uint256(
@@ -32,8 +38,10 @@ contract RandomAllocator {
     }
 
     /**
-     * @dev Return value
-     * @return value of 'number'
+     * @notice generate _k integers from 0 to N
+     * @param _k integer
+     * @param N_range integer
+     * @return randomly generated integers array of size _k
      */
     function generateIntegers(uint256 _k, uint256 N_range) public view returns (uint256[] memory) {
         require(N_range > 0 && _k <= N_range && _k >= 1, "k or N are not OK for RNG");
@@ -87,6 +95,12 @@ contract RandomAllocator {
         return integers;
     }
 
+    /**
+     * @dev Select k unique integer out of the N range (0,1,2,...,N)
+     * @param k integer
+     * @param N integer
+     * @return array of selected random integers
+     */
     function random_selection(uint256 k, uint256 N) public view returns (uint256[] memory) {
         require(N > 0 && k <= N && k >= 1, "k or N are not OK for RNG");
         uint256[] memory resultArray = generateIntegers(k, N);
