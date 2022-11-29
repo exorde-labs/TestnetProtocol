@@ -71,7 +71,7 @@ contract Statistics is Ownable {
     }
 
     function TotalTxCount() public view returns (uint256) {
-        uint256 _totalCount = BaseTransactionCount_;
+        uint256 _totalCount = BaseTransactionCount;
         for (uint256 i = 0; i < MonitoredSystemAddress.length; i++) {
             IDataContract dataContract = IDataContract(MonitoredSystemAddress[i]);
             _totalCount += dataContract.getTxCounter();
