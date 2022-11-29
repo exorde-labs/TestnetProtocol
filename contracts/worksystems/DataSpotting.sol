@@ -953,15 +953,15 @@ contract DataSpotting is Ownable, RandomAllocator {
             if (
                 DataBatch[CurrentCursor].allocated_to_work == true &&
                 (DataEnded(CurrentCursor) || (DataBatch[CurrentCursor].unrevealed_workers == 0))
-            ) {
-                // check if the batch is already validated
-                if (DataBatch[CurrentCursor].checked == false) {
-                    ValidateDataBatch(CurrentCursor);
-                    // increment BatchCheckingCursor if possible
-                    if (CurrentCursor == BatchCheckingCursor + 1) {
-                        BatchCheckingCursor = BatchCheckingCursor.add(1);
-                    }
-                }
+            )  {	
+                // check if the batch is already validated	
+                if (DataBatch[CurrentCursor].checked == false) {	
+                    ValidateDataBatch(CurrentCursor);	
+                }	
+                // increment BatchCheckingCursor if possible	
+                if (CurrentCursor == BatchCheckingCursor + 1) {	
+                    BatchCheckingCursor = BatchCheckingCursor.add(1);	
+                }	
             }
         }
     }
