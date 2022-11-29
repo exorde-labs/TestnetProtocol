@@ -44,6 +44,10 @@ contract Statistics is Ownable {
         return MonitoredSystemMap[_address];
     }
 
+    function updateBaseTransactionCount(uint256 BaseTransactionCountNew_) public onlyOwner {
+        BaseTransactionCount = BaseTransactionCountNew_;
+    }
+
     function addAddress(address _address) public onlyOwner {
         require(MonitoredSystemMap[_address] != true, "Address must not be whitelisted already");
         MonitoredSystemMap[_address] = true;
@@ -67,7 +71,7 @@ contract Statistics is Ownable {
     }
 
     function TotalTxCount() public view returns (uint256) {
-        uint256 _totalCount = 0;
+        uint256 _totalCount = BaseTransactionCount_;
         for (uint256 i = 0; i < MonitoredSystemAddress.length; i++) {
             IDataContract dataContract = IDataContract(MonitoredSystemAddress[i]);
             _totalCount += dataContract.getTxCounter();
