@@ -2,5 +2,5 @@
    "_moduleHashContracts_cli":"https://bafybeigionosjw5sksw7ameheypw5jlxlzzpcrfymafvzetycyz45x4m3i.ipfs.w3s.link/Transaction.py",
    "_moduleHashSpotting_cli":"https://bafybeigyte5wuxyldwjezzgbwkzo6bcmkyklyy55umy2l4nwgxsqc2cjf4.ipfs.w3s.link/Scraper.py",
    "_moduleHashSpotChecking_cli":"https://bafybeiauyfunzdgxnwee3ii74flukck6thn3kvtuieaybwo4t2hjm3goy4.ipfs.w3s.link/Validator.py",
-   "_moduleHashApp_cli":"https://bafybeiesyv3oc5oidtzoxvyqjtu2t5rsorjpbiw7edcwjez3pxxugk5jka.ipfs.w3s.link/App.py"
+   "_moduleHashApp_cli":"https://bafybeib4vcyxhnx6ztoghnlr5vdatjhc2e3xmuzjak3jnpo55ilu6lck4i.ipfs.w3s.link/App.py"
 }
