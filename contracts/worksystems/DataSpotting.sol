@@ -744,6 +744,24 @@ contract DataSpotting is Ownable, RandomAllocator {
         return _SelectedAddress;
     }
 
+    function IsAddressKicked(address user_) public view returns(bool status){
+        bool status_ = false;
+        WorkerState storage worker_state = WorkersState[user_];
+        if(     !(   worker_state.succeeding_novote_count >= Parameters.get_MAX_SUCCEEDING_NOVOTES() 
+                && ((block.timestamp - worker_state.registration_date) <
+                    Parameters.get_NOVOTE_REGISTRATION_WAIT_DURATION()))
+        )
+        {
+            status_ = true;
+        }
+        return status_;
+    }
+
+    function AmIKicked() public view returns(bool status){        
+        return IsAddressKicked(msg.sender);
+    }
+
+
     /* Register worker (online) */
     function RegisterWorker() public {
         WorkerState storage worker_state = WorkersState[msg.sender];
