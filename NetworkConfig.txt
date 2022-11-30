@@ -1,9 +1,6 @@
 {
-  "_urlSkale": "https://light-vast-diphda-archive.skalenodes.com:10072/",
-  "_urlTxSkale": "https://mainnet.skalenodes.com/v1/light-vast-diphda",
-  "_chainID": "2139927552",
-  "_blockExplorer": "https://light-vast-diphda.explorer.mainnet.skalenodes.com/",
-  "_fileStorage": "https://mainnet.skalenodes.com/fs/light-vast-diphda",
-  "_chainNameHash": "0x1bf548f30e9ad0078a81737973648281b1165dcdd7fdb69fa2db8ef7aacab134",
-  "_webSocket": "wss://mainnet.skalenodes.com/v1/ws/light-vast-diphda"
+   "_urlSkale":"https://light-vast-diphda-sync-testnet.skalenodes.com:10264",
+   "_urlTxSkale":"https://legacy-proxy.skalenodes.com/v1/light-vast-diphda",
+   "_chainID":"2139927552",
+   "_blockExplorer":"http://light-vast-diphda.legacy-explorer.skalenodes.com/"
 }
