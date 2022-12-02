@@ -340,7 +340,7 @@ contract AddressManager is Ownable {
         WorkerClaimingMaster[_master][msg.sender] = true;
         SubToMasterMap[msg.sender] = _master; //overwrite, 1->1 link, Sub to Master
         TransferRepToMaster(msg.sender);
-        TransferRewardsToMaster(msg.sender);
+        //TransferRewardsToMaster(msg.sender); //to fix
         emit AddressAddedByWorker(msg.sender, _master);
     }
 
