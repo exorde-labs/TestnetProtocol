@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------------------
-User Address             : Exorde Testnet v1.2.2 Reputation (REP) as of 10.11.2022 (revision 5)
+User Address             : Exorde Testnet v1.2.2 Reputation (REP) as of 10.11.2022 (revision 5) (First iteration)
 
 0x9CF634a6Aec0B4c058c5777A86Eb18390736F92C : 16361800   : 20.495 %
 0x7D4e9992F6c4F063c7598499Fb7294616890f3Ef : 9961675    : 12.478 %
