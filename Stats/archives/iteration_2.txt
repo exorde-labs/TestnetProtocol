@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------------------
-User Address 		 : Exorde Testnet v1.3.3 (Endend before Late November Migration) Reputation (REP) as of 05.12.2022
+User Address 		 : Exorde Testnet v1.3.3 (Endend before Late November Migration) Reputation (REP) as of 05.12.2022 (Second iteration)
 
 0xC8dEbd0E72524deaadE5567E228aA8FF002B4926 : 112139 	: 5.078 %
 0xAfB08B347DdCB0356d607C0CDeCC471070082992 : 46333 	: 2.098 %
