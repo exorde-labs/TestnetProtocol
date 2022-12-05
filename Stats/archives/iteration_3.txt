@@ -1,5 +1,6 @@
 -------------------------------------------------------------------------------------------
 User Address 		 : Exorde Testnet v1.3.4.3b Reputation (REP) as of 05.12.2022 (Third iteration)
+---- ITERATION IN PROGRESS, this is a snapshot repartition ----
 
 0xF55eF5B2e84d15D5FB587E035e0A9f7DeF25e4dd : 8761459 	: 9.337 %
 0xf366F59bBf6Eb8Fea24EEcEF270877cbb74Be8F0 : 6309065 	: 6.723 %
