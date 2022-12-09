@@ -21,7 +21,7 @@
  *   Huge Acknowledgment to AP & CS for Guidance on this contract
  */
 
-pragma solidity 0.8.0;
+pragma solidity 0.8.8;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
@@ -62,7 +62,7 @@ contract SFuelContracts is Ownable {
     event ReturnedSFuel(address indexed returner, address indexed whitelistedContract, uint256 amount);
 
     constructor() {
-        MIN_USER_BALANCE = 0.0001 ether;
+        MIN_USER_BALANCE = 0.001 ether;
         MIN_CONTRACT_BALANCE = 0.01 ether;
         isPaused = false;
     }
@@ -80,11 +80,6 @@ contract SFuelContracts is Ownable {
     modifier isActive() {
         require(!isPaused, "Contract is Paused");
         _;
-    }
-
-    function updateMinUserBalance(uint256 min_balance_) onlyOwner public{
-        require(min_balance_>0, "MIN_USER_BALANCE must be positive");
-        MIN_USER_BALANCE = min_balance_;
     }
 
     ///  Used by other contracts as a function to top up S-Fuel

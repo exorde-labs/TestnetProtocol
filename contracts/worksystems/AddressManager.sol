@@ -1,9 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0
 
-pragma solidity >=0.5.0;
+pragma solidity 0.8.8;
 
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 interface IReputation {
@@ -55,14 +53,16 @@ interface IParametersManager {
     function getsFuelSystem() external view returns (address);
 
     function getExordeToken() external view returns (address);
+
+    function get_MAX_UPDATE_ITERATIONS() external view returns (uint256);
 }
 
 contract AddressManager is Ownable {
     mapping(address => mapping(address => bool)) public MasterClaimingWorker; // master -> worker -> true/false
-    mapping(address => mapping(address => bool)) public WorkerClaimingMaster; // master -> worker -> true/false
 
     mapping(address => address[]) public MasterToSubsMap; // master -> workers dynamic array, 1->N relation
-    mapping(address => address) public SubToMasterMap; // worker -> master, only 1 master per worker address, 1->1 relation
+    mapping(address => address) public SubToMasterMap; 
+    // worker -> master, only 1 master per worker address, 1->1 relation
     // ALWAYS [MASTER, WORKER] order in the arguments of all functions
 
     uint256 MAX_MASTER_LOOKUP = 5;
@@ -70,6 +70,7 @@ contract AddressManager is Ownable {
     IParametersManager public Parameters;
     // ------------------------------------------------------------------------------------------
 
+    event ParametersUpdated(address parameters);
     event AddressAddedByMaster(address indexed account, address account2);
     event AddressRemovedByMaster(address indexed account, address account2);
     event AddressAddedByWorker(address indexed account, address account2);
@@ -86,8 +87,15 @@ contract AddressManager is Ownable {
     function updateParametersManager(address addr) public onlyOwner {
         require(addr != address(0));
         Parameters = IParametersManager(addr);
+        emit ParametersUpdated(addr);
     }
 
+    /**
+     * @dev Destroy Contract, important to release storage space if critical
+     */
+    function destroyContract() public onlyOwner {
+        selfdestruct(payable(owner()));
+    }
     //// --------------------------- GETTERS FOR MASTERS
 
     /**
@@ -143,14 +151,23 @@ contract AddressManager is Ownable {
      * @notice Check if sub worker is in the MasterToSubsMap mapping of Master
      * @param _worker address
      * @param _master address
+     * @param iterations_max max iteration count
+     * @param starting_index starting index of the loop
      * @return bool true if _address is in the MasterToSubsMap mapping of _master
      */
-    function isSubInMasterArray(address _worker, address _master) public view returns (bool) {
+    function isSubInMasterArray(address _worker, address _master, uint256 iterations_max, uint256 starting_index) 
+    public view returns (bool) {
         bool found = false;
+        uint256 k = 0;
         address[] memory sub_workers_ = MasterToSubsMap[_master];
-        for (uint256 i = 0; i < sub_workers_.length; i++) {
+        require(starting_index <=  sub_workers_.length, "starting_index must not be out of bounds");
+        for (uint256 i = starting_index; i < sub_workers_.length; i++) {
             if (sub_workers_[i] == _worker) {
                 found = true;
+                break;
+            }
+            k += 1;
+            if ( k >= iterations_max ){
                 break;
             }
         }
@@ -170,14 +187,23 @@ contract AddressManager is Ownable {
      * @notice Pops _worker from Master's MasterToSubsMap array
      * @param _master address
      * @param _worker address
+     * @param iterations_max max number of iterations
+     * @param starting_index start index to loop
      */
-    function PopFromSubsArray(address _master, address _worker) internal {
+    function PopFromSubsArray(address _master, address _worker, uint256 iterations_max, uint256 starting_index) 
+    internal {
+        require(starting_index <=  MasterToSubsMap[_master].length, "starting_index must not be out of bounds");
         uint256 index = 0;
         bool found = false;
-        for (uint256 i = 0; i < MasterToSubsMap[_master].length; i++) {
+        uint256 k = 0;
+        for (uint256 i = starting_index; i < MasterToSubsMap[_master].length; i++) {
             if (MasterToSubsMap[_master][i] == _worker) {
                 found = true;
                 index = i;
+                break;
+            }
+            k += 1;
+            if ( k >= iterations_max ){
                 break;
             }
         }
@@ -195,8 +221,8 @@ contract AddressManager is Ownable {
      * @param _address address
      * @return bool true if both addresses are mapped to each other
      */
-    function AreMasterSubLinked(address _master, address _address) public view returns (bool) {
-        return (isSubWorkerOf(_master, _address) && isMasterOf(_master, _address));
+    function AreMasterWorkerLinked(address _master, address _address) public view returns (bool) {
+        return (isSubWorkerOf(_master, _address) && (getMaster(_address) == _master) );
     }
 
     //// -----------------------------------------------------------
@@ -208,6 +234,7 @@ contract AddressManager is Ownable {
      * @param _address address
      */
     function MasterClaimSub(address _address) public {
+        require(_address != address(0), "_address must be non zero");
         MasterClaimingWorker[msg.sender][_address] = true;
         MasterToSubsMap[msg.sender].push(_address);
         emit AddressAddedByMaster(msg.sender, _address);
@@ -216,13 +243,22 @@ contract AddressManager is Ownable {
     /**
      * @notice Add mutliple sub-worker addresses to be mapped to msg.sender
      * @param _addresses array of address
+     * @param iterations_max max number of iterations
+     * @param starting_index start index to loop
      */
-    function MasterClaimManySubs(address[] memory _addresses) public {
-        for (uint256 i = 0; i < _addresses.length; i++) {
+    function MasterClaimManySubs(address[] memory _addresses, uint256 iterations_max, uint256 starting_index) public {
+        require(starting_index <=  _addresses.length, "starting_index must not be out of bounds");
+        uint256 k = 0;
+        for (uint256 i = starting_index; i < _addresses.length; i++) {
+            require(_addresses[i] != address(0), "addresses in array must be non zero");
             if (MasterClaimingWorker[msg.sender][_addresses[i]] != true) {
                 MasterClaimingWorker[msg.sender][_addresses[i]] = true;
                 MasterToSubsMap[msg.sender].push(_addresses[i]);
                 emit AddressAddedByMaster(msg.sender, _addresses[i]);
+            }
+            k += 1;
+            if ( k >= iterations_max ){
+                break;
             }
         }
     }
@@ -232,14 +268,15 @@ contract AddressManager is Ownable {
     /**
      * @notice Remove sub-worker addresses mapped to msg.sender
      * @param _address address
+     * @param start_index optional, let to zero if the number of subs is low
      */
-    function MasterRemoveSub(address _address) public {
+    function MasterRemoveSub(address _address, uint256 start_index) public {
         require(
             MasterClaimingWorker[msg.sender][_address] != false,
             "Can't remove: Master not claiming this Sub Address"
         );
         MasterClaimingWorker[msg.sender][_address] = false;
-        PopFromSubsArray(msg.sender, _address);
+        PopFromSubsArray(msg.sender, _address, Parameters.get_MAX_UPDATE_ITERATIONS(), start_index);
         emit AddressRemovedByMaster(msg.sender, _address);
     }
 
@@ -247,12 +284,17 @@ contract AddressManager is Ownable {
      * @notice Remove Multiple sub-worker addresses mapped to msg.sender
      * @param _addresses array of addresses
      */
-    function MasterRemoveManySubs(address[] memory _addresses) public {
+    function MasterRemoveManySubs(address[] memory _addresses, uint256 iterations_max, uint256 start_index) public {
+        uint256 k = 0;
         for (uint256 i = 0; i < _addresses.length; i++) {
             if (MasterClaimingWorker[msg.sender][_addresses[i]] != false) {
                 MasterClaimingWorker[msg.sender][_addresses[i]] = false;
-                PopFromSubsArray(msg.sender, _addresses[i]);
+                PopFromSubsArray(msg.sender, _addresses[i], iterations_max, start_index);
                 emit AddressRemovedByMaster(msg.sender, _addresses[i]);
+            }
+            k += 1;
+            if ( k >= iterations_max ){
+                break;
             }
         }
     }
@@ -262,6 +304,8 @@ contract AddressManager is Ownable {
 
     /**
      * @notice Fetch the Highest Master on the graph starting from the _worker leaf
+               This function will return the worker address itself, if master has not been set.
+               This behavior might be subject to change later.
      * @param _worker address
      * @return The highest master of worker _worker, or _worker if no master found
      */
@@ -337,10 +381,10 @@ contract AddressManager is Ownable {
      * @param _master address
      */
     function ClaimMaster(address _master) public {
-        WorkerClaimingMaster[_master][msg.sender] = true;
+        require(_master != address(0)," _master must be non null");
         SubToMasterMap[msg.sender] = _master; //overwrite, 1->1 link, Sub to Master
         TransferRepToMaster(msg.sender);
-        //TransferRewardsToMaster(msg.sender); //to fix
+        TransferRewardsToMaster(msg.sender);
         emit AddressAddedByWorker(msg.sender, _master);
     }
 
@@ -349,8 +393,6 @@ contract AddressManager is Ownable {
      * @param _master address
      */
     function RemoveMaster(address _master) public {
-        require(WorkerClaimingMaster[_master][msg.sender] != false, "Can't remove Master: not claiming this address");
-        WorkerClaimingMaster[_master][msg.sender] = false;
         SubToMasterMap[msg.sender] = address(0); //reset to adress 0x0000000..0
         emit AddressRemovedByWorker(msg.sender, _master);
     }

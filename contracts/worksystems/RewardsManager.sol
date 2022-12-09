@@ -1,9 +1,8 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity >=0.5.0;
+pragma solidity 0.8.8;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 interface IAddressManager {
@@ -26,7 +25,6 @@ interface IParametersManager {
 contract RewardsManager is Ownable {
     event UserRegistered(bytes32 name, uint256 timestamp);
     event UserTransferred(bytes32 name);
-    using SafeMath for uint256;
 
     IERC20 public token;
     mapping(address => uint256) public rewards; // maps user's address to voteToken balance
@@ -80,9 +78,9 @@ contract RewardsManager is Ownable {
         require(_RewardsAllocation > 0, "rewards to allocate must be positive..");
         // check if the contract calling this method has rights to allocate from user Rewards
         if (ManagerBalance >= _RewardsAllocation) {
-            ManagerBalance = ManagerBalance.sub(_RewardsAllocation);
-            rewards[_user] = rewards[_user].add(_RewardsAllocation);
-            TotalRewards = TotalRewards.add(_RewardsAllocation);
+            ManagerBalance -= _RewardsAllocation;
+            rewards[_user] +=  _RewardsAllocation;
+            TotalRewards += _RewardsAllocation;
             return true;
         }
         return (false);
@@ -99,14 +97,15 @@ contract RewardsManager is Ownable {
      * @notice A method for a verified whitelisted contract to allocate for itself some Rewards
      */
     function OwnerAddRewards(uint256 rep, address _user) public onlyOwner {
-        rewards[_user] = rewards[_user].add(rep);
+        rewards[_user] += rep;
     }
 
     /**
      * @notice A method for a verified whitelisted contract to allocate for itself some Rewards
      */
     function OwnerRemoveRewards(uint256 rep, address _user) public onlyOwner {
-        rewards[_user] = rewards[_user].sub(rep);
+        require(rewards[_user] >= rep, "can't substract more rewards that user has");
+        rewards[_user] -= rep;
     }
 
     function OwnerResetRewards(address _user) public onlyOwner {

@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: GPL-3.0
-pragma solidity 0.8.0;
+pragma solidity 0.8.8;
 
 contract RandomAllocator {
 
-    
+    uint256 constant EXTRA_ITERATIONS_  = 20;
     /**
      * @notice Get Native RNG Seed endpoint from SKALE chain
      * @return addr bytes32 seed output
@@ -39,21 +39,25 @@ contract RandomAllocator {
 
     /**
      * @notice generate _k integers from 0 to N
-     * @param _k integer
-     * @param N_range integer
+     * @param _k integer (should be low)
+     * @param N_range integer Should be low (<100)
      * @return randomly generated integers array of size _k
      */
     function generateIntegers(uint256 _k, uint256 N_range) public view returns (uint256[] memory) {
         require(N_range > 0 && _k <= N_range && _k >= 1, "k or N are not OK for RNG");
-        require(_k >= 1, "_k >= 0");
-        require(N_range >= 1, "N_range > 0");
         uint256 seed = uint256(keccak256(abi.encodePacked(uint256(keccak256(abi.encodePacked(getRandom()))))));
         uint256[] memory integers = new uint256[](_k);
 
         uint256 c = 0;
-        uint256 nb_iterations = _k + 20;
+        uint256 nb_iterations = _k + EXTRA_ITERATIONS_;
 
         for (uint256 l = 0; l < nb_iterations; l++) {
+            if (N_range > (uint256(keccak256(abi.encodePacked(seed + l * l))))){
+                // if N_range is larger than the value on the right, 
+                // then the modulo below will just return the first hash, which leads to weak randomness
+                // So in that case we continue: this case should be very rare
+                continue;
+            }
             uint256 randNumber = (uint256(keccak256(abi.encodePacked(seed + l * l)))) % N_range;
             bool already_exists = false;
             // check if already generated
@@ -102,7 +106,6 @@ contract RandomAllocator {
      * @return array of selected random integers
      */
     function random_selection(uint256 k, uint256 N) public view returns (uint256[] memory) {
-        require(N > 0 && k <= N && k >= 1, "k or N are not OK for RNG");
         uint256[] memory resultArray = generateIntegers(k, N);
         return resultArray;
     }

@@ -1,13 +1,11 @@
 // SPDX-License-Identifier: MIT
-pragma solidity >=0.5.0;
+pragma solidity 0.8.8;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract StakingManager is
     Ownable {
-    using SafeMath for uint256;
 
     IERC20 public token;
 
@@ -82,11 +80,11 @@ contract StakingManager is
         require(balances[msg.sender].free_balance >= _stake);
         if (balances[msg.sender].staked_balance == 0) addStakeholder(msg.sender);
 
-        balances[msg.sender].free_balance = balances[msg.sender].free_balance.sub(_stake);
-        balances[msg.sender].staked_balance = balances[msg.sender].staked_balance.add(_stake);
+        balances[msg.sender].free_balance -= _stake;
+        balances[msg.sender].staked_balance += _stake;
 
         // Global state update
-        TotalAvailableStake = TotalAvailableStake.add(_stake);
+        TotalAvailableStake += _stake;
     }
 
     /**
@@ -94,11 +92,11 @@ contract StakingManager is
      */
     function closeAllStakes() public {
         uint256 staked_amount = balances[msg.sender].staked_balance;
-        balances[msg.sender].free_balance = balances[msg.sender].free_balance.add(staked_amount);
-        balances[msg.sender].staked_balance = balances[msg.sender].staked_balance.sub(staked_amount);
+        balances[msg.sender].free_balance += staked_amount;
+        balances[msg.sender].staked_balance -= staked_amount;
 
         // Global state update
-        TotalAvailableStake = TotalAvailableStake.sub(staked_amount);
+        TotalAvailableStake -= staked_amount;
         removeStakeholder(msg.sender);
     }
 
@@ -116,15 +114,13 @@ contract StakingManager is
         );
         // check if the contract calling this method has rights to allocate from user stake
 
-        balances[_stakeholder].staked_balance = balances[_stakeholder].staked_balance.sub(_StakeAllocation);
-        balances[_stakeholder].allocated_balance = balances[_stakeholder].allocated_balance.add(_StakeAllocation);
+        balances[_stakeholder].staked_balance -= _StakeAllocation;
+        balances[_stakeholder].allocated_balance += _StakeAllocation;
 
-        SystemsUserAllocations[_stakeholder][msg.sender] = SystemsUserAllocations[_stakeholder][msg.sender].add(
-            _StakeAllocation
-        );
+        SystemsUserAllocations[_stakeholder][msg.sender] += _StakeAllocation;
 
         // Global state update
-        TotalAllocatedStake = TotalAllocatedStake.add(_StakeAllocation);
+        TotalAllocatedStake += _StakeAllocation;
         return (true);
     }
 
@@ -142,14 +138,12 @@ contract StakingManager is
         );
         // check if the contract calling this method has rights to allocate from user stake
 
-        balances[_stakeholder].allocated_balance = balances[_stakeholder].allocated_balance.sub(_StakeToDeallocate);
-        balances[_stakeholder].staked_balance = balances[_stakeholder].staked_balance.add(_StakeToDeallocate);
+        balances[_stakeholder].allocated_balance -= _StakeToDeallocate;
+        balances[_stakeholder].staked_balance += _StakeToDeallocate;
 
-        SystemsUserAllocations[_stakeholder][msg.sender] = SystemsUserAllocations[_stakeholder][msg.sender].sub(
-            _StakeToDeallocate
-        );
+        SystemsUserAllocations[_stakeholder][msg.sender] -= _StakeToDeallocate;
         // Global state update
-        TotalAllocatedStake = TotalAllocatedStake.sub(_StakeToDeallocate);
+        TotalAllocatedStake -= _StakeToDeallocate;
         return (true);
     }
 

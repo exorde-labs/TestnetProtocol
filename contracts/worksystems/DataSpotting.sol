@@ -880,22 +880,6 @@ contract DataSpotting is Ownable, RandomAllocator {
     // ================================================================================
 
     /**
-  * @notice Delete Spotted Data with ID _DataId
-  * @param _DataId index of the data to delete
-  */
-    function deleteData(uint256 _DataId) public onlyOwner {
-        delete SpotsMapping[_DataId];
-    }
-
-    /**
-  * @notice Delete DataBatch with ID _BatchId
-  * @param _BatchId index of the batch to delete
-  */
-    function deleteDataBatch(uint256 _BatchId) public onlyOwner {
-        delete DataBatch[_BatchId];
-    }
-
-    /**
   * @notice Delete Data in a rolling window
   */
     function deleteOldData() internal {
@@ -909,10 +893,8 @@ contract DataSpotting is Ownable, RandomAllocator {
                 uint256 end_batch_idx = DataBatch[BatchDeletionCursor].start_idx +
                     DataBatch[BatchDeletionCursor].counter;
                 for (uint256 l = start_batch_idx; l < end_batch_idx; l++) {
-                    deleteData(l); // delete SpotsMapping at index l
+                    delete SpotsMapping[l]; // delete SpotsMapping at index l
                 }
-                // Then delete the Data Batch
-                deleteDataBatch(BatchDeletionCursor);
                 emit _DataBatchDeleted(BatchDeletionCursor);
             }
         }
