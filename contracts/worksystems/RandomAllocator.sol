@@ -1,9 +1,17 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity 0.8.8;
 
+/**
+* @notice RandomAllocator seeds it randomness from getSeed() a native SKALE RNG Endpoint
+*         It is sufficient that it rotates every block
+*         The work allocation must be as random as possible, over time, statistically
+*         We could use Oracles to improve randomness, but it is not relevant.
+*/
 contract RandomAllocator {
 
-    uint256 constant EXTRA_ITERATIONS_  = 20;
+    uint256 constant EXTRA_ITERATIONS_  = 20;    
+    uint256 constant public MAX_RANGE = 100; // must be low (< 200)
+
     /**
      * @notice Get Native RNG Seed endpoint from SKALE chain
      * @return addr bytes32 seed output
@@ -45,11 +53,14 @@ contract RandomAllocator {
      */
     function generateIntegers(uint256 _k, uint256 N_range) public view returns (uint256[] memory) {
         require(N_range > 0 && _k <= N_range && _k >= 1, "k or N are not OK for RNG");
+        require(N_range <= MAX_RANGE, "N_range is above MAX_RANGE (by default 100)");
         uint256 seed = uint256(keccak256(abi.encodePacked(uint256(keccak256(abi.encodePacked(getRandom()))))));
         uint256[] memory integers = new uint256[](_k);
 
         uint256 c = 0;
         uint256 nb_iterations = _k + EXTRA_ITERATIONS_;
+
+                // This loop can be considered O(1) because nb_iterations is always lower than MAX_RANGE which is <= 100
 
         for (uint256 l = 0; l < nb_iterations; l++) {
             if (N_range > (uint256(keccak256(abi.encodePacked(seed + l * l))))){
