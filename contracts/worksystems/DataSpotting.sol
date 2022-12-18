@@ -2182,7 +2182,7 @@ contract DataSpotting is Ownable, RandomAllocator {
   * @param B_ Integer identifier associated with target SpottedData
   * @return workers array of workers of size (B_-A_+1)
   */
-    function getALlWorkersBetweenIndex(uint256 A_, uint256 B_) public view returns (address[] memory workers) {
+    function getAllWorkersBetweenIndex(uint256 A_, uint256 B_) public view returns (address[] memory workers) {
         require(B_>= A_, " _B must be >= _A");
         require(B_<= (AllWorkersList.length -1), " B_ is out of bounds");
         uint256 _array_size = B_ - A_+1;
