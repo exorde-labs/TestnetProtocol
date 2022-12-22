@@ -975,9 +975,9 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
                 //----- Track Storage usage -----
                 // DELETE FOR ALL WORKERS
                 address[] memory allocated_workers = WorkersPerBatch[BatchDeletionCursor];
-                for (uint128 i = 0; i < allocated_workers.length; i++) {
+                for (uint128 k = 0; k < allocated_workers.length; i++) {
                     //////////////////// FOR EACH WORKER ALLOCATED TO EACH BATCH
-                    address _worker = allocated_workers[i];
+                    address _worker = allocated_workers[k];
                     // clear store
                     bytes32 worker_UUID = attrUUID(_worker, BatchDeletionCursor);
                     resetAttribute(worker_UUID, "numTokens");
