@@ -259,10 +259,10 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
         FLAGGED
     }
 
-    // ------ Spot-flow related structure : 2 slots
+    // ------ Spot-flow related structure : 1 slots
     struct TimeframeCounter {
-        uint256 timestamp;
-        uint256 counter;
+        uint128 timestamp;
+        uint128 counter;
     }
 
     // ------ Worker State Structure : 2 slots
@@ -392,6 +392,7 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
     // Initial storage variables: 64+16+16+15*256+256+256*12+4*256+128*9+256*10+16*2+6*8+16*4+256*1+256*2 bits
     // Approx. 404 bytes.
     uint256 public BytesUsed = 404;
+    uint256 public MaximumBytesTarget = 5*(10**8) ; //500 Megabyte
 
     // ------ Vote related    
     uint16 constant APPROVAL_VOTE_MAPPING_  = 1;
@@ -408,7 +409,6 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
     uint16 public InstantRevealRewardsDivider = 2;
     uint16 public MaxPendingDataBatchCount = 1000;
     uint16 public SPOT_FILE_SIZE = 100;
-    uint256 public GAS_LEFT_LIMIT = 1000000;
 
     // ------ Addresses & Interfaces
     IERC20 public token;
@@ -515,11 +515,11 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
     }
 
     /**
-  * @notice update Gas Left limit, limiting the validation loops iterations
-  * @param new_limit_ gas limit in wei
+  * @notice update MaximumBytesTarget, the max target of storage used by the contract (in bytes)
+  * @param new_limit_ in bytes
   */
-    function updateGasLeftLimit(uint16 new_limit_) public onlyOwner {
-        GAS_LEFT_LIMIT = new_limit_;
+    function updateMaximumBytesTarget(uint16 new_limit_) public onlyOwner {
+        MaximumBytesTarget = new_limit_;
     }
 
     // ================================================================================
@@ -830,7 +830,7 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
             AllWorkersList.push(msg.sender);
             worker_state.isWorkerSeen = true;
             //----- Track Storage usage -----
-            BytesUsed += BYTES_256 + BYTES_8; 
+            BytesUsed += BYTES_256 + BYTES_8 + BYTES_256*NB_TIMEFRAMES; 
             //----- Track Storage usage -----
         }
         require(IParametersManager(address(0)) != Parameters, "Parameters Manager must be set.");
@@ -888,6 +888,10 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
             //////////////////////////////////
             worker_state.unregistration_request = true;
             toUnregisterWorkers.push(msg.sender);
+            //----- Track Storage usage -----
+            // toUnregisterWorkers push
+            BytesUsed += BYTES_256*1;
+            //----- Track Storage usage -----
             WorkersStatus[msg.sender].isToUnregisterWorker = true;
         }
         if (worker_state.allocated_work_batch == 0) {
@@ -901,11 +905,6 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
             worker_state.registered = false;
             emit _WorkerUnregistered(msg.sender, block.timestamp);
         }
-        
-        //----- Track Storage usage -----
-        // toUnregisterWorkers push
-        BytesUsed += BYTES_256*1;
-        //----- Track Storage usage -----
 
         AllTxsCounter += 1;
         _retrieveSFuel();
@@ -940,76 +939,167 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
     //                             Data Deletion Function
     // ================================================================================
 
+    function pauseSystem() public onlyOwner{
+        _pause();
+    }
+
     /**
-  * @notice Delete Data in a rolling window
+  * @notice Delete Data
   */
     function deleteOldData(uint128 iteration_count) internal {
         // Rolling delete of previous data
-        uint128 BatchesToDeleteCount = BatchCheckingCursor - BatchDeletionCursor;
-        // Here the amount of iterations is capped by get_MAX_UPDATE_ITERATIONS
-        if (BatchesToDeleteCount > Parameters.get_MAX_CONTRACT_STORED_BATCHES()) {
+        uint128 _deletion_index = BatchDeletionCursor;
+        uint128 BatchesToDeleteCount = BatchCheckingCursor - _deletion_index;
+        if (BatchesToDeleteCount > Parameters.get_MAX_CONTRACT_STORED_BATCHES()
+            || BytesUsed >= MaximumBytesTarget) {
+            _deletion_index = BatchDeletionCursor;
+            // Here the amount of iterations is capped by get_MAX_UPDATE_ITERATIONS
             for (uint128 i = 0; i < iteration_count; i++) {
                 // First Delete Atomic Data composing the Batch, from start to end indices
-                uint128 start_batch_idx = DataBatch[BatchDeletionCursor].start_idx;
-                uint128 end_batch_idx = DataBatch[BatchDeletionCursor].start_idx 
-                                        +  DataBatch[BatchDeletionCursor].counter;
-
+                uint128 start_batch_idx = DataBatch[_deletion_index].start_idx;
+                uint128 end_batch_idx = DataBatch[_deletion_index].start_idx 
+                                        +  DataBatch[_deletion_index].counter;
                 for (uint128 l = start_batch_idx; l < end_batch_idx; l++) {
-                    delete SpotsMapping[l]; // delete SpotsMapping at index l
-                    
+                    delete SpotsMapping[l]; // delete SpotsMapping at index l                    
                     //----- Track Storage usage -----
                     BytesUsed -= BYTES_256*2;
                     //----- Track Storage usage -----
-
                 }
                 // delete the batch
-                delete DataBatch[BatchDeletionCursor];
+                delete DataBatch[_deletion_index];
                 //----- Track Storage usage -----
                 BytesUsed -= BYTES_256*2;
                 //----- Track Storage usage -----
                 // delete the BatchCommitedVoteCount && BatchRevealedVoteCount
-                delete BatchCommitedVoteCount[BatchDeletionCursor];
-                delete BatchRevealedVoteCount[BatchDeletionCursor];
+                delete BatchCommitedVoteCount[_deletion_index];
+                delete BatchRevealedVoteCount[_deletion_index];
                 //----- Track Storage usage -----
                 BytesUsed -= BYTES_128*2;
                 //----- Track Storage usage -----
                 // DELETE FOR ALL WORKERS
-                address[] memory allocated_workers = WorkersPerBatch[BatchDeletionCursor];
-                for (uint128 k = 0; k < allocated_workers.length; i++) {
+                address[] memory allocated_workers = WorkersPerBatch[_deletion_index];
+                for (uint128 k = 0; k < allocated_workers.length; k++) {
                     //////////////////// FOR EACH WORKER ALLOCATED TO EACH BATCH
                     address _worker = allocated_workers[k];
                     // clear store
-                    bytes32 worker_UUID = attrUUID(_worker, BatchDeletionCursor);
+                    bytes32 worker_UUID = attrUUID(_worker, _deletion_index);
                     resetAttribute(worker_UUID, "numTokens");
                     resetAttribute(worker_UUID, "commitHash");
                     resetAttribute(worker_UUID, "commitVote");
                     // clear UserVoteSubmission
-                    delete UserVoteSubmission[BatchDeletionCursor][_worker];
-
+                    delete UserVoteSubmission[_deletion_index][_worker];
                     //----- Track Storage usage -----
                     BytesUsed -= BYTES_256*3+BYTES_256*2;
                     //----- Track Storage usage -----
                 }
 
                 // clear WorkersPerBatch
-                delete WorkersPerBatch[BatchDeletionCursor];
+                delete WorkersPerBatch[_deletion_index];
 
                 //----- Track Storage usage -----
                 BytesUsed -= BYTES_256*allocated_workers.length;
                 //----- Track Storage usage -----
 
-                emit _DataBatchDeleted(BatchDeletionCursor);
+                emit _DataBatchDeleted(_deletion_index);
                 BatchDeletionCursor += 1;
             }
         }
     }
 
     /**
-     * @dev Destroy Contract, important to release storage space if critical
-     */
-    function destroyContract() public onlyOwner {
-        selfdestruct(payable(owner()));
+  * @notice Delete Data
+  */
+    function adminDataDelete(uint128 startIdx, uint128 iteration_count) public onlyOwner {
+        // Rolling delete of previous data
+        // Here the amount of iterations is capped by get_MAX_UPDATE_ITERATIONS
+        for (uint128 i = 0; i < iteration_count; i++) {
+            uint128 _deletion_index = startIdx+i;
+            // First Delete Atomic Data composing the Batch, from start to end indices
+            uint128 start_batch_idx = DataBatch[_deletion_index].start_idx;
+            uint128 end_batch_idx = DataBatch[_deletion_index].start_idx 
+                                    +  DataBatch[_deletion_index].counter;
+            for (uint128 l = start_batch_idx; l < end_batch_idx; l++) {
+                delete SpotsMapping[l]; // delete SpotsMapping at index l                    
+                //----- Track Storage usage -----
+                BytesUsed -= BYTES_256*2;
+                //----- Track Storage usage -----
+            }
+            // delete the batch
+            delete DataBatch[_deletion_index];
+            //----- Track Storage usage -----
+            BytesUsed -= BYTES_256*2;
+            //----- Track Storage usage -----
+            // delete the BatchCommitedVoteCount && BatchRevealedVoteCount
+            delete BatchCommitedVoteCount[_deletion_index];
+            delete BatchRevealedVoteCount[_deletion_index];
+            //----- Track Storage usage -----
+            BytesUsed -= BYTES_128*2;
+            //----- Track Storage usage -----
+            // DELETE FOR ALL WORKERS
+            address[] memory allocated_workers = WorkersPerBatch[_deletion_index];
+            for (uint128 k = 0; k < allocated_workers.length; k++) {
+                //////////////////// FOR EACH WORKER ALLOCATED TO EACH BATCH
+                address _worker = allocated_workers[k];
+                // clear store
+                bytes32 worker_UUID = attrUUID(_worker, _deletion_index);
+                resetAttribute(worker_UUID, "numTokens");
+                resetAttribute(worker_UUID, "commitHash");
+                resetAttribute(worker_UUID, "commitVote");
+                // clear UserVoteSubmission
+                delete UserVoteSubmission[_deletion_index][_worker];
+                //----- Track Storage usage -----
+                BytesUsed -= BYTES_256*3+BYTES_256*2;
+                //----- Track Storage usage -----
+            }
+
+            // clear WorkersPerBatch
+            delete WorkersPerBatch[_deletion_index];
+
+            //----- Track Storage usage -----
+            BytesUsed -= BYTES_256*allocated_workers.length;
+            //----- Track Storage usage -----
+
+            emit _DataBatchDeleted(_deletion_index);
+            BatchDeletionCursor += 1;
+        }        
     }
+
+
+    /**
+     * @dev Destroy Spot Data, important to release storage space if critical
+     */
+    function deleteSpotData(uint128 spotIndexA, uint128 spotIndexB) public onlyOwner {
+        require(spotIndexA < spotIndexB, "spotIndexA must be <= spotIndexB");
+        for (uint128 i = spotIndexA; i < spotIndexB; i++) {
+            delete SpotsMapping[i]; // delete SpotsMapping at index l            
+            //----- Track Storage usage -----
+            BytesUsed -= BYTES_256*2;
+            //----- Track Storage usage -----
+        }
+    }
+
+    /**
+     * @dev Destroy WorkersPerBatch, important to release storage space if critical
+     */
+    function deleteWorkersSubmission(uint128 batchToDeleteIndex) public onlyOwner {
+        address[] memory allocated_workers = WorkersPerBatch[batchToDeleteIndex];
+        for (uint128 k = 0; k < allocated_workers.length; k++) {
+            //////////////////// FOR EACH WORKER ALLOCATED TO EACH BATCH
+            address _worker = allocated_workers[k];
+            // clear store
+            bytes32 worker_UUID = attrUUID(_worker, batchToDeleteIndex);
+            resetAttribute(worker_UUID, "numTokens");
+            resetAttribute(worker_UUID, "commitHash");
+            resetAttribute(worker_UUID, "commitVote");
+            // clear UserVoteSubmission
+            delete UserVoteSubmission[batchToDeleteIndex][_worker];
+
+            //----- Track Storage usage -----
+            BytesUsed -= BYTES_256*3+BYTES_256*2;
+            //----- Track Storage usage -----
+        }
+    }
+                    
 
     /**
      * @dev Destroy AllWorkersArray, important to release storage space if critical
@@ -1019,7 +1109,7 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
         BytesUsed -= BYTES_256*AllWorkersList.length;
         //----- Track Storage usage -----
         delete AllWorkersList;  
-}
+    }
 
     /**
      * @dev Destroy AllWorkersArray, important to release storage space if critical
@@ -1068,6 +1158,7 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
         // Update the Spot Flow System
         updateGlobalSpotFlow();
         updateItemCount();
+        deleteOldData(iteration_count);
         TriggerValidation(iteration_count);
         // Log off waiting users first
         processLogoffRequests(iteration_count);
@@ -1439,15 +1530,16 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
         "selected_k must be at most MAX_WORKER_ALLOCATED_PER_BATCH" );
         uint256 n = availableWorkers.length;
 
-        if ((block.timestamp - LastAllocationTime) >= Parameters.get_SPOT_INTER_ALLOCATION_DURATION()) {
+        if ((uint64(block.timestamp) - LastAllocationTime) >= Parameters.get_SPOT_INTER_ALLOCATION_DURATION()) {
+            uint128 _allocated_batch_cursor = AllocatedBatchCursor;
             ///////////////////////////// BATCH UPDATE STATE /////////////////////////////
-            DataBatch[AllocatedBatchCursor].unrevealed_workers = selected_k;
-            DataBatch[AllocatedBatchCursor].uncommited_workers = selected_k;
+            DataBatch[_allocated_batch_cursor].unrevealed_workers = selected_k;
+            DataBatch[_allocated_batch_cursor].uncommited_workers = selected_k;
             uint64 _commitEndDate = uint64(block.timestamp + Parameters.get_SPOT_COMMIT_ROUND_DURATION());
             uint64 _revealEndDate = uint64(_commitEndDate + Parameters.get_SPOT_REVEAL_ROUND_DURATION());
-            DataBatch[AllocatedBatchCursor].commitEndDate = _commitEndDate;
-            DataBatch[AllocatedBatchCursor].revealEndDate = _revealEndDate;
-            DataBatch[AllocatedBatchCursor].allocated_to_work = true;
+            DataBatch[_allocated_batch_cursor].commitEndDate = _commitEndDate;
+            DataBatch[_allocated_batch_cursor].revealEndDate = _revealEndDate;
+            DataBatch[_allocated_batch_cursor].allocated_to_work = true;
             //////////////////////////////////////////////////////////////////////////////
 
             //----- Track Storage usage -----
@@ -1470,21 +1562,21 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
                 address selected_worker_ = selected_workers_addresses[i];
                 WorkerState storage worker_state = WorkersState[selected_worker_];
                 // clear existing values
-                UserVoteSubmission[AllocatedBatchCursor][selected_worker_].commited = false;
-                UserVoteSubmission[AllocatedBatchCursor][selected_worker_].revealed = false;
+                UserVoteSubmission[_allocated_batch_cursor][selected_worker_].commited = false;
+                UserVoteSubmission[_allocated_batch_cursor][selected_worker_].revealed = false;
                 ///// worker swapping from available to busy, not to be picked again while working.
                 PopFromAvailableWorkers(selected_worker_);
                 PushInBusyWorkers(selected_worker_); //set worker as busy
-                WorkersPerBatch[AllocatedBatchCursor].push(selected_worker_);
+                WorkersPerBatch[_allocated_batch_cursor].push(selected_worker_);
                 ///// allocation
-                worker_state.allocated_work_batch = AllocatedBatchCursor;
+                worker_state.allocated_work_batch = _allocated_batch_cursor;
                 worker_state.allocated_batch_counter += 1;
                     
                 //----- Track Storage usage -----
                 BytesUsed += BYTES_32+BYTES_256;
                 //----- Track Storage usage -----
 
-                emit _WorkAllocated(AllocatedBatchCursor, selected_worker_);
+                emit _WorkAllocated(_allocated_batch_cursor, selected_worker_);
             }
 
             LastAllocationTime = uint64(block.timestamp);
@@ -1538,13 +1630,13 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
         require(IParametersManager(address(0)) != Parameters, "Parameters Manager must be set.");
         uint256 last_timeframe_idx_ = GlobalSpotFlowManager.length - 1;
         uint256 mostRecentTimestamp_ = GlobalSpotFlowManager[last_timeframe_idx_].timestamp;
-        if ((block.timestamp - mostRecentTimestamp_) > Parameters.get_SPOT_TIMEFRAME_DURATION()) {
+        if ((uint64(block.timestamp) - mostRecentTimestamp_) > Parameters.get_SPOT_TIMEFRAME_DURATION()) {
             // cycle & move periods to the left
             for (uint256 i = 0; i < (GlobalSpotFlowManager.length - 1); i++) {
                 GlobalSpotFlowManager[i] = GlobalSpotFlowManager[i + 1];
             }
             //update last timeframe with new values & reset counter
-            GlobalSpotFlowManager[last_timeframe_idx_].timestamp = block.timestamp;
+            GlobalSpotFlowManager[last_timeframe_idx_].timestamp = uint64(block.timestamp);
             GlobalSpotFlowManager[last_timeframe_idx_].counter = 0;
         }
     }
@@ -1568,13 +1660,13 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
         require(IParametersManager(address(0)) != Parameters, "Parameters Manager must be set.");
         uint256 last_timeframe_idx_ = ItemFlowManager.length - 1;
         uint256 mostRecentTimestamp_ = ItemFlowManager[last_timeframe_idx_].timestamp;
-        if ((block.timestamp - mostRecentTimestamp_) > Parameters.get_SPOT_TIMEFRAME_DURATION()) {
+        if ((uint64(block.timestamp) - mostRecentTimestamp_) > Parameters.get_SPOT_TIMEFRAME_DURATION()) {
             // cycle & move periods to the left
             for (uint256 i = 0; i < (ItemFlowManager.length - 1); i++) {
                 ItemFlowManager[i] = ItemFlowManager[i + 1];
             }
             //update last timeframe with new values & reset counter
-            ItemFlowManager[last_timeframe_idx_].timestamp = block.timestamp;
+            ItemFlowManager[last_timeframe_idx_].timestamp = uint64(block.timestamp);
             ItemFlowManager[last_timeframe_idx_].counter = 0;
         }
     }
@@ -1596,8 +1688,6 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
   */
     function updateUserSpotFlow(address user_) public {
         require(IParametersManager(address(0)) != Parameters, "Parameters Manager must be set.");
-        // string[] memory proposedNewFiles = new string[](allocated_workers.length);
-        // TimeframeCounter[] storage UserSpotFlowManager = WorkersState[user_].spotflow_manager;
         TimeframeCounter[NB_TIMEFRAMES] storage UserSpotFlowManager = WorkersSpotFlowManager[user_];
 
         uint256 last_timeframe_idx_ = UserSpotFlowManager.length - 1;
@@ -1608,7 +1698,7 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
                 UserSpotFlowManager[i] = UserSpotFlowManager[i + 1];
             }
             //update last timeframe with new values & reset counter
-            UserSpotFlowManager[last_timeframe_idx_].timestamp = block.timestamp;
+            UserSpotFlowManager[last_timeframe_idx_].timestamp = uint64(block.timestamp);
             UserSpotFlowManager[last_timeframe_idx_].counter = 0;
         }
     }
@@ -1643,7 +1733,9 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
         string[] calldata URL_domains_,
         uint64[] memory item_counts_,
         string memory extra_
-    ) public returns (uint256 Dataid_) {
+    ) public
+    whenNotPaused()
+    returns (uint256 Dataid_) {
         require(IParametersManager(address(0)) != Parameters, "Parameters Manager must be set.");
         // ---- Spot Flow Management ---------------------------------------
         require(Parameters.get_SPOT_TOGGLE_ENABLED(), "Spotting is not currently enabled by Owner");
@@ -1662,10 +1754,12 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
         updateUserSpotFlow(_selectedAddress); // first update the User SpotFlow Management System
         // -----------------------------------------------------------------
 
+        uint128 _batch_counter = LastBatchCounter;
+
         if (
             getUserPeriodSpotCount(_selectedAddress) < Parameters.get_SPOT_MAX_SPOT_PER_USER_PER_PERIOD() &&
             getGlobalPeriodSpotCount() < Parameters.get_SPOT_GLOBAL_MAX_SPOT_PER_PERIOD() &&
-            (LastBatchCounter - AllocatedBatchCursor) <= MaxPendingDataBatchCount
+            (_batch_counter - AllocatedBatchCursor) <= MaxPendingDataBatchCount
         ) {
             if (STAKING_REQUIREMENT_TOGGLE_ENABLED) {
                 // ---  Master/SubWorker Stake Management
@@ -1678,7 +1772,7 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
 
             // -----------------------------------------------------------------
             // ---- Spot Batch Processing --------------------------------------
-            for (uint256 i = 0; i < file_hashs_.length; i++) {
+            for (uint64 i = 0; i < file_hashs_.length; i++) {
                 string memory file_hash = file_hashs_[i];
                 string memory URL_domain_ = URL_domains_[i];
                 uint64 item_count_ = item_counts_[i];
@@ -1692,9 +1786,12 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
                     extra: extra_,
                     status: DataStatus.TBD
                 });
+                //----- Track Storage usage -----
+                BytesUsed += BYTES_256*2; //SpottedData
+                //----- Track Storage usage -----
 
                 // UPDATE STREAMING DATA BATCH STRUCTURE
-                BatchMetadata storage current_data_batch = DataBatch[LastBatchCounter];
+                BatchMetadata storage current_data_batch = DataBatch[_batch_counter];
                 if (current_data_batch.counter < Parameters.get_SPOT_DATA_BATCH_SIZE()) {
                     current_data_batch.counter += 1;
                 }
@@ -1703,13 +1800,12 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
                     current_data_batch.complete = true;
                     current_data_batch.checked = false;
                     LastBatchCounter += 1;
-                    DataBatch[LastBatchCounter].start_idx = DataNonce;
+                    DataBatch[_batch_counter].start_idx = DataNonce;
+                    //----- Track Storage usage -----
+                    BytesUsed += BYTES_8+BYTES_128; //bool + start_idx
+                    //----- Track Storage usage -----
                 }
 
-                //----- Track Storage usage -----
-                BytesUsed += BYTES_8+BYTES_128; // SpottedData Struct
-                BytesUsed += BYTES_256*2; // bool & start_idx
-                //----- Track Storage usage -----
 
 
                 // Global state update - spot flow management: increase global sliding counter & user counter
@@ -1759,19 +1855,12 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
             }
             // -----------------------------------------------------------------
         }
-
-        WorkerState storage worker_state = WorkersState[msg.sender];
-        
+        WorkerState storage worker_state = WorkersState[msg.sender];        
         if ( !worker_state.isWorkerSeen ){
             AllWorkersList.push(msg.sender);
             worker_state.isWorkerSeen = true;
         }
-
         worker_state.last_interaction_date = uint64(block.timestamp);
-
-        //----- Track Storage usage -----
-        BytesUsed += BYTES_64;
-        //----- Track Storage usage -----
 
         _retrieveSFuel();
         AllTxsCounter += 1;
@@ -1792,7 +1881,9 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
         bytes32 _encryptedVote,
         uint32 _BatchCount,
         string memory _From
-    ) public {
+    ) public 
+    whenNotPaused()
+    {
         require(IParametersManager(address(0)) != Parameters, "Parameters Manager must be set.");
         require(commitPeriodActive(_DataBatchId), "commit period needs to be open for this batchId");
         require(!UserVoteSubmission[_DataBatchId][msg.sender].commited, "User has already commited to this batchId");
@@ -1871,10 +1962,13 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
         string memory _clearIPFSHash,
         uint8 _clearVote,
         uint256 _salt
-    ) public {
+    ) public
+    whenNotPaused()
+    {
         // Make sure the reveal period is active
         require(revealPeriodActive(_DataBatchId), "Reveal period not open for this DataID");
-        require(UserVoteSubmission[_DataBatchId][msg.sender].commited, "User has not commited before, thus can't reveal");
+        require(UserVoteSubmission[_DataBatchId][msg.sender].commited, 
+        "User has not commited before, thus can't reveal");
         require(!UserVoteSubmission[_DataBatchId][msg.sender].revealed, "User has already revealed, thus can't reveal");
         require(
             getEncryptedStringHash(_clearIPFSHash, _salt) == getCommitIPFSHash(msg.sender, _DataBatchId),
