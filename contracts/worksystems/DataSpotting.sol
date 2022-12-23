@@ -1132,8 +1132,8 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
     /**
      * @dev Destroy WorkersStatus for users_ array, important to release storage space if critical
      */
-    function deleteManyWorkersStatus(address[] users_) public onlyOwner {
-        for (i = 0; i < users_.length; i++){
+    function deleteManyWorkersStatus(address[] memory users_) public onlyOwner {
+        for (uint256 i = 0; i < users_.length; i++){
             address _user = users_[i];
             deleteWorkersStatus(_user);
         }
@@ -1155,8 +1155,8 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
     /**
      * @dev Destroy WorkersStatus for users_ array, important to release storage space if critical
      */
-    function deleteManyWorkersState(address[] users_) public onlyOwner {
-        for (i = 0; i < users_.length; i++){
+    function deleteManyWorkersState(address[] memory users_) public onlyOwner {
+        for (uint256 i = 0; i < users_.length; i++){
             address _user = users_[i];
             deleteWorkersState(_user);
         }
