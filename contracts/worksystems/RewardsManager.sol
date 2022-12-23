@@ -22,6 +22,26 @@ interface IParametersManager {
     function getAddressManager() external view returns (address);
 }
 
+// // Define the maximum number of tokens that can be distributed per day
+// uint256 public dailyTokenLimit = 30000;
+
+// // Keep track of the total number of tokens distributed on the current day
+// uint256 public totalTokensDistributedToday;
+
+// // Function to distribute ERC20 tokens
+// function distributeTokens(uint256 amount) public {
+//     // Check if the daily token limit has been reached
+//     require(totalTokensDistributedToday + amount <= dailyTokenLimit, "Daily token limit reached");
+
+//     // Distribute the tokens
+//     // ...
+
+//     // Update the total number of tokens distributed on the current day
+//     totalTokensDistributedToday += amount;
+// }
+
+
+
 contract RewardsManager is Ownable {
     event UserRegistered(bytes32 name, uint256 timestamp);
     event UserTransferred(bytes32 name);

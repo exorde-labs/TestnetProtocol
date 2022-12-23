@@ -4,6 +4,19 @@ pragma solidity 0.8.8;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
+/*
+
+            USE LINKED LISTS TO TRACK LOCKED TOKENS (STAKE ALLOCATION)
+            PER WORKSYSTEM (Address)
+            PER USER
+
+            SCALABLY
+
+            EACH ALLOCATION MUST HAVE DIFFERENT EXPIRATION DATE (UNLOCK DATE)
+            EACH ALLOCATION CAN BE REMOVED FROM THE LIST
+*/
+
+
 contract StakingManager is
     Ownable {
 

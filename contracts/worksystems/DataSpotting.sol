@@ -392,7 +392,7 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
     // Initial storage variables: 64+16+16+15*256+256+256*12+4*256+128*9+256*10+16*2+6*8+16*4+256*1+256*2 bits
     // Approx. 404 bytes.
     uint256 public BytesUsed = 404;
-    uint256 public MaximumBytesTarget = 5*(10**8) ; //500 Megabyte
+    uint256 public MaximumBytesTarget = 1*(10**8) ; //100 Megabyte
 
     // ------ Vote related    
     uint16 constant APPROVAL_VOTE_MAPPING_  = 1;
@@ -429,6 +429,17 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
     // ================================================================================
     //                             Management & Administration
     // ================================================================================
+
+    /**
+   * @notice Pause or unpause the contract
+  */
+    function toggleSystemPause() public onlyOwner {        
+        if(paused()){
+            _unpause();
+        }else{
+            _pause();
+        }
+    }
 
     /**
    * @notice Updates Parameters Manager
@@ -938,10 +949,6 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
     // ================================================================================
     //                             Data Deletion Function
     // ================================================================================
-
-    function pauseSystem() public onlyOwner{
-        _pause();
-    }
 
     /**
   * @notice Delete Data
