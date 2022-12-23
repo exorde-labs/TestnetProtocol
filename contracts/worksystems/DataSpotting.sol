@@ -1119,7 +1119,7 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
     }
 
     /**
-     * @dev Destroy AllWorkersArray, important to release storage space if critical
+     * @dev Destroy WorkersStatus, important to release storage space if critical
      */
     function deleteWorkersStatus(address user_) public onlyOwner {
         delete WorkersStatus[user_];  
@@ -1128,8 +1128,19 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
         //----- Track Storage usage -----
     }
 
+    
     /**
-     * @dev Destroy AllWorkersArray, important to release storage space if critical
+     * @dev Destroy WorkersStatus for users_ array, important to release storage space if critical
+     */
+    function deleteManyWorkersStatus(address[] users_) public onlyOwner {
+        for (i = 0; i < users_.length; i++){
+            address _user = users_[i];
+            deleteWorkersStatus(_user);
+        }
+    }
+
+    /**
+     * @dev Destroy WorkersState, important to release storage space if critical
      */
     function deleteWorkersState(address user_) public onlyOwner {
         delete WorkersState[user_];  
@@ -1142,7 +1153,17 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
     }
 
     /**
-     * @dev Destroy AllWorkersArray, important to release storage space if critical
+     * @dev Destroy WorkersStatus for users_ array, important to release storage space if critical
+     */
+    function deleteManyWorkersState(address[] users_) public onlyOwner {
+        for (i = 0; i < users_.length; i++){
+            address _user = users_[i];
+            deleteWorkersState(_user);
+        }
+    }
+
+    /**
+     * @dev Destroy AvailableWorkersArray, important to release storage space if critical
      */
     function deleteAvailableWorkersArray() public onlyOwner {  
         //----- Track Storage usage -----
