@@ -14,30 +14,30 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 contract Parameters is Ownable {
     // Default values
     //////////////// GENERAL SYSTEM PARAMTERS
-    uint256 public MAX_TOTAL_WORKERS = 1000;
+    uint256 public MAX_TOTAL_WORKERS = 100000;
     uint256 public VOTE_QUORUM = 50;
     uint256 public MAX_UPDATE_ITERATIONS = 50;
     uint256 public MAX_CONTRACT_STORED_BATCHES = 200000;
     //////////////// SPOTTING RELATED PARAMETERS
-    uint256 public SPOT_DATA_BATCH_SIZE = 5;
+    uint256 public SPOT_DATA_BATCH_SIZE = 20;
     uint256 public SPOT_MIN_STAKE = 25 * (10**18);
-    uint256 public SPOT_MIN_CONSENSUS_WORKER_COUNT = 2;
-    uint256 public SPOT_MAX_CONSENSUS_WORKER_COUNT = 10;
-    uint256 public SPOT_COMMIT_ROUND_DURATION = 180;
-    uint256 public SPOT_REVEAL_ROUND_DURATION = 180;
-    uint256 public SPOT_MIN_REWARD_SpotData = 1 * (10**15);
-    uint256 public SPOT_MIN_REP_SpotData = 10 * (10**15);
-    uint256 public SPOT_MIN_REWARD_DataValidation = 1 * (10**15);
-    uint256 public SPOT_MIN_REP_DataValidation = 10 * (10**15);
+    uint256 public SPOT_MIN_CONSENSUS_WORKER_COUNT = 7;
+    uint256 public SPOT_MAX_CONSENSUS_WORKER_COUNT = 11;
+    uint256 public SPOT_COMMIT_ROUND_DURATION = 450;
+    uint256 public SPOT_REVEAL_ROUND_DURATION = 150;
+    uint256 public SPOT_MIN_REWARD_SpotData = 1 * (10**13);
+    uint256 public SPOT_MIN_REP_SpotData = 5 * (10**15);
+    uint256 public SPOT_MIN_REWARD_DataValidation = 1 * (10**13);
+    uint256 public SPOT_MIN_REP_DataValidation = 20 * (10**15);
     // SPOT DATA LIMITATIONS
-    uint256 public SPOT_INTER_ALLOCATION_DURATION = 5;
+    uint256 public SPOT_INTER_ALLOCATION_DURATION = 0;
     bool public SPOT_TOGGLE_ENABLED = true;
-    uint256 public SPOT_TIMEFRAME_DURATION = 15 * 60; //15 minutes
-    uint256 public SPOT_GLOBAL_MAX_SPOT_PER_PERIOD = 1000;
-    uint256 public SPOT_MAX_SPOT_PER_USER_PER_PERIOD = 25;
-    uint256 public SPOT_NB_TIMEFRAMES = 4;
-    uint256 public MAX_SUCCEEDING_NOVOTES = 3;
-    uint256 public NOVOTE_REGISTRATION_WAIT_DURATION = 3600; // in seconds
+    uint256 public SPOT_TIMEFRAME_DURATION = 240;
+    uint256 public SPOT_GLOBAL_MAX_SPOT_PER_PERIOD = 3000000;
+    uint256 public SPOT_MAX_SPOT_PER_USER_PER_PERIOD = 1000;
+    uint256 public SPOT_NB_TIMEFRAMES = 15;
+    uint256 public MAX_SUCCEEDING_NOVOTES = 10;
+    uint256 public NOVOTE_REGISTRATION_WAIT_DURATION = 30; // in seconds
     //////////////// Compliance RELATED PARAMETERS
     uint256 public COMPLIANCE_DATA_BATCH_SIZE = 1;
     uint256 public COMPLIANCE_MIN_CONSENSUS_WORKER_COUNT = 2;
