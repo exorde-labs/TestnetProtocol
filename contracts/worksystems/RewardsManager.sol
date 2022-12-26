@@ -106,6 +106,20 @@ contract RewardsManager is Ownable {
         return (false);
     }
 
+    /**
+     * @notice A method for a verified whitelisted contract to transferRewards // nonReentrant()
+     */
+    function ProxyTransferRewards(address _initial, address _receiving) external returns (bool) {
+        require(isRewardsWhitelisted(msg.sender), "RewardsManager: sender must be whitelisted to Proxy act");
+        uint256 _amount_to_transfer = rewards[_initial];
+        if (_amount_to_transfer > 0){
+            // transfer Rewards
+            rewards[_initial] = 0;
+            rewards[_receiving] += _amount_to_transfer;
+        }
+        return true;
+    }
+
 
     function RewardsBalanceOf(address _address) public view returns (uint256) {
         return rewards[_address];
