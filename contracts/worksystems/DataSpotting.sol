@@ -392,7 +392,7 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
     // Initial storage variables: 64+16+16+15*256+256+256*12+4*256+128*9+256*10+16*2+6*8+16*4+256*1+256*2 bits
     // Approx. 404 bytes.
     uint256 public BytesUsed = 404;
-    uint256 public MaximumBytesTarget = 1*(10**8) ; //100 Megabyte
+    uint256 public MaximumBytesTarget = 50*(10**6) ; //50 Mb
 
     // ------ Vote related    
     uint16 constant APPROVAL_VOTE_MAPPING_  = 1;
@@ -405,8 +405,8 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
     bool public FORCE_VALIDATE_BATCH_FILE = true;
     bool public InstantSpotRewards = true;
     bool public InstantRevealRewards = true;
-    uint16 public InstantSpotRewardsDivider = 5;
-    uint16 public InstantRevealRewardsDivider = 2;
+    uint16 public InstantSpotRewardsDivider = 3;
+    uint16 public InstantRevealRewardsDivider = 1;
     uint16 public MaxPendingDataBatchCount = 1000;
     uint16 public SPOT_FILE_SIZE = 100;
 
@@ -955,7 +955,7 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
   */
     function deleteOldData(uint128 iteration_count) internal {
         // Rolling delete of previous data
-        uint128 _deletion_index = BatchDeletionCursor;
+        uint128 _deletion_index;
         uint128 BatchesToDeleteCount = BatchCheckingCursor - _deletion_index;
         if (BatchesToDeleteCount > Parameters.get_MAX_CONTRACT_STORED_BATCHES()
             || BytesUsed >= MaximumBytesTarget) {
@@ -1008,7 +1008,8 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
                 //----- Track Storage usage -----
 
                 emit _DataBatchDeleted(_deletion_index);
-                BatchDeletionCursor += 1;
+                // Update Global Variable
+                BatchDeletionCursor = BatchDeletionCursor + 1;
             }
         }
     }
@@ -1067,7 +1068,6 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
             //----- Track Storage usage -----
 
             emit _DataBatchDeleted(_deletion_index);
-            BatchDeletionCursor += 1;
         }        
     }
 

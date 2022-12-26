@@ -17,7 +17,7 @@ contract Parameters is Ownable {
     uint256 public MAX_TOTAL_WORKERS = 100000;
     uint256 public VOTE_QUORUM = 50;
     uint256 public MAX_UPDATE_ITERATIONS = 50;
-    uint256 public MAX_CONTRACT_STORED_BATCHES = 20000;
+    uint256 public MAX_CONTRACT_STORED_BATCHES = 200000;
     //////////////// SPOTTING RELATED PARAMETERS
     uint256 public SPOT_DATA_BATCH_SIZE = 20;
     uint256 public SPOT_MIN_STAKE = 25 * (10**18);
