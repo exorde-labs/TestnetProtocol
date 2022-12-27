@@ -1,6 +1,6 @@
 {
-   "_urlSkale":"http://44.212.212.254:10067",
-   "_urlSkale2":"http://44.212.212.254:10067",
+   "_urlSkale":"http://44.212.212.254:10067/",
+   "_urlSkale2":"http://44.212.212.254:10067/",
    "_urlTxSkale":"https://mainnet.skalenodes.com/v1/light-vast-diphda",
    "_chainID":"2139927552",
    "_blockExplorer":"https://light-vast-diphda.explorer.mainnet.skalenodes.com/",
