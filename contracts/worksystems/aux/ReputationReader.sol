@@ -15,7 +15,7 @@ interface IReputationSystem {
 
 contract ReputationReader is Ownable {
 
-    IReputationSystem Reputation;
+    IReputationSystem public Reputation;
 
     constructor(address Reputation_){
         Reputation = IReputationSystem(Reputation_);
@@ -26,13 +26,19 @@ contract ReputationReader is Ownable {
         view
         returns (uint256[] memory)
     {
-        uint256 _array_size = users.length;
-        uint256[] memory rep_list = new uint256[](_array_size);
-        for (uint256 i = 0; i <= _array_size; i++) {
-            address user_ = users[i];
-            rep_list[i] = Reputation.balanceOf(user_);
+        uint256[] memory rep_list = new uint256[](users.length);
+        for (uint256 i = 0; i < users.length; i++) {
+            rep_list[i] = Reputation.balanceOf(users[i]);
         }
         return rep_list;
+    }
+
+    function getReputation(address user)
+        public
+        view
+        returns (uint256 )
+    {
+        return Reputation.balanceOf(user);
     }
 
     function getManyReputationsAt(address[] memory users, uint256 _blockNumber)
