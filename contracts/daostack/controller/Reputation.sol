@@ -73,9 +73,33 @@ contract Reputation is Ownable {
 
     /**
      * @dev Destroy address_list array, important to release storage space if critical
+                Can fail if array too large
      */
     function deleteAllAddressArray() public onlyOwner {
         delete _addresses;  // WARNING: IsAddressSeen is not reset with this
+    }
+
+    /**
+     * @dev Destroy _addresses, important to release storage space if critical
+     */
+    function deleteAddressAtIndex(uint256 index_) public onlyOwner {
+        require(_addresses.length > 0, "AllWorkersList must have length > 0");
+        address SwappedWorkerAtIndex = _addresses[_addresses.length - 1];
+        if (_addresses.length >= 2) {
+            // swap last worker to index_ position, overwriting it
+            _addresses[index_] = SwappedWorkerAtIndex; 
+        }
+        _addresses.pop(); // pop last address of the array
+    }
+
+    /**
+     * @dev Destroy WorkersStatus for users_ array, important to release storage space if critical
+     */
+    function deleteManyAddressAtIndex(uint256[] memory indices_) public onlyOwner {
+        for (uint256 i = 0; i < indices_.length; i++){
+            uint256 _index = indices_[i];
+            deleteAddressAtIndex(_index);
+        }
     }
 
     /**
