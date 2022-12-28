@@ -1,6 +1,6 @@
 {
    "mainnet":"40",
-   "testnet1":"60",
-   "testnet2":"0",
-   "testnet3":"0"
+   "testnet-A":"60",
+   "testnet-B":"0",
+   "testnet-C":"0"
 }
