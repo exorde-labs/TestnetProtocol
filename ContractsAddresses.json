@@ -1,6 +1,5 @@
-[
-   {
-      "_networkId":"mainnet-A",
+{
+   "mainnet-A":{
       "Reputation":"0xE0179b333bD5170f9dC088013AEb693E38f0f6B0",
       "EXDT":"0xC50b575c9184A02a8EdbAD90017E75Cfb502C26B",
       "Avatar":"0xb9354a597Bf68eC9B7486feFeB16da46b887cC1f",
@@ -18,8 +17,8 @@
       "QuickWalletScheme":"0x89021D0805F6fdDE09575112618EBB1f619A5924",
       "sfuel":"0x3B6974F98b84d6A473691ac2b9dA6497efF6f8f0"
    },
-   {
-      "_networkId":"testnet-A",
+   
+   "testnet-A":{
       "Reputation":"0xeB00E9d2A96636412057f5eB8b840865182ba174",
       "EXDT":"0xcBc357F3077989B4636E93a8Ce193E05cd8cc56E",
       "Avatar":"0x169c87F481a9129a58A7bA1db5E5ADE592c9f12B",
@@ -38,4 +37,4 @@
       "PermissionRegistry":"0x378A9CA37015af31715776cb699131e6D5d38cFF",
       "sFuelContracts":"0x2791A1aF774ed9ef58e9bd26EC6b72636b4670A6"
    }
-]
+}
