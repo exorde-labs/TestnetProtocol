@@ -1,5 +1,0 @@
-{
-   "mainnet":35,
-   "testnetB":65,
-   "testnetC":0,
-}
