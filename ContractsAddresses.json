@@ -12,7 +12,7 @@
       "DataSpotting":"0x370a6390044866016370E81a149D781307540764",
       "sFuelContracts":"0x190c7D16c3EC7FC71c37b9c7D30AA8638361D2B1",
       "ReputationReader":"0x17F263717586240A51c2B41824990d7869F27523"
-   }
+   },
    "testnet-A":{
       "Reputation":"0xE0179b333bD5170f9dC088013AEb693E38f0f6B0",
       "EXDT":"0xC50b575c9184A02a8EdbAD90017E75Cfb502C26B",
@@ -30,5 +30,5 @@
       "MasterWalletScheme":"0x999dfE2Ae5797fd0a440Ee55027ff5efe12cEb90",
       "QuickWalletScheme":"0x89021D0805F6fdDE09575112618EBB1f619A5924",
       "sfuel":"0x3B6974F98b84d6A473691ac2b9dA6497efF6f8f0"
-   },
+   }
 }
