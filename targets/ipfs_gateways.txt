@@ -1,9 +1,5 @@
 http://ipfs-gateway.exorde.network/ipfs/
 http://ipfs-gateway.exorde.network/ipfs/
-http://ipfs-gateway.exorde.network/ipfs/
 https://w3s.link/ipfs/
-https://exorde-1.myfilebase.com/ipfs/
 https://gateway.ipfs.io/ipfs/
-https://exorde-2.myfilebase.com/ipfs/
 https://ipfs.io/ipfs/
-https://exorde-private.myfilebase.com/ipfs/
