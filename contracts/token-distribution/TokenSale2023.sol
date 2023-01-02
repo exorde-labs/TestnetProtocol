@@ -218,16 +218,19 @@ contract Crowdsale is Context, ReentrancyGuard, Ownable, Pausable {
         _preValidatePurchase(beneficiary, purchaseAmount);
 
         (uint256 tokens, uint256 dollarsToRefund) = _getTokenAmount(purchaseAmount);
+
+        require( dollarsToRefund  <= purchaseAmount, "error: dollarsToRefund > purchaseAmount");
+        uint256 effectivePurchaseAmount = purchaseAmount - dollarsToRefund;
         
         // update state
-        _dollarRaised = _dollarRaised.add(purchaseAmount);
+        _dollarRaised = _dollarRaised.add(effectivePurchaseAmount);
 
         _processPurchase(beneficiary, tokens);  
-        emit TokensPurchased(_msgSender(), beneficiary, purchaseAmount, tokens);
+        emit TokensPurchased(_msgSender(), beneficiary, effectivePurchaseAmount, tokens);
 
-        _updatePurchasingState(beneficiary, purchaseAmount);
+        _updatePurchasingState(beneficiary, effectivePurchaseAmount);
 
-        _forwardFunds(USDC, purchaseAmount);
+        _forwardFunds(USDC, effectivePurchaseAmount);
         _postValidatePurchase(USDC, beneficiary, dollarsToRefund);
     }
 
@@ -249,17 +252,19 @@ contract Crowdsale is Context, ReentrancyGuard, Ownable, Pausable {
         _preValidatePurchase(beneficiary, purchaseAmount);
 
         (uint256 tokens, uint256 dollarsToRefund) = _getTokenAmount(purchaseAmount);
-
+        require( dollarsToRefund  <= purchaseAmount, "error: dollarsToRefund > purchaseAmount");
+        uint256 effectivePurchaseAmount = purchaseAmount - dollarsToRefund;
+        
         // update state
-        _dollarRaised = _dollarRaised.add(purchaseAmount);
+        _dollarRaised = _dollarRaised.add(effectivePurchaseAmount);
 
-        _processPurchase(beneficiary, tokens);
-        emit TokensPurchased(_msgSender(), beneficiary, purchaseAmount, tokens);
+        _processPurchase(beneficiary, tokens);  
+        emit TokensPurchased(_msgSender(), beneficiary, effectivePurchaseAmount, tokens);
 
-        _updatePurchasingState(beneficiary, purchaseAmount);
+        _updatePurchasingState(beneficiary, effectivePurchaseAmount);
 
-        _forwardFunds(USDT, purchaseAmount);
-        _postValidatePurchase(USDT, beneficiary, dollarsToRefund);
+        _forwardFunds(USDC, effectivePurchaseAmount);
+        _postValidatePurchase(USDC, beneficiary, dollarsToRefund);
     }
 
 
@@ -280,17 +285,19 @@ contract Crowdsale is Context, ReentrancyGuard, Ownable, Pausable {
         _preValidatePurchase(beneficiary, purchaseAmount);
 
         (uint256 tokens, uint256 dollarsToRefund) = _getTokenAmount(purchaseAmount);
-
+        require( dollarsToRefund  <= purchaseAmount, "error: dollarsToRefund > purchaseAmount");
+        uint256 effectivePurchaseAmount = purchaseAmount - dollarsToRefund;
+        
         // update state
-        _dollarRaised = _dollarRaised.add(purchaseAmount);
+        _dollarRaised = _dollarRaised.add(effectivePurchaseAmount);
 
-        _processPurchase(beneficiary, tokens);
-        emit TokensPurchased(_msgSender(), beneficiary, purchaseAmount, tokens);
+        _processPurchase(beneficiary, tokens);  
+        emit TokensPurchased(_msgSender(), beneficiary, effectivePurchaseAmount, tokens);
 
-        _updatePurchasingState(beneficiary, purchaseAmount);
+        _updatePurchasingState(beneficiary, effectivePurchaseAmount);
 
-        _forwardFunds(DAI, purchaseAmount);
-        _postValidatePurchase(DAI, beneficiary, dollarsToRefund);
+        _forwardFunds(USDC, effectivePurchaseAmount);
+        _postValidatePurchase(USDC, beneficiary, dollarsToRefund);
     }
 
     /**
