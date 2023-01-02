@@ -450,7 +450,7 @@ contract Crowdsale is Context, ReentrancyGuard, Ownable, Pausable {
         uint256 surplusDollarsForNextTier = 0;
         uint256 surplusDollarsToRefund = 0;
 
-        uint256 tierSelected = getCurrentTier();
+        uint256 _currentTier = getCurrentTier();
         uint256 _tokensNextTier = 0;
 
         uint256 remainingTierDollarPurchase = remainingTierDollars();
@@ -460,15 +460,19 @@ contract Crowdsale is Context, ReentrancyGuard, Ownable, Pausable {
         }
         if( surplusDollarsForNextTier > 0 ){
             // If there's excessive dollar for the last tier
-            if(tierSelected != 3){ // if we are in Tier 1 or 2, then all dollars can be used
-                _tokensNextTier = calculateTokensTier(surplusDollarsForNextTier, (tierSelected+1) );
+            if(_currentTier != 3){ // if we are in Tier 1 or 2, then all dollars can be used
+                _tokensNextTier = calculateTokensTier(surplusDollarsForNextTier, (_currentTier + 1) );
+                // total Allocated Tokens = tokens for this tier + token for next tier
+                allocatedTokens = calculateTokensTier((dollarPurchaseAmount - surplusDollarsForNextTier), _currentTier) + _tokensNextTier; 
             }
             else{ // if we are in the last tier & have surplus, we have to refund this amount
                 surplusDollarsToRefund = surplusDollarsForNextTier;
             }
         }
-        // total Allocated Tokens = tokens for this tier + (optional) token for next tier
-        allocatedTokens = (dollarPurchaseAmount - surplusDollarsForNextTier) + _tokensNextTier; 
+        else{
+            allocatedTokens = calculateTokensTier(dollarPurchaseAmount, _currentTier);
+        }
+        
         
         return (allocatedTokens, surplusDollarsToRefund);
    }
