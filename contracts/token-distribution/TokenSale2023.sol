@@ -62,11 +62,8 @@ contract Crowdsale is Context, ReentrancyGuard, Ownable, Pausable {
     uint256 public _priceTier1 = 350; // $0.35, thirty five cents
     uint256 public _priceTier2 = 375; // $0.375, thirty five cents + half a cent
     uint256 public _priceTier3 = 400; // $0.4, fourty cents
+    uint256 public _priceBase = 1000; // $0.4, fourty cents
 
-    // dollar-based rate
-    uint256 public _rateTier1 = (1*1000)/(_priceTier1);
-    uint256 public _rateTier2 = (1*1000)/(_priceTier2);
-    uint256 public _rateTier3 = (1*1000)/(_priceTier3);
 
    // You can only buy up to 12M tokens
     uint256 public maxTokensRaised = 12*(10**18); // 12 millions
@@ -75,12 +72,15 @@ contract Crowdsale is Context, ReentrancyGuard, Ownable, Pausable {
     uint256 public _tier2SupplyThreshold = 6*(10**18); // 4 million at _rateTier2 (2m + 4m = 6m)
     uint256 public _tier3SupplyThreshold = 12*(10**18); // 6 million at _rateTier3  (2m + 4m + 6m = 12m = maxTokensRaised)
 
+    uint256 public userMaxTotalPurchase = 50000; // 50000 dollars ($50k)
 
     uint256 public startTime;
     uint256 public endTime;
 
     // Amount of dollar raised
     uint256 public _dollarRaised;
+
+    mapping(address => uint256) public _usersTotalPurchase;
 
     // Amount of token sold
     uint256 public totalTokensRaised;
@@ -205,20 +205,53 @@ contract Crowdsale is Context, ReentrancyGuard, Ownable, Pausable {
      * @dev low level token purchase ***DO NOT OVERRIDE***
      * This function has a non-reentrancy guard, so it shouldn't be called by
      * another `nonReentrant` function.
-     * @param beneficiary Recipient of the token purchase
      * @param purchaseAmount in dollar (usdc/usdt/dai)
      */
-    function buyTokensUSDC(address beneficiary, uint256 purchaseAmount) public 
+    function buyTokensUSDC(uint256 purchaseAmount) public 
     nonReentrant 
     whenNotPaused
-    isWhitelisted(beneficiary) 
+    isWhitelisted(_msgSender()) 
     {
-        USDC.safeTransferFrom(_msgSender(), address(this), purchaseAmount);
+        address beneficiary = _msgSender();
+        USDC.safeTransferFrom(beneficiary, address(this), purchaseAmount);
         
         _preValidatePurchase(beneficiary, purchaseAmount);
 
         (uint256 tokens, uint256 dollarsToRefund) = _getTokenAmount(purchaseAmount);
 
+        require( dollarsToRefund  <= purchaseAmount, "error: dollarsToRefund > purchaseAmount");
+        uint256 effectivePurchaseAmount = purchaseAmount - dollarsToRefund;
+        
+        // update state
+        _dollarRaised = _dollarRaised.add(effectivePurchaseAmount);
+
+        _processPurchase(beneficiary, tokens);  
+        emit TokensPurchased(beneficiary, beneficiary, effectivePurchaseAmount, tokens);
+
+        _updatePurchasingState(beneficiary, effectivePurchaseAmount);
+
+        _forwardFunds(USDC, effectivePurchaseAmount);
+        _postValidatePurchase(USDC, beneficiary, dollarsToRefund);
+    }
+
+
+    /**
+     * @dev low level token purchase ***DO NOT OVERRIDE***
+     * This function has a non-reentrancy guard, so it shouldn't be called by
+     * another `nonReentrant` function.
+     * @param purchaseAmount in dollar (usdc/usdt/dai)
+     */
+    function buyTokensUSDT(uint256 purchaseAmount) public 
+    nonReentrant 
+    whenNotPaused
+    isWhitelisted( _msgSender()) 
+    {
+        address beneficiary = _msgSender();
+        USDT.safeTransferFrom(beneficiary, address(this), purchaseAmount);
+        
+        _preValidatePurchase(beneficiary, purchaseAmount);
+
+        (uint256 tokens, uint256 dollarsToRefund) = _getTokenAmount(purchaseAmount);
         require( dollarsToRefund  <= purchaseAmount, "error: dollarsToRefund > purchaseAmount");
         uint256 effectivePurchaseAmount = purchaseAmount - dollarsToRefund;
         
@@ -239,47 +272,14 @@ contract Crowdsale is Context, ReentrancyGuard, Ownable, Pausable {
      * @dev low level token purchase ***DO NOT OVERRIDE***
      * This function has a non-reentrancy guard, so it shouldn't be called by
      * another `nonReentrant` function.
-     * @param beneficiary Recipient of the token purchase
      * @param purchaseAmount in dollar (usdc/usdt/dai)
      */
-    function buyTokensUSDT(address beneficiary, uint256 purchaseAmount) public 
+    function buyTokensDAI(uint256 purchaseAmount) public 
     nonReentrant 
     whenNotPaused
-    isWhitelisted(beneficiary) 
-    {
-        USDT.safeTransferFrom(_msgSender(), address(this), purchaseAmount);
-        
-        _preValidatePurchase(beneficiary, purchaseAmount);
-
-        (uint256 tokens, uint256 dollarsToRefund) = _getTokenAmount(purchaseAmount);
-        require( dollarsToRefund  <= purchaseAmount, "error: dollarsToRefund > purchaseAmount");
-        uint256 effectivePurchaseAmount = purchaseAmount - dollarsToRefund;
-        
-        // update state
-        _dollarRaised = _dollarRaised.add(effectivePurchaseAmount);
-
-        _processPurchase(beneficiary, tokens);  
-        emit TokensPurchased(_msgSender(), beneficiary, effectivePurchaseAmount, tokens);
-
-        _updatePurchasingState(beneficiary, effectivePurchaseAmount);
-
-        _forwardFunds(USDC, effectivePurchaseAmount);
-        _postValidatePurchase(USDC, beneficiary, dollarsToRefund);
-    }
-
-
-    /**
-     * @dev low level token purchase ***DO NOT OVERRIDE***
-     * This function has a non-reentrancy guard, so it shouldn't be called by
-     * another `nonReentrant` function.
-     * @param beneficiary Recipient of the token purchase
-     * @param purchaseAmount in dollar (usdc/usdt/dai)
-     */
-    function buyTokensDAI(address beneficiary, uint256 purchaseAmount) public 
-    nonReentrant 
-    whenNotPaused
-    isWhitelisted(beneficiary) 
+    isWhitelisted( _msgSender()) 
     payable {
+        address beneficiary = _msgSender();
         DAI.safeTransferFrom(_msgSender(), address(this), purchaseAmount);
         
         _preValidatePurchase(beneficiary, purchaseAmount);
@@ -312,6 +312,8 @@ contract Crowdsale is Context, ReentrancyGuard, Ownable, Pausable {
     function _preValidatePurchase(address beneficiary, uint256 dollarAmount) internal view virtual {
         require(beneficiary != address(0), "Crowdsale: beneficiary is the zero address");
         require(dollarAmount != 0, "Crowdsale: dollarAmount is 0");
+        // check if user total purchase is below the user cap.
+        require( (_usersTotalPurchase[beneficiary]+dollarAmount) <= userMaxTotalPurchase, "total user purchase is capped at $50k" );
     }
 
     /**
@@ -354,7 +356,7 @@ contract Crowdsale is Context, ReentrancyGuard, Ownable, Pausable {
      * @param dollarAmount Value in dollar involved in the purchase
      */
     function _updatePurchasingState(address beneficiary, uint256 dollarAmount) internal virtual {
-        // solhint-disable-previous-line no-empty-blocks
+        _usersTotalPurchase[beneficiary] += dollarAmount;
     }
 
     // function _buyTokens(uint256 purchaseAmount) internal 
@@ -412,24 +414,24 @@ contract Crowdsale is Context, ReentrancyGuard, Ownable, Pausable {
    /// @notice Calculates how many dollar will be used to generate the tokens in
    /// case the buyer sends more than the maximum balance but has some balance left
    /// e.g. if 500 balance and user sends 1000, it will refund 500 dollars
-    function calculateExcessDollarBalance(uint256 purchaseAmount) view public returns(uint256) {
-        uint256 amountPaid = purchaseAmount;
-        uint256 differenceDollar = 0;
-        // If we're in the last tier, check that the limit hasn't been reached
-        // and if so, refund the difference and return what will be used to
-        // buy the remaining tokens
-        if(totalTokensRaised >= _tier3SupplyThreshold) {
-            uint256 addedTokens = totalTokensRaised.add(amountPaid.mul(_rateTier3));
-            // If totalTokensRaised + what you paid converted to tokens is bigger than the max
-            if(addedTokens > maxTokensRaised) {
-                // Refund the difference
-                uint256 difference = addedTokens.sub(maxTokensRaised);
-                differenceDollar = difference.div(_rateTier3);
-                amountPaid = amountPaid.sub(differenceDollar);
-            }
-        }
-        return amountPaid;
-    }
+    // function calculateExcessDollarBalance(uint256 purchaseAmount) view public returns(uint256) {
+    //     uint256 amountPaid = purchaseAmount;
+    //     uint256 differenceDollar = 0;
+    //     // If we're in the last tier, check that the limit hasn't been reached
+    //     // and if so, refund the difference and return what will be used to
+    //     // buy the remaining tokens
+    //     if(totalTokensRaised >= _tier3SupplyThreshold) {
+    //         uint256 addedTokens = totalTokensRaised.add(amountPaid.mul(_rateTier3));
+    //         // If totalTokensRaised + what you paid converted to tokens is bigger than the max
+    //         if(addedTokens > maxTokensRaised) {
+    //             // Refund the difference
+    //             uint256 difference = addedTokens.sub(maxTokensRaised);
+    //             differenceDollar = difference.div(_rateTier3);
+    //             amountPaid = amountPaid.sub(differenceDollar);
+    //         }
+    //     }
+    //     return amountPaid;
+    // }
     
 
     function getSupplyLimitPerTier(uint256 tierSelected_) public view returns (uint256) {
@@ -448,19 +450,19 @@ contract Crowdsale is Context, ReentrancyGuard, Ownable, Pausable {
     }
 
 
-    function getRatePerTier(uint256 tierSelected_) public view returns (uint256) {
+    function getPricePerTier(uint256 tierSelected_) public view returns (uint256) {
         require(tierSelected_ >= 1 && tierSelected_ <= 3);
-        uint256 _tierRate;
+        uint256 _price;
         if( tierSelected_ == 1 ){
-            _tierRate = _rateTier1;
+            _price = _priceTier1;
         }
         else if( tierSelected_ == 2 ){            
-            _tierRate = _rateTier2;
+            _price = _priceTier2;
         }
         else if( tierSelected_ == 3 ){            
-            _tierRate = _rateTier3;
+            _price = _priceTier3;
         }
-        return _tierRate;
+        return _price;
     }
 
 
@@ -493,13 +495,13 @@ contract Crowdsale is Context, ReentrancyGuard, Ownable, Pausable {
       uint256 calculatedTokens;
 
       if(tierSelected_ == 1){
-         calculatedTokens = dollarPaid_.mul(_rateTier1);
+         calculatedTokens = dollarPaid_.mul(_priceBase).div(_priceTier1);
       }
       else if(tierSelected_ == 2){
-         calculatedTokens = dollarPaid_.mul(_rateTier2);
+         calculatedTokens = dollarPaid_.mul(_priceBase).div(_priceTier2);
       }
       else{
-         calculatedTokens = dollarPaid_.mul(_rateTier3);
+         calculatedTokens = dollarPaid_.mul(_priceBase).div(_priceTier3);
       }
 
      return calculatedTokens;
@@ -537,7 +539,7 @@ contract Crowdsale is Context, ReentrancyGuard, Ownable, Pausable {
 
         uint256 tierSelected = getCurrentTier();
         uint256 _currentTierSupplyLimit = getSupplyLimitPerTier(tierSelected);
-        uint256 _currentRate = getRatePerTier(tierSelected);
+        uint256 _currentRate = getPricePerTier(tierSelected);
         uint256 _tokensNextTier = 0;
 
         uint remainingTierDollars = ( _currentTierSupplyLimit - totalTokensRaised ) / _currentRate;
