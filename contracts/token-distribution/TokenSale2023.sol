@@ -66,11 +66,11 @@ contract Crowdsale is Context, ReentrancyGuard, Ownable, Pausable {
 
 
    // You can only buy up to 12M tokens
-    uint256 public maxTokensRaised = 12*(10**18); // 12 millions
+    uint256 public maxTokensRaised = 12*(10**6)*(10**18); // 12 millions
 
-    uint256 public _tier1SupplyThreshold = 2*(10**18); // 2 million at _rateTier1
-    uint256 public _tier2SupplyThreshold = 6*(10**18); // 4 million at _rateTier2 (2m + 4m = 6m)
-    uint256 public _tier3SupplyThreshold = 12*(10**18); // 6 million at _rateTier3  (2m + 4m + 6m = 12m = maxTokensRaised)
+    uint256 public _tier1SupplyThreshold = 2*(10**18); // 2 million at _priceTier1
+    uint256 public _tier2SupplyThreshold = 6*(10**18); // 4 million at _priceTier2 (2m + 4m = 6m)
+    uint256 public _tier3SupplyThreshold = 12*(10**18); // 6 million at _priceTier3  (2m + 4m + 6m = 12m = maxTokensRaised)
 
     uint256 public userMaxTotalPurchase = 50000; // 50000 dollars ($50k)
 
@@ -107,7 +107,7 @@ contract Crowdsale is Context, ReentrancyGuard, Ownable, Pausable {
 
     
     /**
-     * @dev The rate is the conversion between dollar and the smallest and indivisible
+     * @dev The price is the conversion between dollar and the smallest and indivisible
      * token unit. So, if you are using a rate of 1 with a ERC20Detailed token
      * with 3 decimals called TOK, 1 dollar will give you 1 unit, or 0.001 TOK.
      * @param wallet_ Address where collected funds will be forwarded to
@@ -278,7 +278,7 @@ contract Crowdsale is Context, ReentrancyGuard, Ownable, Pausable {
     nonReentrant 
     whenNotPaused
     isWhitelisted( _msgSender()) 
-    payable {
+    {
         address beneficiary = _msgSender();
         DAI.safeTransferFrom(_msgSender(), address(this), purchaseAmount);
         
@@ -359,81 +359,6 @@ contract Crowdsale is Context, ReentrancyGuard, Ownable, Pausable {
         _usersTotalPurchase[beneficiary] += dollarAmount;
     }
 
-    // function _buyTokens(uint256 purchaseAmount) internal 
-    // whenNotPaused 
-    // {
-    //   uint256 tokens = 0;      
-    //   uint256 amountPaid = calculateExcessDollarBalance(purchaseAmount);
-
-    //   if(totalTokensRaised < _tier1SupplyThreshold) {
-    //      // Tier 1
-    //      tokens = amountPaid.mul(_rateTier1);
-
-    //      // If the amount of tokens that you want to buy gets out of this tier
-    //      if(totalTokensRaised.add(tokens) > _tier1SupplyThreshold)
-    //         tokens = calculateTokensToAllocate(amountPaid, 1);
-    //   } else if(totalTokensRaised >= _tier1SupplyThreshold && totalTokensRaised < _tier2SupplyThreshold) {
-
-    //      // Tier 2
-    //      tokens = amountPaid.mul(_rateTier2);
-
-    //      // If the amount of tokens that you want to buy gets out of this tier
-    //      if(totalTokensRaised.add(tokens) > _tier1SupplyThreshold)
-    //         tokens = calculateExcessTokens(amountPaid, 2);
-    //   } else if(totalTokensRaised >= _tier2SupplyThreshold && totalTokensRaised < _tier3SupplyThreshold) {
-    //      // Tier 3
-    //      tokens = amountPaid.mul(_rateTier3);
-    //   }
-
-    //   _dollarRaised += amountPaid;
-    //   uint256 tokensRaisedBeforeThisTransaction = totalTokensRaised;
-    //   totalTokensRaised += tokens;
-    //   token.distributeICOTokens(msg.sender, tokens);
-
-    //   // Keep a record of how many tokens everybody gets in case we need to do refunds
-    //   tokensBought[msg.sender] = tokensBought[msg.sender].add(tokens);
-    //   TokenPurchase(msg.sender, amountPaid, tokens);
-
-    //   if(tokensRaisedBeforeThisTransaction > minimumGoal) {
-
-    //      walletB.transfer(amountPaid);
-
-    //   } else {
-    //      vault.deposit.value(amountPaid)(msg.sender);
-    //      if(goalReached()) {
-    //       vault.close();
-    //      }
-         
-    //   }
-    //   // If the minimum goal of the ICO has been reach, close the vault to send
-    //   // the dollar to the wallet of the crowdsale
-    //   checkCompletedCrowdsale();
-    // }
-
-
-   /// @notice Calculates how many dollar will be used to generate the tokens in
-   /// case the buyer sends more than the maximum balance but has some balance left
-   /// e.g. if 500 balance and user sends 1000, it will refund 500 dollars
-    // function calculateExcessDollarBalance(uint256 purchaseAmount) view public returns(uint256) {
-    //     uint256 amountPaid = purchaseAmount;
-    //     uint256 differenceDollar = 0;
-    //     // If we're in the last tier, check that the limit hasn't been reached
-    //     // and if so, refund the difference and return what will be used to
-    //     // buy the remaining tokens
-    //     if(totalTokensRaised >= _tier3SupplyThreshold) {
-    //         uint256 addedTokens = totalTokensRaised.add(amountPaid.mul(_rateTier3));
-    //         // If totalTokensRaised + what you paid converted to tokens is bigger than the max
-    //         if(addedTokens > maxTokensRaised) {
-    //             // Refund the difference
-    //             uint256 difference = addedTokens.sub(maxTokensRaised);
-    //             differenceDollar = difference.div(_rateTier3);
-    //             amountPaid = amountPaid.sub(differenceDollar);
-    //         }
-    //     }
-    //     return amountPaid;
-    // }
-    
-
     function getSupplyLimitPerTier(uint256 tierSelected_) public view returns (uint256) {
         require(tierSelected_ >= 1 && tierSelected_ <= 3);
         uint256 _supplyLmit;
@@ -466,7 +391,7 @@ contract Crowdsale is Context, ReentrancyGuard, Ownable, Pausable {
     }
 
 
-    function getCurrentTier() internal view returns (uint256) {
+    function getCurrentTier() public view returns (uint256) {
         uint256 _currentTier;
         // if tokenRaised is > threshold2, then we are in Tier 3
         if( totalTokensRaised > _tier2SupplyThreshold ){
@@ -508,25 +433,6 @@ contract Crowdsale is Context, ReentrancyGuard, Ownable, Pausable {
    }
 
 
-//    /// @notice Checks if a purchase is considered valid
-//    /// @return bool If the purchase is valid or not
-//    function validPurchase(uint256 purchaseAmount) internal  returns(bool) {
-//       bool withinPeriod = now >= startTime && now <= endTime;
-//       bool NoEthZeroPurchase = purchaseAmount == 0;
-//       bool withinTokenLimit = totalTokensRaised < maxTokensRaised;
-//       bool hasBalanceAvailable = crowdsaleBalances[purchaseAmount] < maxPurchase;
-
-//       // We want to limit the gas to avoid giving priority to the biggest paying contributors
-//       //bool limitGas = tx.gasprice <= limitGasPrice;
-
-//       return withinPeriod && NoEthZeroPurchase && withinTokenLimit && hasBalanceAvailable;
-//    }
-   
-//    /// @notice Public function to check if the crowdsale has ended or not
-//    function hasEnded() public returns(bool) {
-//       return now > endTime || totalTokensRaised >= maxTokensRaised;
-//    }
-
     /// @notice Buys the tokens for the specified tier and for the next one
     /// @param dollarPurchaseAmount The amount of dollar paid to buy the tokens
     /// @return totalTokens The total amount of tokens bought combining the tier prices
@@ -539,14 +445,13 @@ contract Crowdsale is Context, ReentrancyGuard, Ownable, Pausable {
 
         uint256 tierSelected = getCurrentTier();
         uint256 _currentTierSupplyLimit = getSupplyLimitPerTier(tierSelected);
-        uint256 _currentRate = getPricePerTier(tierSelected);
         uint256 _tokensNextTier = 0;
 
-        uint remainingTierDollars = ( _currentTierSupplyLimit - totalTokensRaised ) / _currentRate;
+        uint remainingTierDollars = ( _currentTierSupplyLimit - totalTokensRaised ).mul(_priceBase).div(getPricePerTier(tierSelected));
         // Check if there isn't enough dollars for the current Tier
         if ( dollarPurchaseAmount > remainingTierDollars ){
             surplusDollarsForNextTier = dollarPurchaseAmount - remainingTierDollars;
-        }        
+        }
         if( surplusDollarsForNextTier > 0 ){
             // If there's excessive dollar for the last tier
             if(tierSelected != 3){ // if we are in Tier 1 or 2, then all dollars can be used
@@ -569,7 +474,7 @@ contract Crowdsale is Context, ReentrancyGuard, Ownable, Pausable {
      * @return Dollar amount to refund (if any, can be zero)
      *  if in last Tier & not enough tokens to sell
      */
-    function _getTokenAmount(uint256 dollarAmount) internal view returns (uint256, uint256) {
+    function _getTokenAmount(uint256 dollarAmount) public view returns (uint256, uint256) {
         return calculateTokensToAllocate(dollarAmount);
     }
 
