@@ -436,7 +436,7 @@ contract Crowdsale is Context, ReentrancyGuard, Ownable, Pausable {
    view returns(uint256){
         uint256 tierSelected = getCurrentTier();
         uint256 remainingTierTokens_ = getSupplyLimitPerTier(tierSelected) - totalTokensRaised;
-        uint256 remainingTierDollarPurchase_ = remainingTierTokens_.mul(getPricePerTier(tierSelected));
+        uint256 remainingTierDollarPurchase_ = remainingTierTokens_.mul(getPricePerTier(tierSelected)).div(_priceBase);
         return remainingTierDollarPurchase_;
    }
 
