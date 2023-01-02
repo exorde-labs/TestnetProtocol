@@ -59,20 +59,20 @@ contract Crowdsale is Context, ReentrancyGuard, Ownable, Pausable {
     //      E. Buyers get the EXD token instantly when buying.
 
     // price per tier, in dollar (divided by 1000)
+    uint256 public _priceBase = 1000*(10**12);
     uint256 public _priceTier1 = 350; // $0.35, thirty five cents
     uint256 public _priceTier2 = 375; // $0.375, thirty five cents + half a cent
     uint256 public _priceTier3 = 400; // $0.4, fourty cents
-    uint256 public _priceBase = 1000; // $0.4, fourty cents
 
 
    // You can only buy up to 12M tokens
     uint256 public maxTokensRaised = 12*(10**6)*(10**18); // 12 millions
 
-    uint256 public _tier1SupplyThreshold = 2*(10**18); // 2 million at _priceTier1
-    uint256 public _tier2SupplyThreshold = 6*(10**18); // 4 million at _priceTier2 (2m + 4m = 6m)
-    uint256 public _tier3SupplyThreshold = 12*(10**18); // 6 million at _priceTier3  (2m + 4m + 6m = 12m = maxTokensRaised)
+    uint256 public _tier1SupplyThreshold = 2*(10**6)*(10**18); // 2 million at _priceTier1
+    uint256 public _tier2SupplyThreshold = 6*(10**6)*(10**18); // 4 million at _priceTier2 (2m + 4m = 6m)
+    uint256 public _tier3SupplyThreshold = 12*(10**6)*(10**18); // 6 million at _priceTier3  (2m + 4m + 6m = 12m = maxTokensRaised)
 
-    uint256 public userMaxTotalPurchase = 50000; // 50000 dollars ($50k)
+    uint256 public userMaxTotalPurchase = 50000*(10**6); // 50000 dollars ($50k)
 
     uint256 public startTime;
     uint256 public endTime;
@@ -106,28 +106,28 @@ contract Crowdsale is Context, ReentrancyGuard, Ownable, Pausable {
     }
 
     
-    /**
-     * @dev The price is the conversion between dollar and the smallest and indivisible
-     * token unit. So, if you are using a rate of 1 with a ERC20Detailed token
-     * with 3 decimals called TOK, 1 dollar will give you 1 unit, or 0.001 TOK.
-     * @param wallet_ Address where collected funds will be forwarded to
-     * @param token_ Address of the token being sold
-     */
-    constructor (address payable wallet_,  uint256 startTime_, uint256 endTime_, 
-    IERC20 token_, IERC20 USDC_, IERC20 USDT_, IERC20 DAI_) {
-        require(wallet_ != address(0), "Crowdsale: wallet is the zero address");
-        require(address(token_) != address(0), "Crowdsale: token is the zero address");
+    // /**
+    //  * @dev The price is the conversion between dollar and the smallest and indivisible
+    //  * token unit. So, if you are using a rate of 1 with a ERC20Detailed token
+    //  * with 3 decimals called TOK, 1 dollar will give you 1 unit, or 0.001 TOK.
+    //  * @param wallet_ Address where collected funds will be forwarded to
+    //  * @param token_ Address of the token being sold
+    //  */
+    // constructor (address payable wallet_,  uint256 startTime_, uint256 endTime_, 
+    // IERC20 token_, IERC20 USDC_, IERC20 USDT_, IERC20 DAI_) {
+    //     require(wallet_ != address(0), "Crowdsale: wallet is the zero address");
+    //     require(address(token_) != address(0), "Crowdsale: token is the zero address");
 
-        startTime = startTime_;
-        endTime = endTime_;
+    //     startTime = startTime_;
+    //     endTime = endTime_;
 
-        USDC = IERC20(USDC_);
-        USDT = IERC20(USDT_);
-        DAI = IERC20(DAI_);
+    //     USDC = IERC20(USDC_);
+    //     USDT = IERC20(USDT_);
+    //     DAI = IERC20(DAI_);
 
-        _wallet = wallet_;
-        _token = token_;
-    }
+    //     _wallet = wallet_;
+    //     _token = token_;
+    // }
 
     //  ----------- WHITELISTING - KYC/AML -----------
         
@@ -420,18 +420,25 @@ contract Crowdsale is Context, ReentrancyGuard, Ownable, Pausable {
       uint256 calculatedTokens;
 
       if(tierSelected_ == 1){
-         calculatedTokens = dollarPaid_.mul(_priceBase).div(_priceTier1);
+         calculatedTokens = dollarPaid_.div(_priceTier1).mul(_priceBase);
       }
       else if(tierSelected_ == 2){
-         calculatedTokens = dollarPaid_.mul(_priceBase).div(_priceTier2);
+         calculatedTokens = dollarPaid_.div(_priceTier2).mul(_priceBase);
       }
       else{
-         calculatedTokens = dollarPaid_.mul(_priceBase).div(_priceTier3);
+         calculatedTokens = dollarPaid_.div(_priceTier3).mul(_priceBase);
       }
 
      return calculatedTokens;
    }
 
+   function remainingTierDollars() public 
+   view returns(uint256){
+        uint256 tierSelected = getCurrentTier();
+        uint256 remainingTierTokens_ = getSupplyLimitPerTier(tierSelected) - totalTokensRaised;
+        uint256 remainingTierDollarPurchase_ = remainingTierTokens_.mul(getPricePerTier(tierSelected));
+        return remainingTierDollarPurchase_;
+   }
 
     /// @notice Buys the tokens for the specified tier and for the next one
     /// @param dollarPurchaseAmount The amount of dollar paid to buy the tokens
@@ -444,18 +451,17 @@ contract Crowdsale is Context, ReentrancyGuard, Ownable, Pausable {
         uint256 surplusDollarsToRefund = 0;
 
         uint256 tierSelected = getCurrentTier();
-        uint256 _currentTierSupplyLimit = getSupplyLimitPerTier(tierSelected);
         uint256 _tokensNextTier = 0;
 
-        uint remainingTierDollars = ( _currentTierSupplyLimit - totalTokensRaised ).mul(_priceBase).div(getPricePerTier(tierSelected));
+        uint256 remainingTierDollarPurchase = remainingTierDollars();
         // Check if there isn't enough dollars for the current Tier
-        if ( dollarPurchaseAmount > remainingTierDollars ){
-            surplusDollarsForNextTier = dollarPurchaseAmount - remainingTierDollars;
+        if ( dollarPurchaseAmount > remainingTierDollarPurchase ){
+            surplusDollarsForNextTier = dollarPurchaseAmount - remainingTierDollarPurchase;
         }
         if( surplusDollarsForNextTier > 0 ){
             // If there's excessive dollar for the last tier
             if(tierSelected != 3){ // if we are in Tier 1 or 2, then all dollars can be used
-                _tokensNextTier = calculateTokensTier(surplusDollarsForNextTier, (tierSelected+1));
+                _tokensNextTier = calculateTokensTier(surplusDollarsForNextTier, (tierSelected+1) );
             }
             else{ // if we are in the last tier & have surplus, we have to refund this amount
                 surplusDollarsToRefund = surplusDollarsForNextTier;
