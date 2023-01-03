@@ -72,7 +72,7 @@ contract Crowdsale is Context, ReentrancyGuard, Ownable, Pausable {
     uint256 public _tier2SupplyThreshold = 6*(10**6)*(10**18); // 4 million at _priceTier2 (2m + 4m = 6m)
     uint256 public _tier3SupplyThreshold = 12*(10**6)*(10**18); // 6 million at _priceTier3  (2m + 4m + 6m = 12m = maxTokensRaised)
 
-    uint256 public userMaxTotalPurchase = 50000*(10**6); // 50000 dollars ($50k)
+    uint256 public userMaxTotalPurchase = 500000000*(10**6); // 50000 dollars ($50k)
 
     uint256 public startTime;
     uint256 public endTime;
@@ -428,7 +428,6 @@ contract Crowdsale is Context, ReentrancyGuard, Ownable, Pausable {
    /// @return calculatedTokens Returns how many tokens you've bought for that dollar paid
    function calculateTokensTier(uint256 dollarPaid_, uint256 tierSelected_) public 
    view returns(uint256){
-      require(dollarPaid_ > 0);
       require(tierSelected_ >= 1 && tierSelected_ <= 3);
       uint256 calculatedTokens;
 
@@ -473,7 +472,7 @@ contract Crowdsale is Context, ReentrancyGuard, Ownable, Pausable {
         }
         if( surplusDollarsForNextTier > 0 ){
             // If there's excessive dollar for the last tier
-            if(_currentTier != 3){ // if we are in Tier 1 or 2, then all dollars can be used
+            if(_currentTier <= 2){ // if we are in Tier 1 or 2, then all dollars can be used
                 _tokensNextTier = calculateTokensTier(surplusDollarsForNextTier, (_currentTier + 1) );
                 // total Allocated Tokens = tokens for this tier + token for next tier
                 allocatedTokens = calculateTokensTier((dollarPurchaseAmount - surplusDollarsForNextTier), _currentTier) + _tokensNextTier; 
@@ -485,7 +484,6 @@ contract Crowdsale is Context, ReentrancyGuard, Ownable, Pausable {
         else{
             allocatedTokens = calculateTokensTier(dollarPurchaseAmount, _currentTier);
         }
-        
         
         return (allocatedTokens, surplusDollarsToRefund);
    }
