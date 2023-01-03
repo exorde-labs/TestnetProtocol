@@ -94,24 +94,6 @@ contract Crowdsale is Context, ReentrancyGuard, Ownable, Pausable {
      */
     event TokensPurchased(address indexed purchaser, address indexed beneficiary, uint256 value, uint256 amount);
 
-    /// @notice Allow to extend ICO end date
-    /// @param _endTime Endtime of ICO
-    function setEndDate(uint256 _endTime)
-        external onlyOwner whenNotPaused
-    {
-        require(endTime < _endTime, "new endTime must be later");
-        endTime = _endTime;
-    }
-
-    /**
-    * @dev Reverts if sale has not started or has ended
-    */
-    modifier isSaleOpen() {
-        require(block.timestamp >= startTime && block.timestamp <= endTime, "the sale has ended");
-        _;
-    }
-
-    
     /**
      * @dev The price is the conversion between dollar and the smallest and indivisible
      * token unit. So, if you are using a rate of 1 with a ERC20Detailed token
@@ -175,6 +157,27 @@ contract Crowdsale is Context, ReentrancyGuard, Ownable, Pausable {
 
     //  ----------------------------------------------
 
+    /// @notice Allow to extend ICO end date
+    /// @param _endTime Endtime of ICO
+    function setEndDate(uint256 _endTime)
+        external onlyOwner whenNotPaused
+    {
+        require(endTime < _endTime, "new endTime must be later");
+        endTime = _endTime;
+    }
+
+    /**
+    * @dev Reverts if sale has not started or has ended
+    */
+    modifier isSaleOpen() {
+        require(block.timestamp >= startTime && block.timestamp <= endTime, "the sale has ended");
+        _;
+    }
+
+    function isOpen() public view returns (bool){
+        return block.timestamp >= startTime && block.timestamp <= endTime;
+    }
+    
     /**
      * @dev fallback function ***DO NOT OVERRIDE***
      * Note that other contracts will transfer funds with a base gas stipend
