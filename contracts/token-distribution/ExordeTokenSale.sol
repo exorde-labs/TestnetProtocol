@@ -313,9 +313,9 @@ contract ExordeTokenSale is Context, ReentrancyGuard, Ownable, Pausable {
     isSaleOpen
     isWhitelisted( _msgSender()) 
     {
-        uint256 purchaseAmount = purchaseAmount_.div(10**12); //DAI has 12 more digits than USDC/UST
         address beneficiary = _msgSender();
-        DAI.safeTransferFrom(_msgSender(), address(this), purchaseAmount);
+        DAI.safeTransferFrom(_msgSender(), address(this), purchaseAmount_);
+        uint256 purchaseAmount = purchaseAmount_.div(10**12); //DAI has 12 more digits than USDC/UST
         
         _preValidatePurchase(beneficiary, purchaseAmount);
 
