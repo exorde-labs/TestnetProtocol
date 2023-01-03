@@ -105,7 +105,7 @@ contract Crowdsale is Context, ReentrancyGuard, Ownable, Pausable {
     IERC20 token_, IERC20 USDC_, IERC20 USDT_, IERC20 DAI_) {
         require(wallet_ != address(0), "Crowdsale: wallet is the zero address");
         require(address(token_) != address(0), "Crowdsale: token is the zero address");
-
+        require(startTime_ < endTime_ && endTime_ > block.timestamp, "start & end time are incorrect");
         startTime = startTime_;
         endTime = endTime_;
 
@@ -156,20 +156,34 @@ contract Crowdsale is Context, ReentrancyGuard, Ownable, Pausable {
     }
 
     //  ----------- ADMIN - END -----------
-    // to withdraw any unsold Exorde tokens or other ERC20 stuck on the contract
+
+    /**
+   * @notice Withdraw (admin/owner only) any unsold Exorde tokens or other ERC20 stuck on the contract
+  */
     function adminWithdrawERC20(IERC20 token_, address beneficiary_, uint256 tokenAmount_) external
     onlyOwner
-    hasEnded
+    isInactive
     {
         token_.safeTransfer(beneficiary_, tokenAmount_);
     }
     
+    /**
+   * @notice Pause or unpause the contract
+  */
+    function toggleSystemPause() public onlyOwner {        
+        if(paused()){
+            _unpause();
+        }else{
+            _pause();
+        }
+    }
+
     //  ----------------------------------------------
 
     /// @notice Allow to extend ICO end date
     /// @param _endTime Endtime of ICO
     function setEndDate(uint256 _endTime)
-        external onlyOwner hasEnded
+        external onlyOwner isInactive
     {
         require(endTime < _endTime, "new endTime must be later");
         endTime = _endTime;
@@ -187,8 +201,8 @@ contract Crowdsale is Context, ReentrancyGuard, Ownable, Pausable {
         return block.timestamp >= startTime && block.timestamp <= endTime;
     }
     
-    modifier hasEnded() {
-        require(block.timestamp >= endTime);
+    modifier isInactive() {
+        require( !isOpen() || paused() );
         _;
     }
     /**
@@ -500,7 +514,7 @@ contract Crowdsale is Context, ReentrancyGuard, Ownable, Pausable {
         
         return (allocatedTokens, surplusDollarsToRefund);
    }
-   
+
     /**
      * @dev Determines how funds are stored/forwarded on purchases.
      */
