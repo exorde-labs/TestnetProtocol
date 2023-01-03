@@ -8,25 +8,38 @@ import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
+    /* 
+    * ________________ Token Sale Setup __________________
+        The EXD Token Sale is a 3-Tiered Dollar-based Token Sale
+    *      Tier 1 = $0.30/EXD for the first 2 million (2 000 000) EXD tokens sold, then
+    *      Tier 2 = $0.325/EXD for 4 million (4 000 000) EXD tokens sold, then
+    *      Tier 3 = $0.35/EXD for the last 6 million (6 000 000) EXD tokens sold.
+    *   Total EXD sold (to be deposited in contract initially) = 12 000 000 EXD tokens. Twelve millions.
+    * ________________ Requirements of the sale: __________________
+    *      A. All buyers must be whitelisted by Exorde Labs, according to their KYC verification done on exorde.network
+    *      B. All buyers are limited to $50k (50 000), 
+    *          fifty thousand dollars of purchase, overall (they can buy multiple times).
+    *      C. A tier ends when all tokens have been sold. 
+    *      D. If tokens remain unsold after the sale, 
+    *          the owner of the contract can withdraw the remaining tokens.
+    *      E. Buyers get the EXD token instantly when buying.
+    * ________________ Contract Administration __________________
+    *      A. When paused/ended, the owner can withdraw any ERC20 tokens from the contract
+    *      B. The owner can pause the contract in case of emergency
+    *      C. The end time can be extended at will by the owner
+    */
 
-/**
- * @title Crowdsale
- * @dev Crowdsale is a base contract for managing a token crowdsale,
- * allowing investors to purchase tokens with dollar. This contract implements
- * such functionality in its most fundamental form and can be extended to provide additional
- * functionality and/or custom behavior.
- * The external interface represents the basic interface for purchasing tokens, and conforms
- * the base architecture for crowdsales. It is *not* intended to be modified / overridden.
- * The internal interface conforms the extensible and modifiable surface of crowdsales. Override
- * the methods to add functionality. Consider using 'super' where appropriate to concatenate
- * behavior.
- */
 contract Crowdsale is Context, ReentrancyGuard, Ownable, Pausable {
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
 
-    // The token being sold
-    IERC20 private _token;
+    event TokensPurchased(address indexed purchaser, address indexed beneficiary, uint256 value, uint256 amount);
+    event AddressWhitelisted(address indexed user);
+    event AddressDeWhitelisted(address indexed user);
+
+    // The EXD ERC20 token being sold
+    // Predeployed & deposited in this contract after deployment
+    IERC20 private _token; 
 
     IERC20 public USDC;
     IERC20 public USDT;
@@ -35,38 +48,22 @@ contract Crowdsale is Context, ReentrancyGuard, Ownable, Pausable {
     uint256 public USDC_decimal_count = 6;
     uint256 public USDT_decimal_count = 6;
     uint256 public DAI_decimal_count = 18;
-
-    // Address where funds are collected
-    address payable private _wallet;
-
-    // The EXD Token Sale is Tiered
-    //      Tier 1 = $0.35/EXD for the first 2 million (2 000 000) EXD tokens sold, then
-    //      Tier 2 = $0.375/EXD for 4 million (4 000 000) EXD tokens sold, then
-    //      Tier 3 = $0.40/EXD for the last 6 million (6 000 000) EXD tokens sold.
-    // ------ Total EXD told (to be deposited in contract initially) = 12 000 000 EXD tokens. Twelve millions.
-    // Requirements of the sale
-    //      A. All buyers must be whitelisted by Exorde Labs, according to their KYC verification done on exorde.network
-    //      B. All buyers are limited to $50k (50 000), 
-    //          fifty thousand dollars of purchase, overall (they can buy multiple times).
-    //      C. A tier ends when all tokens have been sold. 
-    //      D. If token remain unsold after a period of 1 month, 
-    //          the owner of the contract can withdraw the remaining tokens.
-    //      E. Buyers get the EXD token instantly when buying.
-
+    
     // price per tier, in dollar (divided by 1000)
     uint256 public _priceBase = 1000*(10**12);
-    uint256 public _priceTier1 = 350; // $0.35, thirty five cents
-    uint256 public _priceTier2 = 375; // $0.375, thirty five cents + half a cent
-    uint256 public _priceTier3 = 400; // $0.4, fourty cents
-
+    uint256 public _priceTier1 = 300; // $0.35, thirty five cents
+    uint256 public _priceTier2 = 325; // $0.375, thirty five cents + half a cent
+    uint256 public _priceTier3 = 350; // $0.4, fourty cents
 
    // You can only buy up to 12M tokens
-    uint256 public maxTokensRaised = 12*(10**6)*(10**18); // 12 millions
-
-    uint256 public _tier1SupplyThreshold = 2*(10**6)*(10**18); // 2 million at _priceTier1
-    uint256 public _tier2SupplyThreshold = 6*(10**6)*(10**18); // 4 million at _priceTier2 (2m + 4m = 6m)
-    uint256 public _tier3SupplyThreshold = 12*(10**6)*(10**18); // 6 million at _priceTier3  (2m + 4m + 6m = 12m = maxTokensRaised)
-
+    uint256 public maxTokensRaised = 12*(10**6)*(10**18); // 12 millions    
+    // 2 million at _priceTier1
+    uint256 public _tier1SupplyThreshold = 2*(10**6)*(10**18);
+     // 4 million at _priceTier2 (2m + 4m = 6m)
+    uint256 public _tier2SupplyThreshold = 6*(10**6)*(10**18);
+    // 6 million at _priceTier3  (2m + 4m + 6m = 12m = maxTokensRaised)
+    uint256 public _tier3SupplyThreshold = 12*(10**6)*(10**18); 
+   // An individual is capped to $50k
     uint256 public userMaxTotalPurchase = 50000*(10**6); // 50000 dollars ($50k)
 
     uint256 public startTime;
@@ -74,16 +71,23 @@ contract Crowdsale is Context, ReentrancyGuard, Ownable, Pausable {
 
     // Amount of dollar raised
     uint256 public _dollarRaised;
-
+    
+    // Users state
+    mapping(address => bool) public whitelist;
     mapping(address => uint256) public _usersTotalPurchase;
 
     // Amount of token sold
     uint256 public totalTokensRaised;
 
-    event TokensPurchased(address indexed purchaser, address indexed beneficiary, uint256 value, uint256 amount);
-    event AddressWhitelisted(address indexed user);
-    event AddressDeWhitelisted(address indexed user);
+    // Address where funds are collected
+    address payable private _wallet;
 
+    /*
+    * @dev Constructor setting up the sale
+    * @param wallet_ which will receive the funds from the buyers (e.g. a multi sig vault)
+    * @param startTime_ (timestamp) date of start of the token sale
+    * @param endTime_ (timestamp) date of end of the token sale (can be extended)
+    */
     constructor (address payable wallet_,  uint256 startTime_, uint256 endTime_, 
     IERC20 token_, IERC20 USDC_, IERC20 USDT_, IERC20 DAI_) {
         require(wallet_ != address(0), "Crowdsale: wallet is the zero address");
@@ -101,8 +105,6 @@ contract Crowdsale is Context, ReentrancyGuard, Ownable, Pausable {
     }
 
     //  ----------- WHITELISTING - KYC/AML -----------
-        
-    mapping(address => bool) public whitelist;
 
     /**
     * @dev Reverts if beneficiary is not whitelisted. Can be used when extending this contract.
@@ -144,8 +146,8 @@ contract Crowdsale is Context, ReentrancyGuard, Ownable, Pausable {
     //  ----------- ADMIN - END -----------
 
     /**
-   * @notice Withdraw (admin/owner only) any unsold Exorde tokens or other ERC20 stuck on the contract
-  */
+    * @notice Withdraw (admin/owner only) any unsold Exorde tokens or other ERC20 stuck on the contract
+    */
     function adminWithdrawERC20(IERC20 token_, address beneficiary_, uint256 tokenAmount_) external
     onlyOwner
     isInactive
@@ -165,9 +167,10 @@ contract Crowdsale is Context, ReentrancyGuard, Ownable, Pausable {
     }
 
     //  ----------------------------------------------
-
-    /// @notice Allow to extend ICO end date
-    /// @param _endTime Endtime of ICO
+    /**
+    * @notice Allow to extend ICO end date
+    * @param _endTime Endtime of ICO
+    */
     function setEndDate(uint256 _endTime)
         external onlyOwner isInactive
     {
@@ -183,15 +186,25 @@ contract Crowdsale is Context, ReentrancyGuard, Ownable, Pausable {
         _;
     }
 
+    /**
+    * @dev Returns if the Token Sale is active (started & not ended)
+    * @return the boolean indicating if the sale is active (true : active)
+    */
     function isOpen() public view returns (bool){
         return block.timestamp >= startTime && block.timestamp <= endTime;
     }
     
+    /**
+    * @dev Reverts if Sale is Inactive (paused or closed)
+    */
     modifier isInactive() {
         require( !isOpen() || paused(), "the sale is active" );
         _;
     }
     
+    /**
+    * @dev fallback to reject non zero ETH transactions
+    */
     receive () external payable {
         revert("ETH not authorized, please use buyTokens()");
     }
@@ -219,7 +232,7 @@ contract Crowdsale is Context, ReentrancyGuard, Ownable, Pausable {
     }
 
     /**
-     * @dev low level token purchase ***DO NOT OVERRIDE***
+     * @dev Token Purchase Function, using USDC on Ethereum, with 6 decimals
      * This function has a non-reentrancy guard, so it shouldn't be called by
      * another `nonReentrant` function.
      * @param purchaseAmount in dollar (usdc/usdt/dai)
@@ -254,7 +267,7 @@ contract Crowdsale is Context, ReentrancyGuard, Ownable, Pausable {
 
 
     /**
-     * @dev low level token purchase ***DO NOT OVERRIDE***
+     * @dev Token Purchase Function, using USDT (Tether) on Ethereum, with 6 decimals
      * This function has a non-reentrancy guard, so it shouldn't be called by
      * another `nonReentrant` function.
      * @param purchaseAmount in dollar (usdc/usdt/dai)
@@ -288,7 +301,8 @@ contract Crowdsale is Context, ReentrancyGuard, Ownable, Pausable {
 
 
     /**
-     * @dev low level token purchase ***DO NOT OVERRIDE***
+     * @dev Token Purchase Function, using DAI on Ethereum, with 18 decimals
+     * The user who calls this needs to have previously approved (approve()) purchaseAmount_ on the DAI contract
      * This function has a non-reentrancy guard, so it shouldn't be called by
      * another `nonReentrant` function.
      * @param purchaseAmount_ in dollar (usdc/usdt/dai)
@@ -335,7 +349,8 @@ contract Crowdsale is Context, ReentrancyGuard, Ownable, Pausable {
         require(dollarAmount != 0, "Crowdsale: dollarAmount is 0");
         require(totalTokensRaised < maxTokensRaised, "Crowdsale is now sold out");
         // check if user total purchase is below the user cap.
-        require( (_usersTotalPurchase[beneficiary]+dollarAmount) <= userMaxTotalPurchase, "total user purchase is capped at $50k" );
+        require( (_usersTotalPurchase[beneficiary]+dollarAmount) <= userMaxTotalPurchase, 
+        "total user purchase is capped at $50k" );
     }
 
     /**
@@ -381,6 +396,11 @@ contract Crowdsale is Context, ReentrancyGuard, Ownable, Pausable {
         _usersTotalPurchase[beneficiary] += dollarAmount;
     }
 
+    /**
+     * @notice Returns the supply limit threshold of tierSelected_
+     * @param tierSelected_ The tier (1, 2 or 3)
+     * @return supplyLimit of the Tier, in EXD, with 18 decimals
+     */
     function getSupplyLimitPerTier(uint256 tierSelected_) public view returns (uint256) {
         require(tierSelected_ >= 1 && tierSelected_ <= 3);
         uint256 _supplyLmit;
@@ -396,7 +416,11 @@ contract Crowdsale is Context, ReentrancyGuard, Ownable, Pausable {
         return _supplyLmit;
     }
 
-
+    /**
+     * @notice Returns the price of tierSelected_
+     * @param tierSelected_ The tier (1, 2 or 3)
+     * @return price price of the tier, in dollar (with 6 decimals for USDC & USDT)
+     */
     function getPricePerTier(uint256 tierSelected_) public view returns (uint256) {
         require(tierSelected_ >= 1 && tierSelected_ <= 3);
         uint256 _price;
@@ -413,6 +437,10 @@ contract Crowdsale is Context, ReentrancyGuard, Ownable, Pausable {
     }
 
 
+    /**
+     * @notice Return the current Tier (between 1, 2 or 3)
+     * @return Tier current Tier
+     */
     function getCurrentTier() public view returns (uint256) {
         uint256 _currentTier;
         // if tokenRaised is > threshold2, then we are in Tier 3
@@ -431,10 +459,12 @@ contract Crowdsale is Context, ReentrancyGuard, Ownable, Pausable {
     }
 
 
-   /// @notice Calculate the token amount per tier function of dollarPaid in input
-   /// @param dollarPaid_ The amount of dollar paid that will be used to buy tokens
-   /// @param tierSelected_ The tier that you'll use for thir purchase
-   /// @return calculatedTokens Returns how many tokens you've bought for that dollar paid
+    /**
+     * @notice Calculate the token amount per tier function of dollarPaid in input
+     * @param dollarPaid_ The amount of dollar paid that will be used to buy tokens
+     * @param tierSelected_ The tier that you'll use for thir purchase
+     * @return calculatedTokens Returns how many tokens you've bought for that dollar paid
+     */
    function calculateTokensTier(uint256 dollarPaid_, uint256 tierSelected_) public 
    view returns(uint256){
       require(tierSelected_ >= 1 && tierSelected_ <= 3);
@@ -453,6 +483,9 @@ contract Crowdsale is Context, ReentrancyGuard, Ownable, Pausable {
      return calculatedTokens;
    }
 
+    /**
+     * @notice Remaining number of tokens (>= 0) left in the current Tier of the Sale
+     */
    function remainingTierDollars() public 
    view returns(uint256){
         uint256 tierSelected = getCurrentTier();
@@ -461,10 +494,12 @@ contract Crowdsale is Context, ReentrancyGuard, Ownable, Pausable {
         return remainingTierDollarPurchase_;
    }
 
-    /// @notice Buys the tokens for the specified tier and for the next one
-    /// @param dollarPurchaseAmount The amount of dollar paid to buy the tokens
-    /// @return totalTokens The total amount of tokens bought combining the tier prices
-    /// @return potential surplus to refund dollar amount
+    /**
+     * @notice Buys the tokens for the specified tier and for the next one
+     * @param dollarPurchaseAmount The amount of dollar paid to buy the tokens
+     * @return totalTokens The total amount of tokens bought combining the tier prices
+     * @return surplusTokens A potentially non-zero surplus of dollars to refund
+     */
    function _getTokenAmount(uint256 dollarPurchaseAmount) view public returns(uint256, uint256) {
         require(dollarPurchaseAmount > 0);
         uint256 allocatedTokens = 0;
@@ -488,7 +523,8 @@ contract Crowdsale is Context, ReentrancyGuard, Ownable, Pausable {
                 surplusDollarsToRefund = surplusDollarsForNextTier;
             }
             // total Allocated Tokens = tokens for this tier + token for next tier
-            allocatedTokens = calculateTokensTier((dollarPurchaseAmount - surplusDollarsForNextTier), _currentTier) + _tokensNextTier; 
+            allocatedTokens = calculateTokensTier((dollarPurchaseAmount - surplusDollarsForNextTier), _currentTier) 
+                              + _tokensNextTier; 
         }
         else{
             allocatedTokens = calculateTokensTier(dollarPurchaseAmount, _currentTier);
