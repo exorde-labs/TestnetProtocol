@@ -34,8 +34,8 @@ contract RewardsManager is Ownable {
     IParametersManager public Parameters;
 
     struct TimeframeCounter {
-        uint128 timestamp;
-        uint128 counter;
+        uint256 timestamp;
+        uint256 counter;
     }
 
     // Cap rewards at 30k EXD per 24 hours, and 1.25k per hour
@@ -94,6 +94,8 @@ contract RewardsManager is Ownable {
         require(isRewardsWhitelisted(msg.sender), "RewardsManager: sender must be whitelisted to Proxy act");
         // require(ManagerBalance >=  _RewardsAllocation);
         require(_RewardsAllocation > 0, "rewards to allocate must be positive..");
+        updateHourlyRewardsCount();
+        updateDailyRewardsCount();
         require(getDailyRewardsCount() < MAX_DAILY_EXD_REWARDS, "Daily Total Rewards exceed!");
         require(getHourlyRewardsCount() < MAX_HOURLY_EXD_REWARDS, "Hourly Total Rewards exceed!");
         // check if the contract calling this method has rights to allocate from user Rewards
@@ -103,6 +105,7 @@ contract RewardsManager is Ownable {
             TotalRewards += _RewardsAllocation;
             return true;
         }
+        HourlyRewardsFlowManager[HourlyRewardsFlowManager.length - 1].counter +=  _RewardsAllocation;
         return (false);
     }
 
@@ -177,27 +180,6 @@ contract RewardsManager is Ownable {
         return total;
     }
 
-
-    // ---------------------
-
-    /**
-     * @notice A method for a verified whitelisted contract to allocate for itself some Rewards
-     */
-    function OwnerAddRewards(uint256 rep, address _user) public onlyOwner {
-        rewards[_user] += rep;
-    }
-
-    /**
-     * @notice A method for a verified whitelisted contract to allocate for itself some Rewards
-     */
-    function OwnerRemoveRewards(uint256 rep, address _user) public onlyOwner {
-        require(rewards[_user] >= rep, "can't substract more rewards that user has");
-        rewards[_user] -= rep;
-    }
-
-    function OwnerResetRewards(address _user) public onlyOwner {
-        rewards[_user] = 0;
-    }
 
     // ---------- DEPOSIT  MECHANISMS ----------
 
