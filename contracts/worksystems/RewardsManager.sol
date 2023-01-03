@@ -22,25 +22,6 @@ interface IParametersManager {
     function getAddressManager() external view returns (address);
 }
 
-// // Define the maximum number of tokens that can be distributed per day
-// uint256 public dailyTokenLimit = 30000;
-
-// // Keep track of the total number of tokens distributed on the current day
-// uint256 public totalTokensDistributedToday;
-
-// // Function to distribute ERC20 tokens
-// function distributeTokens(uint256 amount) public {
-//     // Check if the daily token limit has been reached
-//     require(totalTokensDistributedToday + amount <= dailyTokenLimit, "Daily token limit reached");
-
-//     // Distribute the tokens
-//     // ...
-
-//     // Update the total number of tokens distributed on the current day
-//     totalTokensDistributedToday += amount;
-// }
-
-
 
 contract RewardsManager is Ownable {
     event UserRegistered(bytes32 name, uint256 timestamp);
@@ -52,6 +33,19 @@ contract RewardsManager is Ownable {
     uint256 TotalRewards = 0;
     IParametersManager public Parameters;
 
+    struct TimeframeCounter {
+        uint128 timestamp;
+        uint128 counter;
+    }
+
+    // Cap rewards at 30k EXD per 24 hours, and 1.25k per hour
+    uint16 constant NB_TIMEFRAMES_HOURLY = 15;
+    uint16 constant TIMEFRAMES_HOURLY_DURATION = 240; // 240*15 = 3600s = 1 hour
+    uint16 constant NB_TIMEFRAMES_DAILY = 24;
+    uint16 constant TIMEFRAMES_HOURLY_DAILY = 3600; // 3600*24 = 1 day
+    TimeframeCounter[NB_TIMEFRAMES_HOURLY] public HourlyRewardsFlowManager;
+    TimeframeCounter[NB_TIMEFRAMES_DAILY] public DailyRewardsFlowManager;
+    
     constructor(
         address EXD_token
     ) {
@@ -126,6 +120,59 @@ contract RewardsManager is Ownable {
     }
 
     // ---------- ----------
+
+    function updateHourlyRewardsCount() public {
+        uint256 last_timeframe_idx_ = HourlyRewardsFlowManager.length - 1;
+        uint256 mostRecentTimestamp_ = HourlyRewardsFlowManager[last_timeframe_idx_].timestamp;
+        if ((uint64(block.timestamp) - mostRecentTimestamp_) > TIMEFRAMES_HOURLY_DURATION) {
+            // cycle & move periods to the left
+            for (uint256 i = 0; i < (HourlyRewardsFlowManager.length - 1); i++) {
+                HourlyRewardsFlowManager[i] = HourlyRewardsFlowManager[i + 1];
+            }
+            //update last timeframe with new values & reset counter
+            HourlyRewardsFlowManager[last_timeframe_idx_].timestamp = uint64(block.timestamp);
+            HourlyRewardsFlowManager[last_timeframe_idx_].counter = 0;
+        }
+    }
+
+    function updateDailyRewardsCount() public {
+        uint256 last_timeframe_idx_ = DailyRewardsFlowManager.length - 1;
+        uint256 mostRecentTimestamp_ = DailyRewardsFlowManager[last_timeframe_idx_].timestamp;
+        if ((uint64(block.timestamp) - mostRecentTimestamp_) > TIMEFRAMES_HOURLY_DAILY) {
+            // cycle & move periods to the left
+            for (uint256 i = 0; i < (DailyRewardsFlowManager.length - 1); i++) {
+                DailyRewardsFlowManager[i] = DailyRewardsFlowManager[i + 1];
+            }
+            //update last timeframe with new values & reset counter
+            DailyRewardsFlowManager[last_timeframe_idx_].timestamp = uint64(block.timestamp);
+            DailyRewardsFlowManager[last_timeframe_idx_].counter = 0;
+        }
+    }
+
+    /**
+  * @notice Count the total EXD rewards on last hour
+  */
+    function getHourlyRewardsCount() public view returns (uint256) {
+        uint256 total = 0;
+        for (uint256 i = 0; i < HourlyRewardsFlowManager.length; i++) {
+            total += HourlyRewardsFlowManager[i].counter;
+        }
+        return total;
+    }
+
+    /**
+  * @notice Count the total EXD rewards on last day
+  */
+    function getDailyRewardsCount() public view returns (uint256) {
+        uint256 total = 0;
+        for (uint256 i = 0; i < DailyRewardsFlowManager.length; i++) {
+            total += DailyRewardsFlowManager[i].counter;
+        }
+        return total;
+    }
+
+
+    // ---------------------
 
     /**
      * @notice A method for a verified whitelisted contract to allocate for itself some Rewards
