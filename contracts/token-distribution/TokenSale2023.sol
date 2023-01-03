@@ -49,7 +49,7 @@ contract Crowdsale is Context, ReentrancyGuard, Ownable, Pausable {
     //      B. All buyers are limited to $50k (50 000), 
     //          fifty thousand dollars of purchase, overall (they can buy multiple times).
     //      C. A tier ends when all tokens have been sold. 
-    //      D. If token remain unsold after the sale has ended, 
+    //      D. If token remain unsold after a period of 1 month, 
     //          the owner of the contract can withdraw the remaining tokens.
     //      E. Buyers get the EXD token instantly when buying.
 
@@ -67,7 +67,7 @@ contract Crowdsale is Context, ReentrancyGuard, Ownable, Pausable {
     uint256 public _tier2SupplyThreshold = 6*(10**6)*(10**18); // 4 million at _priceTier2 (2m + 4m = 6m)
     uint256 public _tier3SupplyThreshold = 12*(10**6)*(10**18); // 6 million at _priceTier3  (2m + 4m + 6m = 12m = maxTokensRaised)
 
-    uint256 public userMaxTotalPurchase = 500000000*(10**6); // 50000 dollars ($50k)
+    uint256 public userMaxTotalPurchase = 5000000*(10**6); // 50000 dollars ($50k)
 
     uint256 public startTime;
     uint256 public endTime;
@@ -188,7 +188,7 @@ contract Crowdsale is Context, ReentrancyGuard, Ownable, Pausable {
     }
     
     modifier isInactive() {
-        require( !isOpen() || paused() );
+        require( !isOpen() || paused(), "the sale is active" );
         _;
     }
     
@@ -333,6 +333,7 @@ contract Crowdsale is Context, ReentrancyGuard, Ownable, Pausable {
     function _preValidatePurchase(address beneficiary, uint256 dollarAmount) internal view virtual {
         require(beneficiary != address(0), "Crowdsale: beneficiary is the zero address");
         require(dollarAmount != 0, "Crowdsale: dollarAmount is 0");
+        require(totalTokensRaised < maxTokensRaised, "Crowdsale is now sold out");
         // check if user total purchase is below the user cap.
         require( (_usersTotalPurchase[beneficiary]+dollarAmount) <= userMaxTotalPurchase, "total user purchase is capped at $50k" );
     }
@@ -466,7 +467,7 @@ contract Crowdsale is Context, ReentrancyGuard, Ownable, Pausable {
     /// @return potential surplus to refund dollar amount
    function _getTokenAmount(uint256 dollarPurchaseAmount) view public returns(uint256, uint256) {
         require(dollarPurchaseAmount > 0);
-        uint256 allocatedTokens;
+        uint256 allocatedTokens = 0;
         uint256 surplusDollarsForNextTier = 0;
         uint256 surplusDollarsToRefund = 0;
 
@@ -482,12 +483,12 @@ contract Crowdsale is Context, ReentrancyGuard, Ownable, Pausable {
             // If there's excessive dollar for the last tier
             if(_currentTier <= 2){ // if we are in Tier 1 or 2, then all dollars can be used
                 _tokensNextTier = calculateTokensTier(surplusDollarsForNextTier, (_currentTier + 1) );
-                // total Allocated Tokens = tokens for this tier + token for next tier
-                allocatedTokens = calculateTokensTier((dollarPurchaseAmount - surplusDollarsForNextTier), _currentTier) + _tokensNextTier; 
             }
             else{ // if we are in the last tier & have surplus, we have to refund this amount
                 surplusDollarsToRefund = surplusDollarsForNextTier;
             }
+            // total Allocated Tokens = tokens for this tier + token for next tier
+            allocatedTokens = calculateTokensTier((dollarPurchaseAmount - surplusDollarsForNextTier), _currentTier) + _tokensNextTier; 
         }
         else{
             allocatedTokens = calculateTokensTier(dollarPurchaseAmount, _currentTier);
