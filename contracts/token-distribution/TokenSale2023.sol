@@ -49,7 +49,7 @@ contract Crowdsale is Context, ReentrancyGuard, Ownable, Pausable {
     //      B. All buyers are limited to $50k (50 000), 
     //          fifty thousand dollars of purchase, overall (they can buy multiple times).
     //      C. A tier ends when all tokens have been sold. 
-    //      D. If token remain unsold after a period of 1 month, 
+    //      D. If token remain unsold after the sale has ended, 
     //          the owner of the contract can withdraw the remaining tokens.
     //      E. Buyers get the EXD token instantly when buying.
 
