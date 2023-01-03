@@ -67,7 +67,7 @@ contract Crowdsale is Context, ReentrancyGuard, Ownable, Pausable {
     uint256 public _tier2SupplyThreshold = 6*(10**6)*(10**18); // 4 million at _priceTier2 (2m + 4m = 6m)
     uint256 public _tier3SupplyThreshold = 12*(10**6)*(10**18); // 6 million at _priceTier3  (2m + 4m + 6m = 12m = maxTokensRaised)
 
-    uint256 public userMaxTotalPurchase = 5000000*(10**6); // 50000 dollars ($50k)
+    uint256 public userMaxTotalPurchase = 50000*(10**6); // 50000 dollars ($50k)
 
     uint256 public startTime;
     uint256 public endTime;
