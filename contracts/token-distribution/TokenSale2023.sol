@@ -72,7 +72,7 @@ contract Crowdsale is Context, ReentrancyGuard, Ownable, Pausable {
     uint256 public _tier2SupplyThreshold = 6*(10**6)*(10**18); // 4 million at _priceTier2 (2m + 4m = 6m)
     uint256 public _tier3SupplyThreshold = 12*(10**6)*(10**18); // 6 million at _priceTier3  (2m + 4m + 6m = 12m = maxTokensRaised)
 
-    uint256 public userMaxTotalPurchase = 50000*(10**6); // 50000 dollars ($50k)
+    uint256 public userMaxTotalPurchase = 500000000*(10**6); // 50000 dollars ($50k)
 
     uint256 public startTime;
     uint256 public endTime;
@@ -155,12 +155,21 @@ contract Crowdsale is Context, ReentrancyGuard, Ownable, Pausable {
         whitelist[_beneficiary] = false;
     }
 
+    //  ----------- ADMIN - END -----------
+    // to withdraw any unsold Exorde tokens or other ERC20 stuck on the contract
+    function adminWithdrawERC20(IERC20 token_, address beneficiary_, uint256 tokenAmount_) external
+    onlyOwner
+    hasEnded
+    {
+        token_.safeTransfer(beneficiary_, tokenAmount_);
+    }
+    
     //  ----------------------------------------------
 
     /// @notice Allow to extend ICO end date
     /// @param _endTime Endtime of ICO
     function setEndDate(uint256 _endTime)
-        external onlyOwner whenNotPaused
+        external onlyOwner hasEnded
     {
         require(endTime < _endTime, "new endTime must be later");
         endTime = _endTime;
@@ -170,7 +179,7 @@ contract Crowdsale is Context, ReentrancyGuard, Ownable, Pausable {
     * @dev Reverts if sale has not started or has ended
     */
     modifier isSaleOpen() {
-        require(block.timestamp >= startTime && block.timestamp <= endTime, "the sale has ended");
+        require(block.timestamp >= startTime && block.timestamp <= endTime, "the sale is not open");
         _;
     }
 
@@ -178,6 +187,10 @@ contract Crowdsale is Context, ReentrancyGuard, Ownable, Pausable {
         return block.timestamp >= startTime && block.timestamp <= endTime;
     }
     
+    modifier hasEnded() {
+        require(block.timestamp >= endTime);
+        _;
+    }
     /**
      * @dev fallback function ***DO NOT OVERRIDE***
      * Note that other contracts will transfer funds with a base gas stipend
@@ -456,7 +469,7 @@ contract Crowdsale is Context, ReentrancyGuard, Ownable, Pausable {
     /// @param dollarPurchaseAmount The amount of dollar paid to buy the tokens
     /// @return totalTokens The total amount of tokens bought combining the tier prices
     /// @return potential surplus to refund dollar amount
-   function calculateTokensToAllocate(uint256 dollarPurchaseAmount) view public returns(uint256, uint256) {
+   function _getTokenAmount(uint256 dollarPurchaseAmount) view public returns(uint256, uint256) {
         require(dollarPurchaseAmount > 0);
         uint256 allocatedTokens;
         uint256 surplusDollarsForNextTier = 0;
@@ -487,18 +500,7 @@ contract Crowdsale is Context, ReentrancyGuard, Ownable, Pausable {
         
         return (allocatedTokens, surplusDollarsToRefund);
    }
-
-    /**
-     * @dev Override to extend the way in which dollar is converted to tokens.
-     * @param dollarAmount Value in dollar to be converted into tokens
-     * @return Number of tokens that can be purchased with the specified _dollarAmount
-     * @return Dollar amount to refund (if any, can be zero)
-     *  if in last Tier & not enough tokens to sell
-     */
-    function _getTokenAmount(uint256 dollarAmount) public view returns (uint256, uint256) {
-        return calculateTokensToAllocate(dollarAmount);
-    }
-
+   
     /**
      * @dev Determines how funds are stored/forwarded on purchases.
      */
