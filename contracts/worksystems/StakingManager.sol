@@ -4,18 +4,6 @@ pragma solidity 0.8.8;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-/*
-
-            USE LINKED LISTS TO TRACK LOCKED TOKENS (STAKE ALLOCATION)
-            PER WORKSYSTEM (Address)
-            PER USER
-
-            SCALABLY
-
-            EACH ALLOCATION MUST HAVE DIFFERENT EXPIRATION DATE (UNLOCK DATE)
-            EACH ALLOCATION CAN BE REMOVED FROM THE LIST
-*/
-
 
 contract StakingManager is
     Ownable {
@@ -30,16 +18,22 @@ contract StakingManager is
 
     address[] internal stakeholders;
     mapping(address => bool) public isStakeholderMap;
-    mapping(address => mapping(address => uint256)) public SystemsUserAllocations; // user -> worksystem -> amount
+
+
+    struct TimeframeCounter {
+        uint128 timestamp;
+        uint128 counter;
+    }
+
+    mapping(address => mapping(address => uint256)) public UserStakeAllocations; // user -> system (contract) -> amount
+    mapping(address => uint256) public TotalAllocationsPerSystem; // system (contract)  -> total system amount
 
     struct Balances {
         uint256 free_balance;
         uint256 staked_balance;
-        uint256 allocated_balance;
     }
 
     uint256 public TotalAvailableStake = 0;
-    uint256 public TotalAllocatedStake = 0;
     uint256 public TotalDeposited = 0;
 
     /**
@@ -48,20 +42,32 @@ contract StakingManager is
     mapping(address => Balances) public balances;
 
     // ------------------------------------------------------------------------------------------
-
+    // Contracts allowed to allocate stakes
     mapping(address => bool) private StakeWhitelistMap;
     address[] public StakeWhitelistedAddress;
     mapping(address => uint256) private StakeWhitelistedAddressIndex;
+
+    // Contracts allowed to slash stakes
+    mapping(address => bool) private StakeSlashingWhitelistMap;
+    address[] public StakeSlashingWhitelistedAddress;
+    mapping(address => uint256) private StakeSlashingWhitelistedAddressIndex;
+
+    address slashedStakeSinkAddress;
     // addresses of schemes/contracts allowed to interact with stakes
 
     event StakeWhitelisted(address indexed account, bool isWhitelisted);
     event StakeUnWhitelisted(address indexed account, bool isWhitelisted);
+    event StakeSlashingWhitelisted(address indexed account, bool isWhitelisted);
+    event StakeSlashingUnWhitelisted(address indexed account, bool isWhitelisted);
 
+    uint256 constant removed_index_value = 999999999;
+
+    // -------
     function isStakeWhitelisted(address _address) public view returns (bool) {
         return StakeWhitelistMap[_address];
     }
 
-    function addAddress(address _address) public onlyOwner {
+    function addWhitelistedAddress(address _address) public onlyOwner {
         require(StakeWhitelistMap[_address] != true, "Address must not be whitelisted already");
         StakeWhitelistMap[_address] = true;
         StakeWhitelistedAddress.push(_address);
@@ -69,19 +75,51 @@ contract StakingManager is
         emit StakeWhitelisted(_address, true);
     }
 
-    function removeAddress(address _address) public onlyOwner {
+    function removeWhitelistedAddress(address _address) public onlyOwner {
         require(StakeWhitelistMap[_address] != false, "Address must be whitelisted already");
         StakeWhitelistMap[_address] = false;
 
         uint256 PrevIndex = StakeWhitelistedAddressIndex[_address];
-        StakeWhitelistedAddressIndex[_address] = 999999999;
+        StakeWhitelistedAddressIndex[_address] = removed_index_value;
 
         StakeWhitelistedAddress[PrevIndex] = StakeWhitelistedAddress[StakeWhitelistedAddress.length - 1]; // move last element
         StakeWhitelistedAddressIndex[StakeWhitelistedAddress[PrevIndex]] = PrevIndex;
         StakeWhitelistedAddress.pop();
-
         emit StakeUnWhitelisted(_address, false);
     }
+
+    // -------
+    function isStakeSlashingWhitelisted(address _address) public view returns (bool) {
+        return StakeSlashingWhitelistMap[_address];
+    }
+
+    function addSlashingWhitelistedAddress(address _address) public onlyOwner {
+        require(StakeSlashingWhitelistMap[_address] != true, "Address must not be whitelisted already");
+        StakeSlashingWhitelistMap[_address] = true;
+        StakeSlashingWhitelistedAddress.push(_address);
+        StakeSlashingWhitelistedAddressIndex[_address] = StakeSlashingWhitelistedAddress.length - 1;
+        emit StakeSlashingWhitelisted(_address, true);
+    }
+
+    function removeSlashingWhitelistedAddress(address _address) public onlyOwner {
+        require(StakeSlashingWhitelistMap[_address] != false, "Address must be whitelisted already");
+        StakeSlashingWhitelistMap[_address] = false;
+
+        uint256 PrevIndex = StakeSlashingWhitelistedAddressIndex[_address];
+        StakeSlashingWhitelistedAddressIndex[_address] = removed_index_value;
+
+        StakeSlashingWhitelistedAddress[PrevIndex] = StakeSlashingWhitelistedAddress[StakeSlashingWhitelistedAddress.length - 1]; // move last element
+        StakeSlashingWhitelistedAddressIndex[StakeSlashingWhitelistedAddress[PrevIndex]] = PrevIndex;
+        StakeSlashingWhitelistedAddress.pop();
+        emit StakeSlashingUnWhitelisted(_address, false);
+    }
+    
+    // -------
+    // update the slashed stake sink address (receving slashed stakes)
+    function updateSlashedSinkAddress(address _address) public onlyOwner {
+        slashedStakeSinkAddress = _address;
+    }
+
 
     // ---------- STAKES ----------
 
@@ -90,7 +128,7 @@ contract StakingManager is
      * @param _stake The size of the stake to be created.
      */
     function Stake(uint256 _stake) public {
-        require(balances[msg.sender].free_balance >= _stake);
+        require(balances[msg.sender].free_balance >= _stake, "deposited stake is too low");
         if (balances[msg.sender].staked_balance == 0) addStakeholder(msg.sender);
 
         balances[msg.sender].free_balance -= _stake;
@@ -98,6 +136,22 @@ contract StakingManager is
 
         // Global state update
         TotalAvailableStake += _stake;
+    }
+
+    /**
+     * @notice A method for a stakeholder to close all available stakes
+     */
+    function Unstake(uint256 _stake) public {
+        require(balances[msg.sender].staked_balance >= _stake, "deposited stake is too low");
+
+        balances[msg.sender].free_balance += _stake;
+        balances[msg.sender].staked_balance -= _stake;
+
+        // Global state update
+        TotalAvailableStake -= _stake;
+        if (balances[msg.sender].staked_balance == 0){
+            removeStakeholder(msg.sender);
+        }
     }
 
     /**
@@ -128,12 +182,11 @@ contract StakingManager is
         // check if the contract calling this method has rights to allocate from user stake
 
         balances[_stakeholder].staked_balance -= _StakeAllocation;
-        balances[_stakeholder].allocated_balance += _StakeAllocation;
-
-        SystemsUserAllocations[_stakeholder][msg.sender] += _StakeAllocation;
 
         // Global state update
-        TotalAllocatedStake += _StakeAllocation;
+        UserStakeAllocations[_stakeholder][msg.sender] += _StakeAllocation;
+        TotalAllocationsPerSystem[msg.sender]  += _StakeAllocation;
+
         return (true);
     }
 
@@ -146,18 +199,102 @@ contract StakingManager is
         require(isStakeWhitelisted(msg.sender), "isStakeWhitelisted must be true for Sender");
         require(isStakeholder(_stakeholder), "isStakeholder must be true for Sender");
         require(
-            balances[_stakeholder].allocated_balance >= _StakeToDeallocate,
-            "_stakeholder has to have enough allocated balance"
+            UserStakeAllocations[_stakeholder][msg.sender] >= _StakeToDeallocate,
+            "_stakeholder has to have enough allocated balance in this sub-system"
         );
-        // check if the contract calling this method has rights to allocate from user stake
 
-        balances[_stakeholder].allocated_balance -= _StakeToDeallocate;
         balances[_stakeholder].staked_balance += _StakeToDeallocate;
 
-        SystemsUserAllocations[_stakeholder][msg.sender] -= _StakeToDeallocate;
-        // Global state update
-        TotalAllocatedStake -= _StakeToDeallocate;
+        if ( UserStakeAllocations[_stakeholder][msg.sender] >= _StakeToDeallocate ){
+            UserStakeAllocations[_stakeholder][msg.sender]  -= _StakeToDeallocate;            
+        }
+        if ( TotalAllocationsPerSystem[msg.sender] >= _StakeToDeallocate ){
+            TotalAllocationsPerSystem[msg.sender]  -= _StakeToDeallocate;            
+        }
         return (true);
+    }
+
+    /**
+     * @notice A method for a verified whitelisted contract to allocate for itself some stake
+     * _StakeToDeallocate has to be equal to the amount of at least one ALLOCATED allocation
+     * else the procedure will fail
+     */
+    function ProxyStakeSlash(uint256 _StakeToSlash, address _stakeholder, address _system_address) public returns (bool) {
+        require(_StakeToSlash > 0, " Stake to slash must be > 0");
+        require(isStakeSlashingWhitelisted(msg.sender), "isStakeSlashingWhitelisted must be true for Sender");
+        require(isStakeholder(_stakeholder), "isStakeholder must be true for Sender");
+        // if a system was selected, slash allocation itself & send tokens to slashed pool
+        if ( _system_address != address(0) && isStakeWhitelisted(_system_address) ){
+            uint256 _allocatedUserSystemStake = UserStakeAllocations[_stakeholder][_system_address];   
+            require(
+                _allocatedUserSystemStake >= _StakeToSlash,
+                "_stakeholder has to have enough allocated balance to slash in system"
+            );
+            if ( UserStakeAllocations[_stakeholder][_system_address] >= _StakeToSlash ){
+                UserStakeAllocations[_stakeholder][_system_address]  -= _StakeToSlash;            
+            }
+            if ( TotalAllocationsPerSystem[_system_address] >= _StakeToSlash ){
+                TotalAllocationsPerSystem[_system_address]  -= _StakeToSlash;            
+            }
+
+        }
+        else{
+            // else slash on staked_balance            
+            require(balances[msg.sender].staked_balance >= _StakeToSlash, "Staked balance is too low to slash");
+            balances[msg.sender].staked_balance -= _StakeToSlash;
+            // Global state update
+            TotalAvailableStake -= _StakeToSlash;
+            if (balances[msg.sender].staked_balance == 0){
+                removeStakeholder(msg.sender);
+            }
+        }
+        // send slashed tokens to slashed sink
+        require(token.transfer(slashedStakeSinkAddress, _StakeToSlash), "_StakeToSlash Token transfer failed");
+        return (true);
+    }
+
+    // ---------- SUB-STAKE MANAGEMENT ----------
+
+    /**
+     * @notice A method for a stakeholder to close all available stakes
+     */
+    function AdminUserDeallocate(uint256 _StakeToDeallocate, address _stakeholder) public onlyOwner {
+        require(balances[_stakeholder].staked_balance >= _StakeToDeallocate, "deposited stake is too low");
+        // Global state update
+        if ( UserStakeAllocations[_stakeholder][msg.sender] >= _StakeToDeallocate ){
+            UserStakeAllocations[_stakeholder][msg.sender]  -= _StakeToDeallocate;            
+        }
+        if ( TotalAllocationsPerSystem[msg.sender] >= _StakeToDeallocate ){
+            TotalAllocationsPerSystem[msg.sender]  -= _StakeToDeallocate;            
+        }
+        balances[_stakeholder].staked_balance += _StakeToDeallocate;
+    }
+
+    function getSystemTotalAllocations(address _system) public view returns (uint256) {
+        require(isStakeWhitelisted(_system), "_system must be whitelisted to have stake allocations");
+        uint256 system_allocations_sum = 0;
+        for(uint256 i = 0; i < StakeWhitelistedAddress.length; i++){
+            address _sub_system = StakeWhitelistedAddress[i];
+            // only whitelisted systems count in the total allocation
+            // removing a system remove the allocations related to it
+            if( StakeWhitelistMap[_sub_system] ){
+                system_allocations_sum += TotalAllocationsPerSystem[_sub_system];
+            }
+        }
+        return system_allocations_sum;
+    }
+
+    function getUserTotalAllocation(address _stakeholder) public view returns (uint256) {
+        uint256 user_allocations_sum = 0;
+        for(uint256 i = 0; i < StakeWhitelistedAddress.length; i++){
+            address _sub_system = StakeWhitelistedAddress[i];
+            // only whitelisted systems count in the total allocation
+            // removing a system remove the allocations related to it
+            if( StakeWhitelistMap[_sub_system] ){
+                user_allocations_sum += UserStakeAllocations[_stakeholder][_sub_system];
+            }
+        }
+        return user_allocations_sum;
     }
 
     // ---------- STAKE STATS ----------
@@ -177,7 +314,7 @@ contract StakingManager is
      * @return uint256 The amount of wei staked.
      */
     function AllocatedStakedAmountOf(address _stakeholder) public view returns (uint256) {
-        return balances[_stakeholder].allocated_balance;
+        return getUserTotalAllocation(_stakeholder);
     }
 
     /**
@@ -193,7 +330,17 @@ contract StakingManager is
      * @return uint256 The aggregated stakes from all stakeholders.
      */
     function TotalAllocatedStakes() public view returns (uint256) {
-        return TotalAllocatedStake;
+        uint256 _TotalAllocatedStake = 0;
+        for(uint256 i = 0; i < StakeWhitelistedAddress.length; i++){
+            address _sub_system = StakeWhitelistedAddress[i];
+            // only whitelisted systems count in the total allocation
+            // removing a system remove the allocations related to it
+            if( StakeWhitelistMap[_sub_system] ){
+                _TotalAllocatedStake += TotalAllocationsPerSystem[_sub_system];
+            }
+        }
+        return _TotalAllocatedStake;
+
     }
 
     /**
