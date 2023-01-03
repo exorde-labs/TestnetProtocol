@@ -1,0 +1,5 @@
+node-skale-0 : 57.128.81.82
+node-skale-1 : 57.128.85.245
+node-skale-2 : 57.128.87.76
+node-skale-3 : 57.128.84.254
+node-skale-4 : 57.128.80.82
