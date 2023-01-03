@@ -45,7 +45,11 @@ contract RewardsManager is Ownable {
     uint16 constant TIMEFRAMES_HOURLY_DAILY = 3600; // 3600*24 = 1 day
     TimeframeCounter[NB_TIMEFRAMES_HOURLY] public HourlyRewardsFlowManager;
     TimeframeCounter[NB_TIMEFRAMES_DAILY] public DailyRewardsFlowManager;
-    
+
+    // Hardcoded limit of rewards per hour & day, to limit protocol inflation & rewards exploits
+    uint256 public MAX_HOURLY_EXD_REWARDS = 1250*(10**18);
+    uint256 public MAX_DAILY_EXD_REWARDS = 30000*(10**18); 
+
     constructor(
         address EXD_token
     ) {
@@ -90,6 +94,8 @@ contract RewardsManager is Ownable {
         require(isRewardsWhitelisted(msg.sender), "RewardsManager: sender must be whitelisted to Proxy act");
         // require(ManagerBalance >=  _RewardsAllocation);
         require(_RewardsAllocation > 0, "rewards to allocate must be positive..");
+        require(getDailyRewardsCount() < MAX_DAILY_EXD_REWARDS, "Daily Total Rewards exceed!");
+        require(getHourlyRewardsCount() < MAX_HOURLY_EXD_REWARDS, "Hourly Total Rewards exceed!");
         // check if the contract calling this method has rights to allocate from user Rewards
         if (ManagerBalance >= _RewardsAllocation) {
             ManagerBalance -= _RewardsAllocation;
