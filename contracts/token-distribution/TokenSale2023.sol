@@ -39,11 +39,6 @@ contract Crowdsale is Context, ReentrancyGuard, Ownable, Pausable {
     // Address where funds are collected
     address payable private _wallet;
 
-    // How many token units a buyer gets per dollar.
-    // The rate is the conversion between dollar and the smallest and indivisible token unit.
-    // So, if you are using a rate of 1 with a ERC20Detailed token with 3 decimals called TOK
-    // 1 dollar will give you 1 unit, or 0.001 TOK.
-
     // The EXD Token Sale is Tiered
     //      Tier 1 = $0.35/EXD for the first 2 million (2 000 000) EXD tokens sold, then
     //      Tier 2 = $0.375/EXD for 4 million (4 000 000) EXD tokens sold, then
@@ -85,22 +80,10 @@ contract Crowdsale is Context, ReentrancyGuard, Ownable, Pausable {
     // Amount of token sold
     uint256 public totalTokensRaised;
 
-    /**
-     * Event for token purchase logging
-     * @param purchaser who paid for the tokens
-     * @param beneficiary who got the tokens
-     * @param value dollars paid for purchase
-     * @param amount amount of tokens purchased
-     */
     event TokensPurchased(address indexed purchaser, address indexed beneficiary, uint256 value, uint256 amount);
+    event AddressWhitelisted(address indexed user);
+    event AddressDeWhitelisted(address indexed user);
 
-    /**
-     * @dev The price is the conversion between dollar and the smallest and indivisible
-     * token unit. So, if you are using a rate of 1 with a ERC20Detailed token
-     * with 3 decimals called TOK, 1 dollar will give you 1 unit, or 0.001 TOK.
-     * @param wallet_ Address where collected funds will be forwarded to
-     * @param token_ Address of the token being sold
-     */
     constructor (address payable wallet_,  uint256 startTime_, uint256 endTime_, 
     IERC20 token_, IERC20 USDC_, IERC20 USDT_, IERC20 DAI_) {
         require(wallet_ != address(0), "Crowdsale: wallet is the zero address");
@@ -135,6 +118,7 @@ contract Crowdsale is Context, ReentrancyGuard, Ownable, Pausable {
     */
     function addToWhitelist(address _beneficiary) external onlyOwner {
         whitelist[_beneficiary] = true;
+        emit AddressWhitelisted(_beneficiary);
     }
 
     /**
@@ -143,7 +127,8 @@ contract Crowdsale is Context, ReentrancyGuard, Ownable, Pausable {
     */
     function addManyToWhitelist(address[] memory _beneficiaries) external onlyOwner {
         for (uint256 i = 0; i < _beneficiaries.length; i++) {
-        whitelist[_beneficiaries[i]] = true;
+            whitelist[_beneficiaries[i]] = true;
+            emit AddressDeWhitelisted(_beneficiaries[i]);
         }
     }
 
@@ -153,6 +138,7 @@ contract Crowdsale is Context, ReentrancyGuard, Ownable, Pausable {
     */
     function removeFromWhitelist(address _beneficiary) external onlyOwner {
         whitelist[_beneficiary] = false;
+        emit AddressDeWhitelisted(_beneficiary);
     }
 
     //  ----------- ADMIN - END -----------
@@ -205,12 +191,7 @@ contract Crowdsale is Context, ReentrancyGuard, Ownable, Pausable {
         require( !isOpen() || paused() );
         _;
     }
-    /**
-     * @dev fallback function ***DO NOT OVERRIDE***
-     * Note that other contracts will transfer funds with a base gas stipend
-     * of 2300, which is not enough to call buyTokens. Consider calling
-     * buyTokens directly when purchasing tokens from a contract.
-     */
+    
     receive () external payable {
         revert("ETH not authorized, please use buyTokens()");
     }
