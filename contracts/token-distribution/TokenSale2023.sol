@@ -99,35 +99,41 @@ contract Crowdsale is Context, ReentrancyGuard, Ownable, Pausable {
     function setEndDate(uint256 _endTime)
         external onlyOwner whenNotPaused
     {
-        require(block.timestamp <= _endTime);
-        require(startTime < _endTime);
-        
+        require(endTime < _endTime, "new endTime must be later");
         endTime = _endTime;
     }
 
+    /**
+    * @dev Reverts if sale has not started or has ended
+    */
+    modifier isSaleOpen() {
+        require(block.timestamp >= startTime && block.timestamp <= endTime, "the sale has ended");
+        _;
+    }
+
     
-    // /**
-    //  * @dev The price is the conversion between dollar and the smallest and indivisible
-    //  * token unit. So, if you are using a rate of 1 with a ERC20Detailed token
-    //  * with 3 decimals called TOK, 1 dollar will give you 1 unit, or 0.001 TOK.
-    //  * @param wallet_ Address where collected funds will be forwarded to
-    //  * @param token_ Address of the token being sold
-    //  */
-    // constructor (address payable wallet_,  uint256 startTime_, uint256 endTime_, 
-    // IERC20 token_, IERC20 USDC_, IERC20 USDT_, IERC20 DAI_) {
-    //     require(wallet_ != address(0), "Crowdsale: wallet is the zero address");
-    //     require(address(token_) != address(0), "Crowdsale: token is the zero address");
+    /**
+     * @dev The price is the conversion between dollar and the smallest and indivisible
+     * token unit. So, if you are using a rate of 1 with a ERC20Detailed token
+     * with 3 decimals called TOK, 1 dollar will give you 1 unit, or 0.001 TOK.
+     * @param wallet_ Address where collected funds will be forwarded to
+     * @param token_ Address of the token being sold
+     */
+    constructor (address payable wallet_,  uint256 startTime_, uint256 endTime_, 
+    IERC20 token_, IERC20 USDC_, IERC20 USDT_, IERC20 DAI_) {
+        require(wallet_ != address(0), "Crowdsale: wallet is the zero address");
+        require(address(token_) != address(0), "Crowdsale: token is the zero address");
 
-    //     startTime = startTime_;
-    //     endTime = endTime_;
+        startTime = startTime_;
+        endTime = endTime_;
 
-    //     USDC = IERC20(USDC_);
-    //     USDT = IERC20(USDT_);
-    //     DAI = IERC20(DAI_);
+        USDC = IERC20(USDC_);
+        USDT = IERC20(USDT_);
+        DAI = IERC20(DAI_);
 
-    //     _wallet = wallet_;
-    //     _token = token_;
-    // }
+        _wallet = wallet_;
+        _token = token_;
+    }
 
     //  ----------- WHITELISTING - KYC/AML -----------
         
@@ -137,7 +143,7 @@ contract Crowdsale is Context, ReentrancyGuard, Ownable, Pausable {
     * @dev Reverts if beneficiary is not whitelisted. Can be used when extending this contract.
     */
     modifier isWhitelisted(address _beneficiary) {
-        require(whitelist[_beneficiary]);
+        require(whitelist[_beneficiary],"user not whitelisted");
         _;
     }
 
@@ -210,6 +216,7 @@ contract Crowdsale is Context, ReentrancyGuard, Ownable, Pausable {
     function buyTokensUSDC(uint256 purchaseAmount) public 
     nonReentrant 
     whenNotPaused
+    isSaleOpen
     isWhitelisted(_msgSender()) 
     {
         address beneficiary = _msgSender();
@@ -244,6 +251,7 @@ contract Crowdsale is Context, ReentrancyGuard, Ownable, Pausable {
     function buyTokensUSDT(uint256 purchaseAmount) public 
     nonReentrant 
     whenNotPaused
+    isSaleOpen
     isWhitelisted( _msgSender()) 
     {
         address beneficiary = _msgSender();
@@ -272,13 +280,15 @@ contract Crowdsale is Context, ReentrancyGuard, Ownable, Pausable {
      * @dev low level token purchase ***DO NOT OVERRIDE***
      * This function has a non-reentrancy guard, so it shouldn't be called by
      * another `nonReentrant` function.
-     * @param purchaseAmount in dollar (usdc/usdt/dai)
+     * @param purchaseAmount_ in dollar (usdc/usdt/dai)
      */
-    function buyTokensDAI(uint256 purchaseAmount) public 
+    function buyTokensDAI(uint256 purchaseAmount_) public 
     nonReentrant 
     whenNotPaused
+    isSaleOpen
     isWhitelisted( _msgSender()) 
     {
+        uint256 purchaseAmount = purchaseAmount_.div(10**12); //DAI has 12 more digits than USDC/UST
         address beneficiary = _msgSender();
         DAI.safeTransferFrom(_msgSender(), address(this), purchaseAmount);
         
