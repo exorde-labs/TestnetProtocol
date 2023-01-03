@@ -636,4 +636,7 @@ Macy’s,
 Asics,
 Vera Wang,
 Dior,
-Puma
+Puma,
+Ronaldo, 
+Messi,
+Tiktok
