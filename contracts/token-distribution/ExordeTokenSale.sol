@@ -29,7 +29,7 @@ import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
     *      C. The end time can be extended at will by the owner
     */
 
-contract Crowdsale is Context, ReentrancyGuard, Ownable, Pausable {
+contract ExordeTokenSale is Context, ReentrancyGuard, Ownable, Pausable {
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
 
@@ -295,8 +295,8 @@ contract Crowdsale is Context, ReentrancyGuard, Ownable, Pausable {
 
         _updatePurchasingState(beneficiary, effectivePurchaseAmount);
 
-        _forwardFunds(USDC, effectivePurchaseAmount);
-        _postValidatePurchase(USDC, beneficiary, dollarsToRefund);
+        _forwardFunds(USDT, effectivePurchaseAmount);
+        _postValidatePurchase(USDT, beneficiary, dollarsToRefund);
     }
 
 
@@ -331,8 +331,8 @@ contract Crowdsale is Context, ReentrancyGuard, Ownable, Pausable {
 
         _updatePurchasingState(beneficiary, effectivePurchaseAmount);
 
-        _forwardFunds(USDC, effectivePurchaseAmount);
-        _postValidatePurchase(USDC, beneficiary, dollarsToRefund);
+        _forwardFunds(DAI, effectivePurchaseAmount);
+        _postValidatePurchase(DAI, beneficiary, dollarsToRefund);
     }
 
     /**
