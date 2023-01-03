@@ -1,6 +1,7 @@
 {
-   "mainnet":[
-      {
+   "mainnet": [],
+   "testnet":[
+       {
          "_networkId":"mainnet-A",
          "_urlSkale":"http://44.212.212.254:10067/",
          "_urlSkale2":"http://57.128.81.82:10067/",
@@ -8,9 +9,7 @@
          "_chainID":"2139927552",
          "_blockExplorer":"https://light-vast-diphda.explorer.mainnet.skalenodes.com/",
          "_webSocket":"wss://mainnet.skalenodes.com/v1/ws/light-vast-diphda"
-      }
-   ],
-   "testnet":[
+      },
       {
          "_networkId":"testnet-A",
          "_urlSkale":"http://44.230.146.249:10195/",
