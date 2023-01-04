@@ -360,6 +360,9 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
     mapping(uint128 => uint16) public BatchCommitedVoteCount; 
     mapping(uint128 => uint16) public BatchRevealedVoteCount; 
 
+    uint16 constant MIN_REGISTRATION_DURATION = 120; // in seconds
+
+
     address[] public availableWorkers;
     address[] public busyWorkers;
     address[] public toUnregisterWorkers;
@@ -392,7 +395,7 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
     // Initial storage variables: 64+16+16+15*256+256+256*12+4*256+128*9+256*10+16*2+6*8+16*4+256*1+256*2 bits
     // Approx. 404 bytes.
     uint256 public BytesUsed = 404;
-    uint256 public MaximumBytesTarget = 50*(10**6) ; //50 Mb
+    uint256 public MaximumBytesTarget = 100*(10**6) ; //50 Mb
 
     // ------ Vote related    
     uint16 constant APPROVAL_VOTE_MAPPING_  = 1;
@@ -910,6 +913,9 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
     function UnregisterWorker() public {
         WorkerState storage worker_state = WorkersState[msg.sender];
         require(worker_state.registered, "Worker is not registered so can't unregister");
+        require(worker_state.registration_date > block.timestamp + MIN_REGISTRATION_DURATION, 
+        "Worker must wait some time to unregister");
+
         if (
             worker_state.allocated_work_batch != 0 &&
             !worker_state.unregistration_request &&
