@@ -3,7 +3,7 @@
    "testnet":[
        {
          "_networkId":"mainnet-A",
-         "_urlSkale":"http://44.212.212.254:10067/",
+         "_urlSkale1":"http://44.212.212.254:10067/",
          "_urlSkale2":"http://57.128.81.82:10067/",
          "SyncNodeCount":"2",
          "_urlTxSkale":"https://mainnet.skalenodes.com/v1/light-vast-diphda",
@@ -13,7 +13,7 @@
       },
       {
          "_networkId":"testnet-B",
-         "_urlSkale":"http://44.230.146.249:10195/",
+         "_urlSkale1":"http://44.230.146.249:10195/",
          "_urlSkale2":"http://35.84.228.194:10195/",
          "_urlSkale3":"http://57.128.85.245:10259",
          "_urlSkale4":"http://57.128.87.76:10259",
