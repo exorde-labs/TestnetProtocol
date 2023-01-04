@@ -11,13 +11,16 @@
          "_webSocket":"wss://mainnet.skalenodes.com/v1/ws/light-vast-diphda"
       },
       {
-         "_networkId":"testnet-A",
+         "_networkId":"testnet-B",
          "_urlSkale":"http://44.230.146.249:10195/",
          "_urlSkale2":"http://35.84.228.194:10195/",
-         "_urlTxSkale":"https://legacy-proxy.skalenodes.com/v1/wan-tasty-kitalpha",
-         "_chainID":"355367913",
-         "_blockExplorer":"http://wan-tasty-kitalpha.legacy-explorer.skalenodes.com/",
-         "_webSocket":"wss://legacy-proxy.skalenodes.com/v1/ws/wan-tasty-kitalpha"
+         "_urlSkale3":"http:// 57.128.85.245:10259",
+         "_urlSkale4":"http:// 57.128.87.76:10259",
+         "_urlSkale5":"http:// 57.128.80.82:10259",
+         "_urlTxSkale":"https://legacy-proxy.skalenodes.com/v1/wary-teeming-mizar",
+         "_chainID":"1494040293",
+         "_blockExplorer":"http://wary-teeming-mizar.legacy-explorer.skalenodes.com/",
+         "_webSocket":"wss://legacy-proxy.skalenodes.com/v1/ws/wary-teeming-mizar"
       }
    ]
 }
