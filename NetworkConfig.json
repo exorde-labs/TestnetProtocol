@@ -12,7 +12,7 @@
          "_webSocket":"wss://mainnet.skalenodes.com/v1/ws/light-vast-diphda"
       },
       {
-         "_networkId":"testnet-B",
+         "_networkId":"testnet-A",
          "_urlSkale1":"http://57.128.85.245:10259",
          "_urlSkale2":"http://57.128.87.76:10259",
          "_urlSkale3":"http://57.128.84.254:10259",
