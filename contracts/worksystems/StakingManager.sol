@@ -415,6 +415,10 @@ contract StakingManager is
 
     // ---------- DEPOSIT AND LOCKUP MECHANISMS ----------
 
+    /**
+    * @notice Deposit _numTokens ERC20 EXD tokens to the free balance of the msg.sender stakes
+    * @param _numTokens The number of ERC20 tokens to deposit
+    */
     function deposit(uint256 tokens) public {
         require(token.balanceOf(msg.sender) >= tokens, "not enough tokens to deposit");
         // add the deposited tokens into existing balance
@@ -425,8 +429,8 @@ contract StakingManager is
     }
 
     /**
-    @notice Withdraw _numTokens ERC20 tokens from the free balance of the msg.sender stakes
-    @param _numTokens The number of ERC20 tokens to withdraw
+    * @notice Withdraw _numTokens ERC20 tokens from the free balance of the msg.sender stakes
+    * @param _numTokens The number of ERC20 tokens to withdraw
     */
     function withdraw(uint256 _numTokens) public {
         require(
