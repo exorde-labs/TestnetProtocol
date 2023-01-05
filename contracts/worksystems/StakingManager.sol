@@ -63,10 +63,18 @@ contract StakingManager is
     uint256 constant removed_index_value = 999999999;
 
     // -------
+    /**
+     * @notice Returns true if an address is whitelist for allocating user Stakes 
+     * @param _address The address (contract, or user)
+     */
     function isStakeWhitelisted(address _address) public view returns (bool) {
         return StakeWhitelistMap[_address];
     }
 
+    /**
+     * @notice Add a whitelisted address, allowed to interact with stakes (allocate them)
+     * @param _address The address (contract, or user)
+     */
     function addWhitelistedAddress(address _address) public onlyOwner {
         require(StakeWhitelistMap[_address] != true, "Address must not be whitelisted already");
         StakeWhitelistMap[_address] = true;
@@ -75,6 +83,10 @@ contract StakingManager is
         emit StakeWhitelisted(_address, true);
     }
 
+    /**
+     * @notice Remove a whitelisted address, allowed to interact with stakes (allocate them)
+     * @param _address The address (contract, or user)
+     */
     function removeWhitelistedAddress(address _address) public onlyOwner {
         require(StakeWhitelistMap[_address] != false, "Address must be whitelisted already");
         StakeWhitelistMap[_address] = false;
@@ -89,10 +101,18 @@ contract StakingManager is
     }
 
     // -------
+    /**
+     * @notice Returns true if an address is whitelist for slashing stakes.
+     * @param _address The address (contract, or user)
+     */
     function isStakeSlashingWhitelisted(address _address) public view returns (bool) {
         return StakeSlashingWhitelistMap[_address];
     }
 
+    /**
+     * @notice Add a whitelisted address to the right to slash other addresses' stakes.
+     * @param _address The address (contract, or user)
+     */
     function addSlashingWhitelistedAddress(address _address) public onlyOwner {
         require(StakeSlashingWhitelistMap[_address] != true, "Address must not be whitelisted already");
         StakeSlashingWhitelistMap[_address] = true;
@@ -101,6 +121,10 @@ contract StakingManager is
         emit StakeSlashingWhitelisted(_address, true);
     }
 
+    /**
+     * @notice Removes a whitelisted address from the right to slash other addresses' stakes.
+     * @param _address The address (contract, or user)
+     */
     function removeSlashingWhitelistedAddress(address _address) public onlyOwner {
         require(StakeSlashingWhitelistMap[_address] != false, "Address must be whitelisted already");
         StakeSlashingWhitelistMap[_address] = false;
@@ -270,6 +294,11 @@ contract StakingManager is
         balances[_stakeholder].staked_balance += _StakeToDeallocate;
     }
 
+    /**
+     * @notice gets the total amount of stakes allocated to a given sub system (a contract, e.g. a WorkSystem)
+     * Allocated stakes are locked stakes, that are locked and unlocked according to the sub systems logic
+     * @param _system The address of the system contract
+     */
     function getSystemTotalAllocations(address _system) public view returns (uint256) {
         require(isStakeWhitelisted(_system), "_system must be whitelisted to have stake allocations");
         uint256 system_allocations_sum = 0;
@@ -284,6 +313,11 @@ contract StakingManager is
         return system_allocations_sum;
     }
 
+    /**
+     * @notice gets the total amount of stakes allocated, for a given user address
+     * Allocated stakes are locked stakes, that are locked and unlocked according to the sub systems logic
+     * @param _stakeholder The address of the user
+     */
     function getUserTotalAllocation(address _stakeholder) public view returns (uint256) {
         uint256 user_allocations_sum = 0;
         for(uint256 i = 0; i < StakeWhitelistedAddress.length; i++){
@@ -391,8 +425,8 @@ contract StakingManager is
     }
 
     /**
-    @notice Withdraw _numTokens ERC20 tokens from the voting contract, revoking these voting rights
-    @param _numTokens The number of ERC20 tokens desired in exchange for voting rights
+    @notice Withdraw _numTokens ERC20 tokens from the free balance of the msg.sender stakes
+    @param _numTokens The number of ERC20 tokens to withdraw
     */
     function withdraw(uint256 _numTokens) public {
         require(
@@ -403,6 +437,9 @@ contract StakingManager is
         balances[msg.sender].free_balance -= _numTokens;
     }
 
+    /**
+     * @notice Withdraw all available stakes (free balance)
+     */
     function withdrawAll() public {
         require(balances[msg.sender].free_balance > 0, "not enough tokens to withdraw");
         require(token.transfer(msg.sender, balances[msg.sender].free_balance), "Token transfer failed");
