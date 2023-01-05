@@ -419,13 +419,13 @@ contract StakingManager is
     * @notice Deposit _numTokens ERC20 EXD tokens to the free balance of the msg.sender stakes
     * @param _numTokens The number of ERC20 tokens to deposit
     */
-    function deposit(uint256 tokens) public {
-        require(token.balanceOf(msg.sender) >= tokens, "not enough tokens to deposit");
+    function deposit(uint256 _numTokens) public {
+        require(token.balanceOf(msg.sender) >= _numTokens, "not enough tokens to deposit");
         // add the deposited tokens into existing balance
-        balances[msg.sender].free_balance += tokens;
+        balances[msg.sender].free_balance += _numTokens;
 
         // transfer the tokens from the sender to this contract
-        require(token.transferFrom(msg.sender, address(this), tokens), "Token transfer failed");
+        require(token.transferFrom(msg.sender, address(this), _numTokens), "Token transfer failed");
     }
 
     /**
