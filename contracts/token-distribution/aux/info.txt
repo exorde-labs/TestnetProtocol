@@ -1,0 +1,1 @@
+These contracts in aux/ are either intermediary contracts, basic contract with less functionalities than the ones in the parent folder or other non-essential contracts, often used during tests & debugging processes.
