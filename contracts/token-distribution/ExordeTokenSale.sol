@@ -11,9 +11,9 @@ import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
     /* 
     * ________________ Token Sale Setup __________________
         The EXD Token Sale is a 3-Tiered Dollar-based Token Sale
-    *      Tier 1 = $0.30/EXD for the first 2 million (2 000 000) EXD tokens sold, then
-    *      Tier 2 = $0.325/EXD for 4 million (4 000 000) EXD tokens sold, then
-    *      Tier 3 = $0.35/EXD for the last 6 million (6 000 000) EXD tokens sold.
+    *      Tier 1 = $0.3000/EXD for the first 2 million (2 000 000) EXD tokens sold, then
+    *      Tier 2 = $0.3125/EXD for 4 million (4 000 000) EXD tokens sold, then
+    *      Tier 3 = $0.3250/EXD for the last 6 million (6 000 000) EXD tokens sold.
     *   Total EXD sold (to be deposited in contract initially) = 12 000 000 EXD tokens. Twelve millions.
     * ________________ Requirements of the sale: __________________
     *      A. All buyers must be whitelisted by Exorde Labs, according to their KYC verification done on exorde.network
@@ -51,9 +51,9 @@ contract ExordeTokenSale is Context, ReentrancyGuard, Ownable, Pausable {
     
     // price per tier, in dollar (divided by 1000)
     uint256 public _priceBase = 1000*(10**12);
-    uint256 public _priceTier1 = 300; // $0.35, thirty five cents
-    uint256 public _priceTier2 = 325; // $0.375, thirty five cents + half a cent
-    uint256 public _priceTier3 = 350; // $0.4, fourty cents
+    uint256 public _priceTier1 = 300; // $0.3000, thirty five cents
+    uint256 public _priceTier2 = 312; // $0.3120, thirty five cents + half a cent
+    uint256 public _priceTier3 = 325; // $0.3250, fourty cents
 
    // You can only buy up to 12M tokens
     uint256 public maxTokensRaised = 12*(10**6)*(10**18); // 12 millions    
