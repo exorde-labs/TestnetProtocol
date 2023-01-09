@@ -3,7 +3,6 @@ pragma solidity 0.8.8;
 
 
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Context.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 
@@ -160,7 +159,7 @@ contract VestingWallet is Context {
     }
 }
 
-contract ExordeVestingWallet is VestingWallet, Ownable{
+contract ExordeVestingWallet is VestingWallet {
 
     uint64 public investor_id; // internal ID
     uint64 public durationSeconds;
