@@ -14,21 +14,20 @@
       "ReputationReader":"0x17F263717586240A51c2B41824990d7869F27523"
    },
    "testnet-A":{
-      "Reputation":"0x6a495533190a5930781a363B6c7E8db6abC63068",
-      "EXDT":"0x2791A1aF774ed9ef58e9bd26EC6b72636b4670A6",
-      "Avatar":"0xaB6bc90A54ea7C7c45dd94E5df10CDB1B07E80eb",
-      "Controller":"0xb9354a597Bf68eC9B7486feFeB16da46b887cC1f",
-      "ConfigRegistry":"0x96813cf25d63c9f4AB6Dd4A5e7E15bDD0e59Ac2e",
-      "PermissionRegistry":"0xc229c14B0085fB43113cc86EA3BE8bB0eA2bE2DF",
-      "StakingManager":"0xe06F2e6D0C0ADC4A87FB614a34c03eB06E05051b",
-      "RewardsManager":"0xcBc357F3077989B4636E93a8Ce193E05cd8cc56E",
-      "Parameters":"0xe221bE54c5Ac0F16885f65De957Eed022eDB11a7",
-      "AddressManager":"0x1791bE54d4b3Af415fc11af8FeE953937F024d79",
-      "Statistics":"0x3419c3205a86074De90Ee9227adD2a0609749e50",
-      "DataSpotting":"0xC22d5CDa7757A5292807ebaE94FE95EF946AF6f6",
-      "RegistrarWalletScheme":"0x7c1c6814f8A4C4c5D5AC7422eC578C1aa19d80A5",
-      "MasterWalletScheme":"0xDb8A552BC19afE1218C40aE2C94e1bCb9EdA8588",
-      "QuickWalletScheme":"0x32dbb0e3E217b3925A2621F2975DbD20a9540a4e",
-      "sfuelDistribute":"0xae23d2E9dfFDC27cc44Efca6A6227b2eba400200"
+      "Reputation":"0xC697bC43acaBC98e13Da691911b6Bc5dC03dcdab",
+      "EXDT":"0x563e5d10347dA814E1f70F18bd4533d89C538443",
+      "Avatar":"0xf0Eb63c4d8a37D70Fd5cA0E164F0997EB7C2DD8b",
+      "Controller":"0x8A076f5844B0eF28914C4871bCee6fD78edd5a3f",
+      "ConfigRegistry":"0x6a495533190a5930781a363B6c7E8db6abC63068",
+      "PermissionRegistry":"0x2aAEBe1435cb881Fa2113a3c34Cee8E8ED51EC4b",
+      "StakingManager":"0xB9d2cEeb505D089B60F1c6e71d2984034E167aC3",
+      "RewardsManager":"0x1Fa8AF9a17b71BC5Ec3AB57c2a3718A08D0035ae",
+      "Parameters":"0x2791A1aF774ed9ef58e9bd26EC6b72636b4670A6",
+      "AddressManager":"0xbdAAd4043fb81a95E327B4fECb53E8631f85f323",
+      "Statistics":"0xF2e7936113D1B90c7946F677dE9E4275aAbb7C71",
+      "DataSpotting":"0x5ac1b5513709d7eCDDeD60f1de8EF4c0599551AB",
+      "RegistrarWalletScheme":"0xE14b8A6832A9eAd4bA49Ce6B8509ea42E0f683A5",
+      "MasterWalletScheme":"0xED33CC400cDe9d8827D5a83419cb50dA9499bC53",
+      "QuickWalletScheme":"0x42C0aeB93c649Acb47D71e79398d2F88490C578c"
    }
 }
