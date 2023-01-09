@@ -20,7 +20,7 @@
          "_urlSkale4":"http://35.84.228.194:10259/",
          "_urlSkale5":"http://44.230.146.249:10259/",
                 "_urlSkale6":"http://57.128.87.76:10259",
-         "SyncNodeCount":"3",
+         "SyncNodeCount":"5",
          "_urlTxSkale":"https://legacy-proxy.skalenodes.com/v1/empty-second-meissa",
          "_chainID":"527299411",
          "_blockExplorer":"https://empty-second-meissa.legacy-explorer.skalenodes.com/",
