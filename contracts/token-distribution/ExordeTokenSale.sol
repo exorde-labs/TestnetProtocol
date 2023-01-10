@@ -11,13 +11,13 @@ import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
     /* 
     * ________________ Token Sale Setup __________________
         The EXD Token Sale is a 3-Tiered Dollar-based Token Sale
-    *      Tier 1 = $0.3000/EXD for the first 2 million (2 000 000) EXD tokens sold, then
-    *      Tier 2 = $0.3125/EXD for 4 million (4 000 000) EXD tokens sold, then
-    *      Tier 3 = $0.3250/EXD for the last 6 million (6 000 000) EXD tokens sold.
+    *      Tier 1 = $0.33/EXD for the first 0.5 million (500 000) EXD tokens sold, then
+    *      Tier 2 = $0.34/EXD for next 1.5 million (1 500 000) EXD tokens sold, then
+    *      Tier 3 = $0.35/EXD for the last 10 million (10 000 000) EXD tokens sold.
     *   Total EXD sold (to be deposited in contract initially) = 12 000 000 EXD tokens. Twelve millions.
     * ________________ Requirements of the sale: __________________
     *      A. All buyers must be whitelisted by Exorde Labs, according to their KYC verification done on exorde.network
-    *      B. All buyers are limited to $50k (50 000), 
+    *      B. All buyers are limited to $50k ($50 000), 
     *          fifty thousand dollars of purchase, overall (they can buy multiple times).
     *      C. A tier ends when all tokens have been sold. 
     *      D. If tokens remain unsold after the sale, 
@@ -45,26 +45,30 @@ contract ExordeTokenSale is Context, ReentrancyGuard, Ownable, Pausable {
     IERC20 public USDT;
     IERC20 public DAI;
 
-    uint256 public USDC_decimal_count = 6;
-    uint256 public USDT_decimal_count = 6;
-    uint256 public DAI_decimal_count = 18;
+    uint256 public constant USDC_decimal_count = 6;
+    uint256 public constant USDT_decimal_count = 6;
+    uint256 public constant DAI_decimal_count = 18;
+
+    uint256 private constant THOUSAND = 10**3;
+    uint256 private constant MILLION = 10**6;
+    uint256 private constant EXD_DECIMAL_COUNT = 10**18;
     
     // price per tier, in dollar (divided by 1000)
     uint256 public _priceBase = 1000*(10**12);
-    uint256 public _priceTier1 = 300; // $0.3000, thirty five cents
-    uint256 public _priceTier2 = 312; // $0.3120, thirty five cents + half a cent
-    uint256 public _priceTier3 = 325; // $0.3250, fourty cents
+    uint256 public _priceTier1 = 330; // $0.33
+    uint256 public _priceTier2 = 340; // $0.34
+    uint256 public _priceTier3 = 350; // $0.35
 
    // You can only buy up to 12M tokens
-    uint256 public maxTokensRaised = 12*(10**6)*(10**18); // 12 millions    
-    // 2 million at _priceTier1
-    uint256 public _tier1SupplyThreshold = 2*(10**6)*(10**18);
-     // 4 million at _priceTier2 (2m + 4m = 6m)
-    uint256 public _tier2SupplyThreshold = 6*(10**6)*(10**18);
-    // 6 million at _priceTier3  (2m + 4m + 6m = 12m = maxTokensRaised)
-    uint256 public _tier3SupplyThreshold = 12*(10**6)*(10**18); 
+    uint256 public maxTokensRaised       =    12 * MILLION  * EXD_DECIMAL_COUNT;            // 12 millions EXD (12 000 000 EXD) maximum to sell
+
+   // tiers supply threshold (cumulative): tier 2 threshold is tier 1 supply + tier 2 supply
+    uint256 public _tier1SupplyThreshold =   500 * THOUSAND * EXD_DECIMAL_COUNT;            // first 500k EXD (500 000 EXD)
+    uint256 public _tier2SupplyThreshold =     2 * MILLION  * EXD_DECIMAL_COUNT;            // then 1.5m EXD (1 500 000 EXD) + previous tokens
+    uint256 public _tier3SupplyThreshold =    12 * MILLION  * EXD_DECIMAL_COUNT;            // last threshold is amount to the max Tokens Raised
+
    // An individual is capped to $50k
-    uint256 public userMaxTotalPurchase = 50000*(10**6); // 50000 dollars ($50k)
+    uint256 public userMaxTotalPurchase = 50 * THOUSAND * (10**6); // 50000 dollars ($50k) in USDC 6 decimals base
 
     uint256 public startTime;
     uint256 public endTime;
