@@ -413,8 +413,8 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
     uint16 public MaxPendingDataBatchCount = 1000;
     uint16 public SPOT_FILE_SIZE = 100;
 
-    uint128 private constant MAX_INDEX_RANGE_BATCHS = 200000;
-    uint128 private constant MAX_INDEX_RANGE_SPOTS = 1000000;
+    uint128 public MAX_INDEX_RANGE_BATCHS = 20000;
+    uint128 public MAX_INDEX_RANGE_SPOTS = 200000;
 
     // ------ Addresses & Interfaces
     IERC20 public token;
@@ -493,6 +493,15 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
     // ================================================================================
     //                             ADMIN Updaters
     // ================================================================================
+
+    /**
+  * @notice Update the rolling range windows
+  */
+    function updateMaxIndexRanges(uint128 MAX_INDEX_RANGE_BATCHS_, uint128 MAX_INDEX_RANGE_SPOTS_) public onlyOwner {
+        MAX_INDEX_RANGE_BATCHS = MAX_INDEX_RANGE_BATCHS_;
+        MAX_INDEX_RANGE_SPOTS = MAX_INDEX_RANGE_SPOTS_;
+    }
+
 
     /**
   * @notice Enable or disable instant rewards when SpottingData (Testnet)
