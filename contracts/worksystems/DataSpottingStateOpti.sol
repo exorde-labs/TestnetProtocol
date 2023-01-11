@@ -1336,7 +1336,7 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
   */
     function TriggerValidation(uint128 iteration_count) public {
         require(IParametersManager(address(0)) != Parameters, "Parameters Manager must be set.");
-        uint128 PrevCursor = BatchCheckingCursor;
+        uint128 PrevCursor = BatchCheckingCursor  % MAX_INDEX_RANGE_BATCHS;
         for (uint128 i = 0; i < iteration_count; i++) {
             uint128 CurrentCursor = (PrevCursor + i) % MAX_INDEX_RANGE_BATCHS;
             // IF CURRENT BATCH IS ALLOCATED TO WORKERS AND VOTE HAS ENDED, THEN CHECK IT & MOVE ON!
