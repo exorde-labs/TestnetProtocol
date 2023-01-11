@@ -413,8 +413,8 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
     uint16 public MaxPendingDataBatchCount = 1000;
     uint16 public SPOT_FILE_SIZE = 100;
 
-    uint128 public MAX_INDEX_RANGE_BATCHS = 20000;
-    uint128 public MAX_INDEX_RANGE_SPOTS = 200000;
+    uint128 public MAX_INDEX_RANGE_BATCHS = 25000;
+    uint128 public MAX_INDEX_RANGE_SPOTS = 100000;
 
     // ------ Addresses & Interfaces
     IERC20 public token;
@@ -925,7 +925,7 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
     function UnregisterWorker() public {
         WorkerState storage worker_state = WorkersState[msg.sender];
         require(worker_state.registered, "Worker is not registered so can't unregister");
-        require(worker_state.registration_date > block.timestamp + MIN_REGISTRATION_DURATION, 
+        require(worker_state.registration_date <= block.timestamp + MIN_REGISTRATION_DURATION, 
         "Worker must wait some time to unregister");
 
         if (
@@ -1641,9 +1641,9 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
   * @notice Allocate last data batch to be checked by K out N currently available workers.
   */
     function AllocateWork() internal {
-        require(DataBatch[AllocatedBatchCursor].complete, "Can't allocate work, the current batch is not complete");
+        require(DataBatch[AllocatedBatchCursor % MAX_INDEX_RANGE_BATCHS].complete, "Can't allocate work, the current batch is not complete");
         require(
-            !DataBatch[AllocatedBatchCursor].allocated_to_work,
+            !DataBatch[AllocatedBatchCursor % MAX_INDEX_RANGE_BATCHS].allocated_to_work,
             "Can't allocate work, the current batch is already allocated"
         );
         uint16 selected_k = uint16(Math.max(
@@ -1879,7 +1879,7 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
         updateUserSpotFlow(_selectedAddress); // first update the User SpotFlow Management System
         // -----------------------------------------------------------------
 
-        uint128 _batch_counter = LastBatchCounter;
+        uint128 _batch_counter = LastBatchCounter % MAX_INDEX_RANGE_BATCHS;
 
         if (
             getUserPeriodSpotCount(_selectedAddress) < Parameters.get_SPOT_MAX_SPOT_PER_USER_PER_PERIOD() &&
@@ -1916,7 +1916,7 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
                 //----- Track Storage usage -----
 
                 // UPDATE STREAMING DATA BATCH STRUCTURE
-                BatchMetadata storage current_data_batch = DataBatch[_batch_counter % MAX_INDEX_RANGE_BATCHS];
+                BatchMetadata storage current_data_batch = DataBatch[_batch_counter];
                 if (current_data_batch.counter < Parameters.get_SPOT_DATA_BATCH_SIZE()) {
                     current_data_batch.counter += 1;
                 }
@@ -1925,7 +1925,7 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
                     current_data_batch.complete = true;
                     current_data_batch.checked = false;
                     LastBatchCounter += 1;
-                    DataBatch[_batch_counter % MAX_INDEX_RANGE_BATCHS].start_idx = DataNonce;
+                    DataBatch[_batch_counter].start_idx = DataNonce;
                     //----- Track Storage usage -----
                     BytesUsed += BYTES_8+BYTES_128; //bool + start_idx
                     //----- Track Storage usage -----
