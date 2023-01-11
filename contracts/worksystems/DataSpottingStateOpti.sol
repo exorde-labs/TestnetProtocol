@@ -925,7 +925,7 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
     function UnregisterWorker() public {
         WorkerState storage worker_state = WorkersState[msg.sender];
         require(worker_state.registered, "Worker is not registered so can't unregister");
-        require(worker_state.registration_date <= block.timestamp + MIN_REGISTRATION_DURATION, 
+        require(worker_state.registration_date <= block.timestamp - MIN_REGISTRATION_DURATION, 
         "Worker must wait some time to unregister");
 
         if (
