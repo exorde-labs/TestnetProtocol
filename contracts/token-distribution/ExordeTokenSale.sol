@@ -488,7 +488,7 @@ contract ExordeTokenSale is Context, ReentrancyGuard, Ownable, Pausable {
    }
 
     /**
-     * @notice Remaining number of tokens (>= 0) left in the current Tier of the Sale
+     * @notice Remaining number of dollars (>= 0) left in the current Tier of the Sale
      */
    function remainingTierDollars() public 
    view returns(uint256){
