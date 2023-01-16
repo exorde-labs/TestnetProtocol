@@ -72,6 +72,7 @@ contract ExordeTokenSale is Context, ReentrancyGuard, Ownable, Pausable {
 
     uint256 public startTime;
     uint256 public endTime;
+    uint256 private immutable OneWeekDuration = 60*60*24*7; //in seconds, 1 week = 60*60*24*7 = 604800
 
     // Amount of dollar raised
     uint256 public _dollarRaised;
@@ -85,6 +86,9 @@ contract ExordeTokenSale is Context, ReentrancyGuard, Ownable, Pausable {
 
     // Address where funds are collected
     address payable private _wallet;
+
+    // Address where funds are collected
+    address private whitelister_wallet;
 
     /*
     * @dev Constructor setting up the sale
@@ -111,6 +115,15 @@ contract ExordeTokenSale is Context, ReentrancyGuard, Ownable, Pausable {
     //  ----------- WHITELISTING - KYC/AML -----------
 
     /**
+    * @dev Updates the whitelister_wallet, only address allowed to add/remove from whitelist
+    * @param new_whitelister_wallet Address to become the new whitelister_wallet 
+    */
+    function adminUpdateWhitelisterAddress(address new_whitelister_wallet) public onlyOwner {
+        require(new_whitelister_wallet != address(0), "new whitelister address must be non zero");
+        whitelister_wallet = new_whitelister_wallet;
+    }
+
+    /**
     * @dev Reverts if beneficiary is not whitelisted. Can be used when extending this contract.
     */
     modifier isWhitelisted(address _beneficiary) {
@@ -122,7 +135,8 @@ contract ExordeTokenSale is Context, ReentrancyGuard, Ownable, Pausable {
     * @dev Adds single address to whitelist.
     * @param _beneficiary Address to be added to the whitelist
     */
-    function addToWhitelist(address _beneficiary) external onlyOwner {
+    function addToWhitelist(address _beneficiary) external {
+        require(msg.sender == whitelister_wallet, "sender is not allowed to modify whitelist");
         whitelist[_beneficiary] = true;
         emit AddressWhitelisted(_beneficiary);
     }
@@ -131,7 +145,8 @@ contract ExordeTokenSale is Context, ReentrancyGuard, Ownable, Pausable {
     * @dev Adds list of addresses to whitelist. Not overloaded due to limitations with truffle testing.
     * @param _beneficiaries Addresses to be added to the whitelist
     */
-    function addManyToWhitelist(address[] memory _beneficiaries) external onlyOwner {
+    function addManyToWhitelist(address[] memory _beneficiaries) external {
+        require(msg.sender == whitelister_wallet, "sender is not allowed to modify whitelist");
         for (uint256 i = 0; i < _beneficiaries.length; i++) {
             whitelist[_beneficiaries[i]] = true;
             emit AddressDeWhitelisted(_beneficiaries[i]);
@@ -142,7 +157,8 @@ contract ExordeTokenSale is Context, ReentrancyGuard, Ownable, Pausable {
     * @dev Removes single address from whitelist.
     * @param _beneficiary Address to be removed to the whitelist
     */
-    function removeFromWhitelist(address _beneficiary) external onlyOwner {
+    function removeFromWhitelist(address _beneficiary) external {
+        require(msg.sender == whitelister_wallet, "sender is not allowed to modify whitelist");
         whitelist[_beneficiary] = false;
         emit AddressDeWhitelisted(_beneficiary);
     }
@@ -155,6 +171,7 @@ contract ExordeTokenSale is Context, ReentrancyGuard, Ownable, Pausable {
     function adminWithdrawERC20(IERC20 token_, address beneficiary_, uint256 tokenAmount_) external
     onlyOwner
     isInactive
+    MinimumTimeLock
     {
         token_.safeTransfer(beneficiary_, tokenAmount_);
     }
@@ -172,13 +189,15 @@ contract ExordeTokenSale is Context, ReentrancyGuard, Ownable, Pausable {
 
     //  ----------------------------------------------
     /**
-    * @notice Allow to extend ICO end date
-    * @param _endTime Endtime of ICO
+    * @notice Allow to extend Sale end date
+    * @param _endTime Endtime of Sale
     */
     function setEndDate(uint256 _endTime)
-        external onlyOwner isInactive
+        external 
+        onlyOwner 
+        MinimumTimeLock
     {
-        require(endTime < _endTime, "new endTime must be later");
+        require(block.timestamp < _endTime, "new endTime must > now");
         endTime = _endTime;
     }
 
@@ -191,6 +210,13 @@ contract ExordeTokenSale is Context, ReentrancyGuard, Ownable, Pausable {
     }
 
     /**
+    * @dev Reverts if 1 week has not passed since the start of the Public Sale
+    */
+    modifier MinimumTimeLock() {        
+        require(block.timestamp > startTime + OneWeekDuration, "Owner must wait at least 1 week after Sale start to update");
+        _;
+    }
+    /**
     * @dev Returns if the Token Sale is active (started & not ended)
     * @return the boolean indicating if the sale is active (true : active)
     */
@@ -202,7 +228,7 @@ contract ExordeTokenSale is Context, ReentrancyGuard, Ownable, Pausable {
     * @dev Reverts if Sale is Inactive (paused or closed)
     */
     modifier isInactive() {
-        require( !isOpen() || paused(), "the sale is active" );
+        require( !isOpen(), "the sale is active" );
         _;
     }
     
