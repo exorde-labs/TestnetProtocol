@@ -1,4 +1,4 @@
 {
-  "minutes_diff_max":"1440",
-  "playwright_collect_amount":"300"
+  "minutes_diff_max":"120",
+  "playwright_collect_amount":"50"
 }
