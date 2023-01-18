@@ -395,7 +395,7 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
     // Initial storage variables: 64+16+16+15*256+256+256*12+4*256+128*9+256*10+16*2+6*8+16*4+256*1+256*2 bits
     // Approx. 404 bytes.
     uint256 public BytesUsed = 404;
-    uint256 public MaximumBytesTarget = 100*(10**6) ; //50 Mb
+    uint256 public MaximumBytesTarget = 400*(10**6) ; //400 Mb
 
     // ------ Vote related    
     uint16 constant APPROVAL_VOTE_MAPPING_  = 1;
@@ -585,12 +585,12 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
         bytes32 key = keccak256(abi.encodePacked(_UUID, _attrName));
         delete store[key];
         //----- Track Storage usage -----
-        uint256 BytesUsedReduction = BYTES_256;           
-        if( (BytesUsed - BytesUsedReduction) >= 0 ){
+        uint256 BytesUsedReduction = BYTES_256;         
+        if( BytesUsed >= BytesUsedReduction ){
             BytesUsed -= BytesUsedReduction;
         }else{
             BytesUsed = 0;
-        }  
+        }
         //----- Track Storage usage -----
     }
 
@@ -665,11 +665,11 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
 
             //----- Track Storage usage -----
             uint256 BytesUsedReduction = BYTES_256;           
-            if( (BytesUsed - BytesUsedReduction) >= 0 ){
+            if( BytesUsed >= BytesUsedReduction ){
                 BytesUsed -= BytesUsedReduction;
             }else{
                 BytesUsed = 0;
-            }  
+            }
             //----- Track Storage usage -----
         }
     }
@@ -697,11 +697,11 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
 
             //----- Track Storage usage -----
             uint256 BytesUsedReduction = BYTES_256;           
-            if( (BytesUsed - BytesUsedReduction) >= 0 ){
+            if( BytesUsed >= BytesUsedReduction ){
                 BytesUsed -= BytesUsedReduction;
             }else{
                 BytesUsed = 0;
-            }  
+            }
             //----- Track Storage usage -----
         }
     }
@@ -726,11 +726,11 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
 
             //----- Track Storage usage -----
             uint256 BytesUsedReduction = BYTES_256;           
-            if( (BytesUsed - BytesUsedReduction) >= 0 ){
+            if( BytesUsed >= BytesUsedReduction ){
                 BytesUsed -= BytesUsedReduction;
             }else{
                 BytesUsed = 0;
-            }  
+            }
             //----- Track Storage usage -----
         }
     }
@@ -962,12 +962,12 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
         
                 //----- Track Storage usage -----
                 // boolean reset
-                uint256 BytesUsedReduction = BYTES_8*3;           
-                if( (BytesUsed - BytesUsedReduction) >= 0 ){
+                uint256 BytesUsedReduction = BYTES_8*3;
+                if( BytesUsed >= BytesUsedReduction ){
                     BytesUsed -= BytesUsedReduction;
                 }else{
                     BytesUsed = 0;
-                }  
+                }
                 //----- Track Storage usage -----
             }
         }
@@ -1047,7 +1047,7 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
                 BatchDeletionCursor = BatchDeletionCursor + 1;
             }
         }
-        if( (BytesUsed - BytesUsedReduction) >= 0 ){
+        if( BytesUsed >= BytesUsedReduction ){
             BytesUsed -= BytesUsedReduction;
         }else{
             BytesUsed = 0;
@@ -1110,11 +1110,11 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
 
             emit _DataBatchDeleted(_deletion_index);
         }
-        if( (BytesUsed - BytesUsedReduction) >= 0 ){
+        if( BytesUsed >= BytesUsedReduction ){
             BytesUsed -= BytesUsedReduction;
         }else{
             BytesUsed = 0;
-        }    
+        }
     }
 
 
@@ -1127,11 +1127,11 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
             delete SpotsMapping[i]; // delete SpotsMapping at index l            
             //----- Track Storage usage -----
             uint256 BytesUsedReduction = BYTES_256*2;                
-            if( (BytesUsed - BytesUsedReduction) >= 0 ){
+            if( BytesUsed >= BytesUsedReduction ){
                 BytesUsed -= BytesUsedReduction;
             }else{
                 BytesUsed = 0;
-            }  
+            }
             //----- Track Storage usage -----
         }
     }
@@ -1154,11 +1154,11 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
 
             //----- Track Storage usage -----
             uint256 BytesUsedReduction = BYTES_256*5+BYTES_256*2;         
-            if( (BytesUsed - BytesUsedReduction) >= 0 ){
+            if( BytesUsed >= BytesUsedReduction ){
                 BytesUsed -= BytesUsedReduction;
             }else{
                 BytesUsed = 0;
-            }  
+            }
             //----- Track Storage usage -----
         }
     }
@@ -1171,11 +1171,11 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
         delete AllWorkersList[index_];  
         //----- Track Storage usage -----
         uint256 BytesUsedReduction = BYTES_256;   
-        if( (BytesUsed - BytesUsedReduction) >= 0 ){
+        if( BytesUsed >= BytesUsedReduction ){
             BytesUsed -= BytesUsedReduction;
         }else{
             BytesUsed = 0;
-        }  
+        }
     }
 
     /**
@@ -1194,11 +1194,11 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
         delete WorkersStatus[user_];  
         //----- Track Storage usage -----
         uint256 BytesUsedReduction = BYTES_256;
-        if( (BytesUsed - BytesUsedReduction) >= 0 ){
+        if( BytesUsed >= BytesUsedReduction ){
             BytesUsed -= BytesUsedReduction;
         }else{
             BytesUsed = 0;
-        }  
+        }
         //----- Track Storage usage -----
     }
 
@@ -1223,11 +1223,11 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
         delete SystemStakedTokenBalance[user_];        
         //----- Track Storage usage -----
         uint256 BytesUsedReduction = BYTES_256*(2+1+15*2+1);
-        if( (BytesUsed - BytesUsedReduction) >= 0 ){
+        if( BytesUsed >= BytesUsedReduction ){
             BytesUsed -= BytesUsedReduction;
         }else{
             BytesUsed = 0;
-        }  
+        }
         //----- Track Storage usage -----
     }
 
@@ -1247,11 +1247,11 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
     function deleteAvailableWorkersArray() public onlyOwner {  
         //----- Track Storage usage -----
         uint256 BytesUsedReduction = BYTES_256*availableWorkers.length;
-        if( (BytesUsed - BytesUsedReduction) >= 0 ){
+        if( BytesUsed >= BytesUsedReduction ){
             BytesUsed -= BytesUsedReduction;
         }else{
             BytesUsed = 0;
-        }  
+        }
         //----- Track Storage usage -----
         delete availableWorkers;  
     }
@@ -2121,11 +2121,11 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
             worker_state.allocated_work_batch = 0;
             //----- Track Storage usage -----
             uint256 BytesUsedReduction = BYTES_8; //boolean reset
-            if( (BytesUsed - BytesUsedReduction) >= 0 ){
+            if( BytesUsed >= BytesUsedReduction ){
                 BytesUsed -= BytesUsedReduction;
             }else{
                 BytesUsed = 0;
-            }  
+            }
             //----- Track Storage usage -----
             PopFromBusyWorkers(msg.sender);
             PushInAvailableWorkers(msg.sender);
@@ -2258,11 +2258,11 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
         
         //----- Track Storage usage -----
         uint256 BytesUsedReduction = BYTES_128;                
-        if( (BytesUsed - BytesUsedReduction) >= 0 ){
+        if( BytesUsed >= BytesUsedReduction ){
             BytesUsed -= BytesUsedReduction;
         }else{
             BytesUsed = 0;
-        }  
+        }
         //----- Track Storage usage -----
 
         _retrieveSFuel();
