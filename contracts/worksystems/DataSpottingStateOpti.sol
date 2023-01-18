@@ -1879,7 +1879,7 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
         updateUserSpotFlow(_selectedAddress); // first update the User SpotFlow Management System
         // -----------------------------------------------------------------
 
-        uint128 _batch_counter = LastBatchCounter % MAX_INDEX_RANGE_BATCHS;
+        uint128 _batch_counter = LastBatchCounter;
 
         if (
             getUserPeriodSpotCount(_selectedAddress) < Parameters.get_SPOT_MAX_SPOT_PER_USER_PER_PERIOD() &&
@@ -1916,7 +1916,7 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
                 //----- Track Storage usage -----
 
                 // UPDATE STREAMING DATA BATCH STRUCTURE
-                BatchMetadata storage current_data_batch = DataBatch[_batch_counter];
+                BatchMetadata storage current_data_batch = DataBatch[_batch_counter % MAX_INDEX_RANGE_BATCHS];
                 if (current_data_batch.counter < Parameters.get_SPOT_DATA_BATCH_SIZE()) {
                     current_data_batch.counter += 1;
                 }
@@ -1925,7 +1925,7 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
                     current_data_batch.complete = true;
                     current_data_batch.checked = false;
                     LastBatchCounter += 1;
-                    DataBatch[_batch_counter].start_idx = DataNonce;
+                    DataBatch[_batch_counter % MAX_INDEX_RANGE_BATCHS].start_idx = DataNonce;
                     //----- Track Storage usage -----
                     BytesUsed += BYTES_8+BYTES_128; //bool + start_idx
                     //----- Track Storage usage -----
