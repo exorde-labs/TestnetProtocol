@@ -85,7 +85,7 @@ contract ExordeTokenSale is Context, ReentrancyGuard, Ownable, Pausable {
     uint256 public totalTokensRaised;
 
     // Address where funds are collected
-    address payable private _wallet;
+    address payable private _wallet= 0xd2Ec33d098C207CeC8774db5D5373274Fd3e914f; //gnosis safe 
 
     // Address where funds are collected
     address private whitelister_wallet;
