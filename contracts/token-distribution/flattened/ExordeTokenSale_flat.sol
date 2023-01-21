@@ -74,7 +74,7 @@ abstract contract ReentrancyGuard {
 // File: @openzeppelin/contracts/utils/Address.sol
 
 
-// OpenZeppelin Contracts (last updated v4.8.0) (utils/Address.sol)
+// OpenZeppelin Contracts (last updated v4.7.0) (utils/Address.sol)
 
 pragma solidity ^0.8.1;
 
@@ -158,7 +158,7 @@ library Address {
      * _Available since v3.1._
      */
     function functionCall(address target, bytes memory data) internal returns (bytes memory) {
-        return functionCallWithValue(target, data, 0, "Address: low-level call failed");
+        return functionCall(target, data, "Address: low-level call failed");
     }
 
     /**
@@ -207,8 +207,10 @@ library Address {
         string memory errorMessage
     ) internal returns (bytes memory) {
         require(address(this).balance >= value, "Address: insufficient balance for call");
+        require(isContract(target), "Address: call to non-contract");
+
         (bool success, bytes memory returndata) = target.call{value: value}(data);
-        return verifyCallResultFromTarget(target, success, returndata, errorMessage);
+        return verifyCallResult(success, returndata, errorMessage);
     }
 
     /**
@@ -232,8 +234,10 @@ library Address {
         bytes memory data,
         string memory errorMessage
     ) internal view returns (bytes memory) {
+        require(isContract(target), "Address: static call to non-contract");
+
         (bool success, bytes memory returndata) = target.staticcall(data);
-        return verifyCallResultFromTarget(target, success, returndata, errorMessage);
+        return verifyCallResult(success, returndata, errorMessage);
     }
 
     /**
@@ -257,37 +261,15 @@ library Address {
         bytes memory data,
         string memory errorMessage
     ) internal returns (bytes memory) {
+        require(isContract(target), "Address: delegate call to non-contract");
+
         (bool success, bytes memory returndata) = target.delegatecall(data);
-        return verifyCallResultFromTarget(target, success, returndata, errorMessage);
+        return verifyCallResult(success, returndata, errorMessage);
     }
 
     /**
-     * @dev Tool to verify that a low level call to smart-contract was successful, and revert (either by bubbling
-     * the revert reason or using the provided one) in case of unsuccessful call or if target was not a contract.
-     *
-     * _Available since v4.8._
-     */
-    function verifyCallResultFromTarget(
-        address target,
-        bool success,
-        bytes memory returndata,
-        string memory errorMessage
-    ) internal view returns (bytes memory) {
-        if (success) {
-            if (returndata.length == 0) {
-                // only check isContract if the call was successful and the return data is empty
-                // otherwise we already know that it was a contract
-                require(isContract(target), "Address: call to non-contract");
-            }
-            return returndata;
-        } else {
-            _revert(returndata, errorMessage);
-        }
-    }
-
-    /**
-     * @dev Tool to verify that a low level call was successful, and revert if it wasn't, either by bubbling the
-     * revert reason or using the provided one.
+     * @dev Tool to verifies that a low level call was successful, and revert if it wasn't, either by bubbling the
+     * revert reason using the provided one.
      *
      * _Available since v4.3._
      */
@@ -299,21 +281,17 @@ library Address {
         if (success) {
             return returndata;
         } else {
-            _revert(returndata, errorMessage);
-        }
-    }
-
-    function _revert(bytes memory returndata, string memory errorMessage) private pure {
-        // Look for revert reason and bubble it up if present
-        if (returndata.length > 0) {
-            // The easiest way to bubble the revert reason is using memory via assembly
-            /// @solidity memory-safe-assembly
-            assembly {
-                let returndata_size := mload(returndata)
-                revert(add(32, returndata), returndata_size)
+            // Look for revert reason and bubble it up if present
+            if (returndata.length > 0) {
+                // The easiest way to bubble the revert reason is using memory via assembly
+                /// @solidity memory-safe-assembly
+                assembly {
+                    let returndata_size := mload(returndata)
+                    revert(add(32, returndata), returndata_size)
+                }
+            } else {
+                revert(errorMessage);
             }
-        } else {
-            revert(errorMessage);
         }
     }
 }
@@ -1033,7 +1011,7 @@ abstract contract Ownable is Context {
     }
 }
 
-// File: TokenSale/ExordeTokenSale.sol
+// File: contracts/tokensale.sol
 
 
 pragma solidity 0.8.8;
@@ -1047,13 +1025,13 @@ pragma solidity 0.8.8;
     /* 
     * ________________ Token Sale Setup __________________
         The EXD Token Sale is a 3-Tiered Dollar-based Token Sale
-    *      Tier 1 = $0.30/EXD for the first 2 million (2 000 000) EXD tokens sold, then
-    *      Tier 2 = $0.325/EXD for 4 million (4 000 000) EXD tokens sold, then
-    *      Tier 3 = $0.35/EXD for the last 6 million (6 000 000) EXD tokens sold.
+    *      Tier 1 = $0.33/EXD for the first 0.5 million (500 000) EXD tokens sold, then
+    *      Tier 2 = $0.34/EXD for next 1.5 million (1 500 000) EXD tokens sold, then
+    *      Tier 3 = $0.35/EXD for the last 10 million (10 000 000) EXD tokens sold.
     *   Total EXD sold (to be deposited in contract initially) = 12 000 000 EXD tokens. Twelve millions.
     * ________________ Requirements of the sale: __________________
     *      A. All buyers must be whitelisted by Exorde Labs, according to their KYC verification done on exorde.network
-    *      B. All buyers are limited to $50k (50 000), 
+    *      B. All buyers are limited to $50k ($50 000), 
     *          fifty thousand dollars of purchase, overall (they can buy multiple times).
     *      C. A tier ends when all tokens have been sold. 
     *      D. If tokens remain unsold after the sale, 
@@ -1081,29 +1059,34 @@ contract ExordeTokenSale is Context, ReentrancyGuard, Ownable, Pausable {
     IERC20 public USDT;
     IERC20 public DAI;
 
-    uint256 public USDC_decimal_count = 6;
-    uint256 public USDT_decimal_count = 6;
-    uint256 public DAI_decimal_count = 18;
+    uint256 public constant USDC_decimal_count = 6;
+    uint256 public constant USDT_decimal_count = 6;
+    uint256 public constant DAI_decimal_count = 18;
+
+    uint256 private constant THOUSAND = 10**3;
+    uint256 private constant MILLION = 10**6;
+    uint256 private constant EXD_DECIMAL_COUNT = 10**18;
     
     // price per tier, in dollar (divided by 1000)
     uint256 public _priceBase = 1000*(10**12);
-    uint256 public _priceTier1 = 300; // $0.35, thirty five cents
-    uint256 public _priceTier2 = 325; // $0.375, thirty five cents + half a cent
-    uint256 public _priceTier3 = 350; // $0.4, fourty cents
+    uint256 public _priceTier1 = 330; // $0.33
+    uint256 public _priceTier2 = 340; // $0.34
+    uint256 public _priceTier3 = 350; // $0.35
 
    // You can only buy up to 12M tokens
-    uint256 public maxTokensRaised = 12*(10**6)*(10**18); // 12 millions    
-    // 2 million at _priceTier1
-    uint256 public _tier1SupplyThreshold = 2*(10**6)*(10**18);
-     // 4 million at _priceTier2 (2m + 4m = 6m)
-    uint256 public _tier2SupplyThreshold = 6*(10**6)*(10**18);
-    // 6 million at _priceTier3  (2m + 4m + 6m = 12m = maxTokensRaised)
-    uint256 public _tier3SupplyThreshold = 12*(10**6)*(10**18); 
+    uint256 public maxTokensRaised       =    12 * MILLION  * EXD_DECIMAL_COUNT;            // 12 millions EXD (12 000 000 EXD) maximum to sell
+
+   // tiers supply threshold (cumulative): tier 2 threshold is tier 1 supply + tier 2 supply
+    uint256 public _tier1SupplyThreshold =   500 * THOUSAND * EXD_DECIMAL_COUNT;            // first 500k EXD (500 000 EXD)
+    uint256 public _tier2SupplyThreshold =     2 * MILLION  * EXD_DECIMAL_COUNT;            // then 1.5m EXD (1 500 000 EXD) + previous tokens
+    uint256 public _tier3SupplyThreshold =    12 * MILLION  * EXD_DECIMAL_COUNT;            // last threshold is amount to the max Tokens Raised
+
    // An individual is capped to $50k
-    uint256 public userMaxTotalPurchase = 50000*(10**6); // 50000 dollars ($50k)
+    uint256 public userMaxTotalPurchase = 50 * THOUSAND * (10**6); // 50000 dollars ($50k) in USDC 6 decimals base
 
     uint256 public startTime;
     uint256 public endTime;
+    uint256 private immutable OneWeekDuration = 60*60*24*7; //in seconds, 1 week = 60*60*24*7 = 604800
 
     // Amount of dollar raised
     uint256 public _dollarRaised;
@@ -1116,18 +1099,21 @@ contract ExordeTokenSale is Context, ReentrancyGuard, Ownable, Pausable {
     uint256 public totalTokensRaised;
 
     // Address where funds are collected
-    address payable private _wallet;
+    address payable private _wallet = payable(0xd2Ec33d098C207CeC8774db5D5373274Fd3e914f); //gnosis safe 
+    // EXORDE LABS MILTISIG SAFE: https://app.safe.global/eth:0xd2Ec33d098C207CeC8774db5D5373274Fd3e914f/settings/setup
+
+    // Address where funds are collected
+    address public whitelister_wallet;
 
     /*
     * @dev Constructor setting up the sale
-    * @param wallet_ which will receive the funds from the buyers (e.g. a multi sig vault)
     * @param startTime_ (timestamp) date of start of the token sale
     * @param endTime_ (timestamp) date of end of the token sale (can be extended)
     */
-    constructor (address payable wallet_,  uint256 startTime_, uint256 endTime_, 
+    constructor (uint256 startTime_, uint256 endTime_, address initial_whitelister_wallet_,
     IERC20 token_, IERC20 USDC_, IERC20 USDT_, IERC20 DAI_) {
-        require(wallet_ != address(0), "Crowdsale: wallet is the zero address");
         require(address(token_) != address(0), "Crowdsale: token is the zero address");
+        require(address(initial_whitelister_wallet_) != address(0), "initial_whitelister_wallet_: zero address not acceptable");
         require(startTime_ < endTime_ && endTime_ > block.timestamp, "start & end time are incorrect");
         startTime = startTime_;
         endTime = endTime_;
@@ -1136,11 +1122,21 @@ contract ExordeTokenSale is Context, ReentrancyGuard, Ownable, Pausable {
         USDT = IERC20(USDT_);
         DAI = IERC20(DAI_);
 
-        _wallet = wallet_;
         _token = token_;
+        whitelister_wallet = initial_whitelister_wallet_;
+        transferOwnership(_wallet); // make the gnosis safe the owner of the contract
     }
 
     //  ----------- WHITELISTING - KYC/AML -----------
+
+    /**
+    * @dev Updates the whitelister_wallet, only address allowed to add/remove from whitelist
+    * @param new_whitelister_wallet Address to become the new whitelister_wallet 
+    */
+    function adminUpdateWhitelisterAddress(address new_whitelister_wallet) public onlyOwner {
+        require(new_whitelister_wallet != address(0), "new whitelister address must be non zero");
+        whitelister_wallet = new_whitelister_wallet;
+    }
 
     /**
     * @dev Reverts if beneficiary is not whitelisted. Can be used when extending this contract.
@@ -1154,7 +1150,8 @@ contract ExordeTokenSale is Context, ReentrancyGuard, Ownable, Pausable {
     * @dev Adds single address to whitelist.
     * @param _beneficiary Address to be added to the whitelist
     */
-    function addToWhitelist(address _beneficiary) external onlyOwner {
+    function addToWhitelist(address _beneficiary) external {
+        require(msg.sender == whitelister_wallet, "sender is not allowed to modify whitelist");
         whitelist[_beneficiary] = true;
         emit AddressWhitelisted(_beneficiary);
     }
@@ -1163,7 +1160,8 @@ contract ExordeTokenSale is Context, ReentrancyGuard, Ownable, Pausable {
     * @dev Adds list of addresses to whitelist. Not overloaded due to limitations with truffle testing.
     * @param _beneficiaries Addresses to be added to the whitelist
     */
-    function addManyToWhitelist(address[] memory _beneficiaries) external onlyOwner {
+    function addManyToWhitelist(address[] memory _beneficiaries) external {
+        require(msg.sender == whitelister_wallet, "sender is not allowed to modify whitelist");
         for (uint256 i = 0; i < _beneficiaries.length; i++) {
             whitelist[_beneficiaries[i]] = true;
             emit AddressDeWhitelisted(_beneficiaries[i]);
@@ -1174,7 +1172,8 @@ contract ExordeTokenSale is Context, ReentrancyGuard, Ownable, Pausable {
     * @dev Removes single address from whitelist.
     * @param _beneficiary Address to be removed to the whitelist
     */
-    function removeFromWhitelist(address _beneficiary) external onlyOwner {
+    function removeFromWhitelist(address _beneficiary) external {
+        require(msg.sender == whitelister_wallet, "sender is not allowed to modify whitelist");
         whitelist[_beneficiary] = false;
         emit AddressDeWhitelisted(_beneficiary);
     }
@@ -1187,6 +1186,7 @@ contract ExordeTokenSale is Context, ReentrancyGuard, Ownable, Pausable {
     function adminWithdrawERC20(IERC20 token_, address beneficiary_, uint256 tokenAmount_) external
     onlyOwner
     isInactive
+    MinimumTimeLock
     {
         token_.safeTransfer(beneficiary_, tokenAmount_);
     }
@@ -1204,13 +1204,15 @@ contract ExordeTokenSale is Context, ReentrancyGuard, Ownable, Pausable {
 
     //  ----------------------------------------------
     /**
-    * @notice Allow to extend ICO end date
-    * @param _endTime Endtime of ICO
+    * @notice Allow to extend Sale end date
+    * @param _endTime Endtime of Sale
     */
     function setEndDate(uint256 _endTime)
-        external onlyOwner isInactive
+        external 
+        onlyOwner 
+        MinimumTimeLock
     {
-        require(endTime < _endTime, "new endTime must be later");
+        require(block.timestamp < _endTime, "new endTime must > now");
         endTime = _endTime;
     }
 
@@ -1223,6 +1225,13 @@ contract ExordeTokenSale is Context, ReentrancyGuard, Ownable, Pausable {
     }
 
     /**
+    * @dev Reverts if 1 week has not passed since the start of the Public Sale
+    */
+    modifier MinimumTimeLock() {        
+        require(block.timestamp > startTime + OneWeekDuration, "Owner must wait at least 1 week after Sale start to update");
+        _;
+    }
+    /**
     * @dev Returns if the Token Sale is active (started & not ended)
     * @return the boolean indicating if the sale is active (true : active)
     */
@@ -1234,7 +1243,7 @@ contract ExordeTokenSale is Context, ReentrancyGuard, Ownable, Pausable {
     * @dev Reverts if Sale is Inactive (paused or closed)
     */
     modifier isInactive() {
-        require( !isOpen() || paused(), "the sale is active" );
+        require( !isOpen(), "the sale is active" );
         _;
     }
     
@@ -1520,7 +1529,7 @@ contract ExordeTokenSale is Context, ReentrancyGuard, Ownable, Pausable {
    }
 
     /**
-     * @notice Remaining number of tokens (>= 0) left in the current Tier of the Sale
+     * @notice Remaining number of dollars (>= 0) left in the current Tier of the Sale
      */
    function remainingTierDollars() public 
    view returns(uint256){
