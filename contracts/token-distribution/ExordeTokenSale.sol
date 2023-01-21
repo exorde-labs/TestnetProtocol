@@ -92,13 +92,11 @@ contract ExordeTokenSale is Context, ReentrancyGuard, Ownable, Pausable {
 
     /*
     * @dev Constructor setting up the sale
-    * @param wallet_ which will receive the funds from the buyers (e.g. a multi sig vault)
     * @param startTime_ (timestamp) date of start of the token sale
     * @param endTime_ (timestamp) date of end of the token sale (can be extended)
     */
-    constructor (address payable wallet_,  uint256 startTime_, uint256 endTime_, 
+    constructor (uint256 startTime_, uint256 endTime_, 
     IERC20 token_, IERC20 USDC_, IERC20 USDT_, IERC20 DAI_) {
-        require(wallet_ != address(0), "Crowdsale: wallet is the zero address");
         require(address(token_) != address(0), "Crowdsale: token is the zero address");
         require(startTime_ < endTime_ && endTime_ > block.timestamp, "start & end time are incorrect");
         startTime = startTime_;
@@ -108,7 +106,6 @@ contract ExordeTokenSale is Context, ReentrancyGuard, Ownable, Pausable {
         USDT = IERC20(USDT_);
         DAI = IERC20(DAI_);
 
-        _wallet = wallet_;
         _token = token_;
     }
 
