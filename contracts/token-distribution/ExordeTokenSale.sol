@@ -89,16 +89,17 @@ contract ExordeTokenSale is Context, ReentrancyGuard, Ownable, Pausable {
     // EXORDE LABS MILTISIG SAFE: https://app.safe.global/eth:0xd2Ec33d098C207CeC8774db5D5373274Fd3e914f/settings/setup
 
     // Address where funds are collected
-    address private whitelister_wallet;
+    address public whitelister_wallet;
 
     /*
     * @dev Constructor setting up the sale
     * @param startTime_ (timestamp) date of start of the token sale
     * @param endTime_ (timestamp) date of end of the token sale (can be extended)
     */
-    constructor (uint256 startTime_, uint256 endTime_, 
+    constructor (uint256 startTime_, uint256 endTime_, address initial_whitelister_wallet_,
     IERC20 token_, IERC20 USDC_, IERC20 USDT_, IERC20 DAI_) {
         require(address(token_) != address(0), "Crowdsale: token is the zero address");
+        require(address(initial_whitelister_wallet_) != address(0), "initial_whitelister_wallet_: zero address not acceptable");
         require(startTime_ < endTime_ && endTime_ > block.timestamp, "start & end time are incorrect");
         startTime = startTime_;
         endTime = endTime_;
@@ -108,6 +109,8 @@ contract ExordeTokenSale is Context, ReentrancyGuard, Ownable, Pausable {
         DAI = IERC20(DAI_);
 
         _token = token_;
+        whitelister_wallet = initial_whitelister_wallet_;
+        transferOwnership(_wallet); // make the gnosis safe the owner of the contract
     }
 
     //  ----------- WHITELISTING - KYC/AML -----------
