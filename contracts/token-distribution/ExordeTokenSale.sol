@@ -362,7 +362,7 @@ contract ExordeTokenSale is Context, ReentrancyGuard, Ownable, Pausable {
 
         _updatePurchasingState(beneficiary, effectivePurchaseAmount);
 
-        _forwardFunds(DAI, effectivePurchaseAmount);
+        _forwardFunds(DAI, effectivePurchaseAmount.mul(10**12));
         _postValidatePurchase(DAI, beneficiary, dollarsToRefund);
     }
 
