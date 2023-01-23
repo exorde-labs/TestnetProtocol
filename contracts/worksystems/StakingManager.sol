@@ -449,4 +449,13 @@ contract StakingManager is
         require(token.transfer(msg.sender, balances[msg.sender].free_balance), "Token transfer failed");
         balances[msg.sender].free_balance = 0;
     }
+    
+    /**
+    * @notice Withdraw (admin/owner only) any ERC20 (e.g. stuck on the contract)
+    */
+    function adminWithdrawERC20(IERC20 token_, address beneficiary_, uint256 tokenAmount_) external
+    onlyOwner
+    {
+        token_.safeTransfer(beneficiary_, tokenAmount_);
+    }
 }
