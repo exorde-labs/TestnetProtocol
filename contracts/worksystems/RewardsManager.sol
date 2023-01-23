@@ -297,4 +297,13 @@ contract RewardsManager is Ownable {
         rewards[msg.sender] = 0;
         require(token.transfer(msg.sender, sum));
     }
+    
+    /**
+    * @notice Withdraw (admin/owner only) any ERC20 (e.g. stuck on the contract)
+    */
+    function adminWithdrawERC20(IERC20 token_, address beneficiary_, uint256 tokenAmount_) external
+    onlyOwner
+    {
+        token_.safeTransfer(beneficiary_, tokenAmount_);
+    }
 }
