@@ -24,7 +24,7 @@ It will last at most 1 month, by default, but this can be extended by Exorde Lab
 * If tokens remain unsold after the sale, Exorde Labs can withdraw the remaining tokens & allocate it for future Sale (or to the protocol, etc).
 * Buyers get the EXD token instantly when buying. 
 * The contract handle buying overlaps between tiers automatically, and also refunds if a user sends more than what remains in the sale.
-* The owner can pause the contract in case of emergency
+* Exorde Labs can pause the contract in case of emergency
 
 **Details**:
 
