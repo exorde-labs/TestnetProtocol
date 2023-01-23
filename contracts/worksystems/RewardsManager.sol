@@ -6,23 +6,6 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
-interface IAddressManager {
-    function isSenderMasterOf(address _address) external returns (bool);
-
-    function isSenderSubOf(address _master) external returns (bool);
-
-    function isSubAddress(address _master, address _address) external returns (bool);
-
-    function addAddress(address _address) external;
-
-    function removeAddress(address _address) external;
-}
-
-interface IParametersManager {
-    // -------------- GETTERS : ADDRESSES --------------------
-    function getAddressManager() external view returns (address);
-}
-
 
 contract RewardsManager is Ownable {
     using SafeERC20 for IERC20;
@@ -34,7 +17,6 @@ contract RewardsManager is Ownable {
     mapping(address => uint256) public rewards;
     uint256 public ManagerBalance = 0;
     uint256 TotalRewards = 0;
-    IParametersManager public Parameters;
 
     struct TimeframeCounter {
         uint256 timestamp;
@@ -57,15 +39,6 @@ contract RewardsManager is Ownable {
         address EXD_token
     ) {
         token = IERC20(EXD_token);
-    }
-
-    /**
-     * @notice Updates the Parameters Manager Address
-     * @param addr The address of the new contract
-     */
-    function updateParametersManager(address addr) public onlyOwner {
-        require(addr != address(0));
-        Parameters = IParametersManager(addr);
     }
 
     // ------------------------------------------------------------------------------------------
