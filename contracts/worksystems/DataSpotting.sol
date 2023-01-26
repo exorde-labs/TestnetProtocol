@@ -301,6 +301,7 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
     struct SpottedData {
         uint64 timestamp; // expiration date of commit period for SpottedData
         uint64 item_count;
+        // uint16 lang;    // language of the spotted data (all sub items must be of the same language)
         DataStatus status; // state of the vote
         string extra; // extra_data
         address author; // author of the proposal
@@ -349,7 +350,7 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
     mapping(uint128 => BatchMetadata) public DataBatch; // refers to SpottedData indices
 
     // ------ Worker & Stake related structure
-    mapping(address => DLL.SpottedData) dllMap;
+    mapping(address => DLL.SpottedData) private dllMap;
     mapping(address => WorkerState) public WorkersState;
     mapping(address => TimeframeCounter[NB_TIMEFRAMES]) public WorkersSpotFlowManager;
     mapping(address => uint256) public SystemStakedTokenBalance; // maps user's address to voteToken balance
@@ -362,6 +363,7 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
 
     uint16 constant MIN_REGISTRATION_DURATION = 120; // in seconds
 
+    uint32 private REMOVED_WORKER_INDEX_VALUE = 2**32-1;
 
     address[] public availableWorkers;
     address[] public busyWorkers;
@@ -640,8 +642,6 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
         return WorkersStatus[_worker].isToUnregisterWorker;
     }
 
-    uint32 REMOVED_WORKER_INDEX_VALUE = 2**32-1;
-
     /**
   * @notice Pop _worker from the Available workers
   */
@@ -736,6 +736,7 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
     }
 
     function PushInAvailableWorkers(address _worker) internal {
+        require(_worker != address(0),"Error: Can't push the null address in available workers");
         if (!isInAvailableWorkers(_worker)) {
             availableWorkers.push(_worker);
 
@@ -751,6 +752,7 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
     }
 
     function PushInBusyWorkers(address _worker) internal {
+        require(_worker != address(0),"Error: Can't push the null address in busy workers");
         if (!isInBusyWorkers(_worker)) {
             busyWorkers.push(_worker);
 
@@ -1120,6 +1122,7 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
 
     /**
      * @dev Destroy Spot Data, important to release storage space if critical
+     *      To be used only if deleteOldData() failed to properly clean state
      */
     function deleteSpotData(uint128 spotIndexA, uint128 spotIndexB) public onlyOwner {
         require(spotIndexA < spotIndexB, "spotIndexA must be <= spotIndexB");
@@ -1898,6 +1901,7 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
                     extra: extra_,
                     status: DataStatus.TBD
                 });
+
                 //----- Track Storage usage -----
                 BytesUsed += BYTES_256*5; //SpottedData
                 //----- Track Storage usage -----
@@ -1912,13 +1916,12 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
                     current_data_batch.complete = true;
                     current_data_batch.checked = false;
                     LastBatchCounter += 1;
-                    DataBatch[_batch_counter].start_idx = DataNonce;
+                    // we indicate that the first spot of the new batch, is the one we just built
+                    DataBatch[_batch_counter].start_idx = DataNonce; 
                     //----- Track Storage usage -----
                     BytesUsed += BYTES_8+BYTES_128; //bool + start_idx
                     //----- Track Storage usage -----
                 }
-
-
 
                 // Global state update - spot flow management: increase global sliding counter & user counter
                 DataNonce = DataNonce + 1;
@@ -2200,7 +2203,8 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
   */
     function withdrawVotingRights(uint256 _numTokens) public {
         require(IParametersManager(address(0)) != Parameters, "Parameters Manager must be set.");        
-        address _selectedAddress = SelectAddressForUser(msg.sender, _numTokens);
+        address _selectedAddress = SelectAddressForUser(msg.sender, _numTokens);        
+        require(_selectedAddress != address(0),"Error: _selectedAddress is null during withdrawVotingRights");
         uint256 availableTokens = SystemStakedTokenBalance[_selectedAddress] - getLockedTokens(_selectedAddress);
         require(availableTokens >= _numTokens, "availableTokens should be >= _numTokens");
 

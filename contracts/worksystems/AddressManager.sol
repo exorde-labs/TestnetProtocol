@@ -118,33 +118,21 @@ contract AddressManager is Ownable {
     }
 
     /**
+     * @notice Returns the master claimed by worker _worker
+     * @param _worker address
+     * @return address of worker's master address
+     */
+    function getMaster(address _worker) public view returns (address) {
+        return SubToMasterMap[_worker];
+    }
+
+    /**
      * @notice Get all sub workers for a given Master address
      * @param _master address
      * @return array of addresses
      */
     function getMasterSubs(address _master) public view returns (address[] memory) {
         return MasterToSubsMap[_master];
-    }
-
-    //// --------------------------- GETTERS FOR WORKERS
-
-    /**
-     * @notice Check if a worker is a sub address of the msg.sender
-     * @param _worker worker address
-     * @return bool true if _worker is a wub worker of msg.sender (master)
-     */
-    function isSubWorkerOfMe(address _worker) public view returns (bool) {
-        return MasterClaimingWorker[msg.sender][_worker];
-    }
-
-    /**
-     * @notice Returns the master claimed by worker _worker
-     * @param _master address
-     * @param _address address
-     * @return bool true if _address is claimed by _master
-     */
-    function isSubWorkerOf(address _master, address _address) public view returns (bool) {
-        return MasterClaimingWorker[_master][_address];
     }
 
     /**
@@ -174,14 +162,6 @@ contract AddressManager is Ownable {
         return found;
     }
 
-    /**
-     * @notice Returns the master claimed by worker _worker
-     * @param _worker address
-     * @return address of worker's master address
-     */
-    function getMaster(address _worker) public view returns (address) {
-        return SubToMasterMap[_worker];
-    }
 
     /**
      * @notice Pops _worker from Master's MasterToSubsMap array
@@ -222,7 +202,7 @@ contract AddressManager is Ownable {
      * @return bool true if both addresses are mapped to each other
      */
     function AreMasterWorkerLinked(address _master, address _address) public view returns (bool) {
-        return (isSubWorkerOf(_master, _address) && (getMaster(_address) == _master) );
+        return (isMasterOf(_master, _address) && (getMaster(_address) == _master) );
     }
 
     //// -----------------------------------------------------------

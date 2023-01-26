@@ -57,10 +57,24 @@ contract StakingManager is
     address slashedStakeSinkAddress;
     // addresses of schemes/contracts allowed to interact with stakes
 
+
+    event AddedStakeholder(address indexed account);
+    event RemovedStakeholder(address indexed account);
+    event Deposited(address indexed account, uint256 amount);
+    event Withdrawn(address indexed account, uint256 amount);
+    event Staked(address indexed account, uint256 amount);
+    event AllocatedStake(address indexed account, uint256 amount);
+    event DeallocatedStake(address indexed account, uint256 amount);
+    event AdminDeallocatedStake(address indexed account, uint256 amount);    
+    event AdminWithdrawERC20(address indexed token_, address beneficiary_, uint256 amount);
+    event Unstaked(address indexed account, uint256 amount);
+    event SlashedOnSystemStake(address indexed account, address system, uint256 amount);
+    event SlashedOnStakedBalance(address indexed account, uint256 amount);
     event StakeWhitelisted(address indexed account, bool isWhitelisted);
     event StakeUnWhitelisted(address indexed account, bool isWhitelisted);
     event StakeSlashingWhitelisted(address indexed account, bool isWhitelisted);
     event StakeSlashingUnWhitelisted(address indexed account, bool isWhitelisted);
+    event SlashSinkUpdated(address indexed previous_account, address new_account);
 
     uint256 constant removed_index_value = 999999999;
 
@@ -96,7 +110,8 @@ contract StakingManager is
         uint256 PrevIndex = StakeWhitelistedAddressIndex[_address];
         StakeWhitelistedAddressIndex[_address] = removed_index_value;
 
-        StakeWhitelistedAddress[PrevIndex] = StakeWhitelistedAddress[StakeWhitelistedAddress.length - 1]; // move last element
+        StakeWhitelistedAddress[PrevIndex] = 
+            StakeWhitelistedAddress[StakeWhitelistedAddress.length - 1]; // move last element
         StakeWhitelistedAddressIndex[StakeWhitelistedAddress[PrevIndex]] = PrevIndex;
         StakeWhitelistedAddress.pop();
         emit StakeUnWhitelisted(_address, false);
@@ -134,7 +149,8 @@ contract StakingManager is
         uint256 PrevIndex = StakeSlashingWhitelistedAddressIndex[_address];
         StakeSlashingWhitelistedAddressIndex[_address] = removed_index_value;
 
-        StakeSlashingWhitelistedAddress[PrevIndex] = StakeSlashingWhitelistedAddress[StakeSlashingWhitelistedAddress.length - 1]; // move last element
+        StakeSlashingWhitelistedAddress[PrevIndex] = 
+            StakeSlashingWhitelistedAddress[StakeSlashingWhitelistedAddress.length - 1]; // move last element
         StakeSlashingWhitelistedAddressIndex[StakeSlashingWhitelistedAddress[PrevIndex]] = PrevIndex;
         StakeSlashingWhitelistedAddress.pop();
         emit StakeSlashingUnWhitelisted(_address, false);
@@ -142,8 +158,10 @@ contract StakingManager is
     
     // -------
     // update the slashed stake sink address (receving slashed stakes)
-    function updateSlashedSinkAddress(address _address) public onlyOwner {
-        slashedStakeSinkAddress = _address;
+    function updateSlashedSinkAddress(address _new_sink_address) public onlyOwner {
+        address previous_address = slashedStakeSinkAddress;
+        slashedStakeSinkAddress = _new_sink_address;
+        emit SlashSinkUpdated(previous_address, _new_sink_address);
     }
 
 
@@ -155,17 +173,21 @@ contract StakingManager is
      */
     function Stake(uint256 _stake) public {
         require(balances[msg.sender].free_balance >= _stake, "deposited stake is too low");
-        if (balances[msg.sender].staked_balance == 0) addStakeholder(msg.sender);
+        if (balances[msg.sender].staked_balance == 0){
+            addStakeholder(msg.sender);
+        }
 
         balances[msg.sender].free_balance -= _stake;
         balances[msg.sender].staked_balance += _stake;
 
         // Global state update
         TotalAvailableStake += _stake;
+        emit Staked(msg.sender, _stake);
     }
 
     /**
-     * @notice A method for a stakeholder to close all available stakes
+     * @notice A method for a stakeholder to unstake _stake from its staked_balance
+     * @param _stake The size of the stake to be unstaked and placed in free_balance.
      */
     function Unstake(uint256 _stake) public {
         require(balances[msg.sender].staked_balance >= _stake, "deposited stake is too low");
@@ -178,10 +200,11 @@ contract StakingManager is
         if (balances[msg.sender].staked_balance == 0){
             removeStakeholder(msg.sender);
         }
+        emit Unstaked(msg.sender, _stake);
     }
 
     /**
-     * @notice A method for a stakeholder to close all available stakes
+     * @notice A method for a stakeholder to close its (not locked) staked_balance 
      */
     function closeAllStakes() public {
         uint256 staked_amount = balances[msg.sender].staked_balance;
@@ -191,6 +214,7 @@ contract StakingManager is
         // Global state update
         TotalAvailableStake -= staked_amount;
         removeStakeholder(msg.sender);
+        emit Unstaked(msg.sender, staked_amount);
     }
 
     // ---------- EXTERNAL STAKE ALLOCATIONS ----------
@@ -213,7 +237,8 @@ contract StakingManager is
         UserStakeAllocations[_stakeholder][msg.sender] += _StakeAllocation;
         TotalAllocationsPerSystem[msg.sender]  += _StakeAllocation;
 
-        return (true);
+        emit AllocatedStake(_stakeholder, _StakeAllocation);
+        return true;
     }
 
     /**
@@ -222,22 +247,24 @@ contract StakingManager is
      * else the procedure will fail
      */
     function ProxyStakeDeallocate(uint256 _StakeToDeallocate, address _stakeholder) public returns (bool) {
+        // msg.sender is the sub-system calling this proxy function
         require(isStakeWhitelisted(msg.sender), "isStakeWhitelisted must be true for Sender");
         require(isStakeholder(_stakeholder), "isStakeholder must be true for Sender");
         require(
             UserStakeAllocations[_stakeholder][msg.sender] >= _StakeToDeallocate,
             "_stakeholder has to have enough allocated balance in this sub-system"
         );
+        require(
+            TotalAllocationsPerSystem[msg.sender] >= _StakeToDeallocate,
+            "TotalAllocations in this sub-system is lower than _StakeToDeallocate"
+        );
 
         balances[_stakeholder].staked_balance += _StakeToDeallocate;
+        UserStakeAllocations[_stakeholder][msg.sender]  -= _StakeToDeallocate;            
+        TotalAllocationsPerSystem[msg.sender]  -= _StakeToDeallocate;
 
-        if ( UserStakeAllocations[_stakeholder][msg.sender] >= _StakeToDeallocate ){
-            UserStakeAllocations[_stakeholder][msg.sender]  -= _StakeToDeallocate;            
-        }
-        if ( TotalAllocationsPerSystem[msg.sender] >= _StakeToDeallocate ){
-            TotalAllocationsPerSystem[msg.sender]  -= _StakeToDeallocate;            
-        }
-        return (true);
+        emit DeallocatedStake(_stakeholder, _StakeToDeallocate);
+        return true;
     }
 
     /**
@@ -245,24 +272,26 @@ contract StakingManager is
      * _StakeToDeallocate has to be equal to the amount of at least one ALLOCATED allocation
      * else the procedure will fail
      */
-    function ProxyStakeSlash(uint256 _StakeToSlash, address _stakeholder, address _system_address) public returns (bool) {
+    function ProxyStakeSlash(uint256 _StakeToSlash, address _stakeholder, address _system_address) 
+    public returns (bool) {
         require(_StakeToSlash > 0, " Stake to slash must be > 0");
         require(isStakeSlashingWhitelisted(msg.sender), "isStakeSlashingWhitelisted must be true for Sender");
         require(isStakeholder(_stakeholder), "isStakeholder must be true for Sender");
+        bool has_slashed = false;
         // if a system was selected, slash allocation itself & send tokens to slashed pool
         if ( _system_address != address(0) && isStakeWhitelisted(_system_address) ){
-            uint256 _allocatedUserSystemStake = UserStakeAllocations[_stakeholder][_system_address];   
             require(
-                _allocatedUserSystemStake >= _StakeToSlash,
+                UserStakeAllocations[_stakeholder][_system_address] >= _StakeToSlash,
                 "_stakeholder has to have enough allocated balance to slash in system"
             );
-            if ( UserStakeAllocations[_stakeholder][_system_address] >= _StakeToSlash ){
-                UserStakeAllocations[_stakeholder][_system_address]  -= _StakeToSlash;            
-            }
-            if ( TotalAllocationsPerSystem[_system_address] >= _StakeToSlash ){
-                TotalAllocationsPerSystem[_system_address]  -= _StakeToSlash;            
-            }
-
+            require(
+                TotalAllocationsPerSystem[_stakeholder] >= _StakeToSlash,
+                "TotalAllocations in this sub-system is lower than _StakeToSlash"
+            );
+            UserStakeAllocations[_stakeholder][_system_address]  -= _StakeToSlash;
+            TotalAllocationsPerSystem[_system_address]  -= _StakeToSlash;
+            has_slashed = true;
+            emit SlashedOnSystemStake(_stakeholder, _system_address, _StakeToSlash);
         }
         else{
             // else slash on staked_balance            
@@ -270,13 +299,15 @@ contract StakingManager is
             balances[msg.sender].staked_balance -= _StakeToSlash;
             // Global state update
             TotalAvailableStake -= _StakeToSlash;
+            has_slashed = true;
             if (balances[msg.sender].staked_balance == 0){
                 removeStakeholder(msg.sender);
             }
+            emit SlashedOnStakedBalance(_stakeholder, _StakeToSlash);
         }
         // send slashed tokens to slashed sink
-        require(token.transfer(slashedStakeSinkAddress, _StakeToSlash), "_StakeToSlash Token transfer failed");
-        return (true);
+        token.safeTransfer(slashedStakeSinkAddress, _StakeToSlash);
+        return has_slashed;
     }
 
     // ---------- SUB-STAKE MANAGEMENT ----------
@@ -294,6 +325,7 @@ contract StakingManager is
             TotalAllocationsPerSystem[msg.sender]  -= _StakeToDeallocate;            
         }
         balances[_stakeholder].staked_balance += _StakeToDeallocate;
+        emit AdminDeallocatedStake(_stakeholder, _StakeToDeallocate);
     }
 
     /**
@@ -405,6 +437,7 @@ contract StakingManager is
      */
     function addStakeholder(address _stakeholder) private {
         isStakeholderMap[_stakeholder] = true;
+        emit AddedStakeholder(_stakeholder);
     }
 
     /**
@@ -413,6 +446,7 @@ contract StakingManager is
      */
     function removeStakeholder(address _stakeholder) private {
         isStakeholderMap[_stakeholder] = false;
+        emit RemovedStakeholder(_stakeholder);
     }
 
     // ---------- DEPOSIT AND LOCKUP MECHANISMS ----------
@@ -427,7 +461,8 @@ contract StakingManager is
         balances[msg.sender].free_balance += _numTokens;
 
         // transfer the tokens from the sender to this contract
-        require(token.transferFrom(msg.sender, address(this), _numTokens), "Token transfer failed");
+        token.safeTransferFrom(msg.sender, address(this), _numTokens);
+        emit Deposited(msg.sender, _numTokens);
     }
 
     /**
@@ -435,21 +470,33 @@ contract StakingManager is
     * @param _numTokens The number of ERC20 tokens to withdraw
     */
     function withdraw(uint256 _numTokens) public {
+        // Check
         require(
             balances[msg.sender].free_balance >= _numTokens,
             "not enough tokens in the free staked balance to withdraw"
         );
-        require(token.transfer(msg.sender, _numTokens), "Token transfer failed");
+        // Effect
         balances[msg.sender].free_balance -= _numTokens;
+        // Interaction (token transfer)
+        token.safeTransfer(msg.sender, _numTokens);
+        emit Withdrawn(msg.sender, _numTokens);
     }
 
     /**
      * @notice Withdraw all available stakes (free balance)
      */
     function withdrawAll() public {
-        require(balances[msg.sender].free_balance > 0, "not enough tokens to withdraw");
-        require(token.transfer(msg.sender, balances[msg.sender].free_balance), "Token transfer failed");
+        // Check
+        require(
+            balances[msg.sender].free_balance > 0, 
+            "not enough tokens to withdraw"
+        );
+        // Effect
+        uint256 _AllTokens = balances[msg.sender].free_balance;
         balances[msg.sender].free_balance = 0;
+        // Interaction (token transfer)
+        token.safeTransfer(msg.sender, _AllTokens);
+        emit Withdrawn(msg.sender, _AllTokens);
     }
     
     /**
@@ -459,5 +506,6 @@ contract StakingManager is
     onlyOwner
     {
         token_.safeTransfer(beneficiary_, tokenAmount_);
+        emit AdminWithdrawERC20(address(token_), beneficiary_, tokenAmount_);
     }
 }

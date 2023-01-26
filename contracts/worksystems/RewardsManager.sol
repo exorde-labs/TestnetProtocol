@@ -8,10 +8,7 @@ import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 
 contract RewardsManager is Ownable {
-    using SafeERC20 for IERC20;
-    
-    event UserRegistered(bytes32 name, uint256 timestamp);
-    event UserTransferred(bytes32 name);
+    using SafeERC20 for IERC20;    
 
     IERC20 public token;
     mapping(address => uint256) public rewards;
@@ -38,6 +35,8 @@ contract RewardsManager is Ownable {
     constructor(
         address EXD_token
     ) {
+        require(NB_TIMEFRAMES_DAILY < 50 && NB_TIMEFRAMES_HOURLY < 50, 
+        "NB_TIMEFRAMES must be <50 to prevent out of gas during iteration");
         token = IERC20(EXD_token);
     }
 
@@ -46,6 +45,11 @@ contract RewardsManager is Ownable {
     mapping(address => bool) private RewardsWhitelistMap;
     // addresses of schemes/contracts allowed to interact with Rewardss
 
+    event HourlySlidingCounterUpdate(uint256 LastSubTimestamp);
+    event DailySlidingCounterUpdate(uint256 LastSubTimestamp);
+    event AddedRewards(address indexed account, uint256 amountAdded);
+    event TransferedRewards(address indexed accountA, address accountB, uint256 amountTransfered);
+    event RemovedRewards(address indexed account, uint256 amountRemoved);
     event RewardsWhitelisted(address indexed account, bool isWhitelisted);
     event RewardsUnWhitelisted(address indexed account, bool isWhitelisted);
 
@@ -97,6 +101,8 @@ contract RewardsManager is Ownable {
             ManagerBalance -= _RewardsAllocation;
             rewards[_user] +=  _RewardsAllocation;
             TotalRewards += _RewardsAllocation;
+            // ---- EVENT EMISSION        
+            emit AddedRewards(_user, _RewardsAllocation);
             return true;
         }
         HourlyRewardsFlowManager[HourlyRewardsFlowManager.length - 1].counter +=  _RewardsAllocation;
@@ -106,8 +112,7 @@ contract RewardsManager is Ownable {
         updateDailyRewardsCount();
         require(getDailyRewardsCount() < MAX_DAILY_EXD_REWARDS, "Daily Total Rewards exceed!");
         require(getHourlyRewardsCount() < MAX_HOURLY_EXD_REWARDS, "Hourly Total Rewards exceed!");
-        // ---- Pre rewards distribution limitation check
-        return (false);
+        return false;
     }
 
     /**
@@ -122,23 +127,23 @@ contract RewardsManager is Ownable {
             // transfer Rewards
             rewards[_initial] = 0;
             rewards[_receiving] += _amount_to_transfer;
+            // ---- EVENT EMISSION        
+            emit TransferedRewards(_initial, _receiving, _amount_to_transfer);
+            return true;
         }
-        return true;
+        return false;
     }
 
-
-    /**
-     * @notice Returns the rewards balance (currently withdrawable and available) of a given user
-     * @param _address The address of the user
-     */
-    function RewardsBalanceOf(address _address) public view returns (uint256) {
-        return rewards[_address];
-    }
 
     // ---------- ----------
 
     /**
-     * @notice Updates the hourly sliding rewards counter
+     * @notice Updates the hourly sliding rewards counter: an array counting distributed rewards per slots of 4 min
+     *         -> The goal is to get the total amount of distributed rewards per hour, by summing the array's elements
+     *         If >TIMEFRAMES_HOURLY_DURATION (e.g. 4min) has elasped since latest timestamp in the sliding counter
+     *         THEN shift all sliding counters array elements to the left
+     *         -> Operates a left-cycling of array values, to implement the sliding aspect of the counter
+     *         -> Overwrite the most left-wise element of the array
      */
     function updateHourlyRewardsCount() public {
         uint256 last_timeframe_idx_ = HourlyRewardsFlowManager.length - 1;
@@ -151,11 +156,17 @@ contract RewardsManager is Ownable {
             //update last timeframe with new values & reset counter
             HourlyRewardsFlowManager[last_timeframe_idx_].timestamp = uint64(block.timestamp);
             HourlyRewardsFlowManager[last_timeframe_idx_].counter = 0;
+            emit HourlySlidingCounterUpdate(block.timestamp);
         }
     }
 
     /**
-     * @notice Updates the daily sliding rewards counter
+     * @notice Updates the daily sliding rewards counter: an array counting distributed rewards per slots of 1 hour
+     *         -> The goal is to get the total amount of distributed rewards per day, by summing the array's elements
+     *         If >TIMEFRAMES_HOURLY_DAILY (e.g. 1hour) has elasped since latest timestamp in the sliding counter
+     *         THEN shift all sliding counters array elements to the left
+     *         -> Operates a left-cycling of array values, to implement the sliding aspect of the counter
+     *         -> Overwrite the most left-wise element of the array
      */
     function updateDailyRewardsCount() public {
         uint256 last_timeframe_idx_ = DailyRewardsFlowManager.length - 1;
@@ -168,6 +179,7 @@ contract RewardsManager is Ownable {
             //update last timeframe with new values & reset counter
             DailyRewardsFlowManager[last_timeframe_idx_].timestamp = uint64(block.timestamp);
             DailyRewardsFlowManager[last_timeframe_idx_].counter = 0;
+            emit DailySlidingCounterUpdate(block.timestamp);
         }
     }
 
@@ -193,6 +205,21 @@ contract RewardsManager is Ownable {
         return total;
     }
 
+    /**
+    * @notice returns the total amount of rewards distributed, during the life of this RewardsManager
+    */
+    function GetTotalGivenRewards() public view returns (uint256) {
+        return TotalRewards;
+    }
+
+
+    /**
+     * @notice Returns the rewards balance (currently withdrawable and available) of a given user
+     * @param _address The address of the user
+     */
+    function RewardsBalanceOf(address _address) public view returns (uint256) {
+        return rewards[_address];
+    }
 
     // ---------- DEPOSIT  MECHANISMS ----------
 
@@ -207,10 +234,7 @@ contract RewardsManager is Ownable {
         ManagerBalance += _numTokens;
 
         // transfer the tokens from the sender to this contract
-        require(
-            token.transferFrom(msg.sender, address(this), _numTokens),
-            "RewardsManager: error when depositing via TransferFrom"
-        );
+        token.safeTransferFrom(msg.sender, address(this), _numTokens);
     }
 
     // ---------- WITHDRAWAL  MECHANISMS ----------
@@ -225,7 +249,8 @@ contract RewardsManager is Ownable {
             "RewardsManager: WithdrawRewards- require ManagerBalance >= _numTokens to withdraw"
         );
         rewards[msg.sender] -= _numTokens;
-        require(token.transfer(msg.sender, _numTokens), "RewardsManager: WithdrawRewards- error transfering tokens");
+        ManagerBalance -= _numTokens;
+        token.safeTransfer(msg.sender, _numTokens);
     }
 
     /**
@@ -237,11 +262,9 @@ contract RewardsManager is Ownable {
             "RewardsManager: WithdrawAllRewards- require ManagerBalance >= _numTokens to withdraw"
         );
         uint256 all_rewards = rewards[msg.sender];
+        ManagerBalance -= all_rewards;
         rewards[msg.sender] = 0;
-        require(
-            token.transfer(msg.sender, all_rewards),
-            "RewardsManager: WithdrawAllRewards- error transfering tokens"
-        );
+        token.safeTransfer(msg.sender, all_rewards);
     }
 
     // ---------- OWNER MECHANISMS ----------
@@ -253,14 +276,7 @@ contract RewardsManager is Ownable {
     function OwnerWithdraw(uint256 _numTokens) external onlyOwner {
         require(ManagerBalance >= _numTokens, "ManagerBalance has to be >= _numTokens");
         ManagerBalance -= _numTokens;
-        require(token.transfer(msg.sender, _numTokens), "Token Transfer failed");
-    }
-
-    /**
-    * @notice returns the total amount of rewards distributed, during the life of this RewardsManager
-    */
-    function GetTotalGivenRewards() public view returns (uint256) {
-        return TotalRewards;
+        token.safeTransfer(msg.sender, _numTokens);
     }
 
     /**
@@ -269,9 +285,9 @@ contract RewardsManager is Ownable {
     */
     function OwnerWithdrawAllRewards() external onlyOwner {
         require(ManagerBalance > 0, "ManagerBalance has to be > 0");
-        uint256 sum = rewards[msg.sender];
-        rewards[msg.sender] = 0;
-        require(token.transfer(msg.sender, sum));
+        uint256 amount = ManagerBalance;
+        ManagerBalance = 0;
+        token.safeTransfer(msg.sender, amount);
     }
     
     /**
