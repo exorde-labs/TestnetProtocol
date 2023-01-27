@@ -14,20 +14,22 @@
       "ReputationReader":"0x17F263717586240A51c2B41824990d7869F27523"
    },
    "testnet-A":{
-      "Reputation":"0x6a495533190a5930781a363B6c7E8db6abC63068",
-      "EXDT":"0x2791A1aF774ed9ef58e9bd26EC6b72636b4670A6",
-      "Avatar":"0xaB6bc90A54ea7C7c45dd94E5df10CDB1B07E80eb",
-      "Controller":"0xb9354a597Bf68eC9B7486feFeB16da46b887cC1f",
-      "ConfigRegistry":"0x96813cf25d63c9f4AB6Dd4A5e7E15bDD0e59Ac2e",
-      "PermissionRegistry":"0xc229c14B0085fB43113cc86EA3BE8bB0eA2bE2DF",
-      "StakingManager":"0xe06F2e6D0C0ADC4A87FB614a34c03eB06E05051b",
-      "RewardsManager":"0xcBc357F3077989B4636E93a8Ce193E05cd8cc56E",
-      "Parameters":"0xe221bE54c5Ac0F16885f65De957Eed022eDB11a7",
-      "AddressManager":"0x1791bE54d4b3Af415fc11af8FeE953937F024d79",
-      "Statistics":"0xD5277b56DB530766587a31CfB4199E04E4Fb066D",
-      "DataSpotting":"0xC22d5CDa7757A5292807ebaE94FE95EF946AF6f6",
-      "RegistrarWalletScheme":"0x7c1c6814f8A4C4c5D5AC7422eC578C1aa19d80A5",
-      "MasterWalletScheme":"0xDb8A552BC19afE1218C40aE2C94e1bCb9EdA8588",
-      "QuickWalletScheme":"0x32dbb0e3E217b3925A2621F2975DbD20a9540a4e"
+      "Reputation":"0xFDd22dd6aA36CA4ff73Bcf1E5AB795c13E383398",
+      "EXDT":"0xa9D04aaAd526A93eaEB2B205fd814A6183e22499",
+      "Avatar":"0x5Ef775aDa67e7A83DAdc1b2cbEBA44a9a7EAdb44",
+      "Controller":"0xe556f64611036e9aE4Bb269ecc84DEE340a6318b",
+      "ConfigRegistry":"0xeF626E65466d08dCc19034fB9b18834a506Ba1Fa",
+      "PermissionRegistry":"0x22dc391799651243F134bf359650DDbB446f99aC",
+      "StakingManager":"0x2A3f3838703002277dab370eEeEC2a3353150951",
+      "RewardsManager":"0x7A0F17639137fb4A9247C7cBbEdbd149625e853D",
+      "Parameters":"0x22dc391799651243F134bf359650DDbB446f99aC",
+      "AddressManager":"0xA82C2c724B02231Fb547eEDaBB93ccB58584fC89",
+      "Statistics":"0xe34a68e692A50643458383737A0067725d6CE5d2",
+      "DataSpotting":"0xaA5F977C9240aaF062EC346fc65dbc186B012980",
+      "RegistrarWalletScheme":"0xf4d17E8865512333beA68d73E58FEa23F84037AD",
+      "MasterWalletScheme":"0xACF14686ACa50f6567b1daf3d79FB5d44Dac1A78",
+      "QuickWalletScheme":"0x9AC3bd0e43a6EBd40c4452e5da8B42795f4b2dC1",
+      "ReputationReader":"0x94043684e69a1c8D9d73Ed2a4d054BA959e43B6e",
+      "sFuelDistribute":"0x786efCF6Eea9F025b863cdecF2f9aD049215ABe0"
    }
 }
