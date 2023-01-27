@@ -1135,54 +1135,6 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
         }
     }
 
-
-    /**
-     * @dev Destroy Spot Data, important to release storage space if critical
-     *      To be used only if deleteOldData() failed to properly clean state
-     */
-    function deleteSpotData(uint128 spotIndexA, uint128 spotIndexB) public onlyOwner {
-        require(spotIndexA < spotIndexB, "spotIndexA must be <= spotIndexB");
-        for (uint128 i = spotIndexA; i < spotIndexB; i++) {
-            delete SpotsMapping[_ModS(i)]; // delete SpotsMapping at index l            
-            //----- Track Storage usage -----
-            uint256 BytesUsedReduction = BYTES_256*2;                
-            if( BytesUsed >= BytesUsedReduction ){
-                BytesUsed -= BytesUsedReduction;
-            }else{
-                BytesUsed = 0;
-            }
-            //----- Track Storage usage -----
-        }
-    }
-
-    /**
-     * @dev Destroy WorkersPerBatch, important to release storage space if critical
-     */
-    function deleteWorkersSubmission(uint128 batchToDeleteIndex) public onlyOwner {
-        address[] memory allocated_workers = WorkersPerBatch[_ModB(batchToDeleteIndex)];
-        for (uint128 k = 0; k < allocated_workers.length; k++) {
-            //////////////////// FOR EACH WORKER ALLOCATED TO EACH BATCH
-            address _worker = allocated_workers[k];
-            // clear store
-            bytes32 worker_UUID = attrUUID(_worker, batchToDeleteIndex);
-            resetAttribute(worker_UUID, "numTokens");
-            resetAttribute(worker_UUID, "commitHash");
-            resetAttribute(worker_UUID, "commitVote");
-            // clear UserVoteSubmission
-            delete UserVoteSubmission[_ModB(batchToDeleteIndex)][_worker];
-
-            //----- Track Storage usage -----
-            uint256 BytesUsedReduction = BYTES_256*5+BYTES_256*2;         
-            if( BytesUsed >= BytesUsedReduction ){
-                BytesUsed -= BytesUsedReduction;
-            }else{
-                BytesUsed = 0;
-            }
-            //----- Track Storage usage -----
-        }
-    }
-                    
-
     /**
      * @dev Destroy AllWorkersArray, important to release storage space if critical
      */
