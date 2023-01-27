@@ -1047,7 +1047,7 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
                     resetAttribute(worker_UUID, "commitHash");
                     resetAttribute(worker_UUID, "commitVote");
                     // clear UserVoteSubmission
-                    delete UserVoteSubmission[_ModB(_ModB(_deletion_index))][_worker];
+                    delete UserVoteSubmission[_ModB(_deletion_index)][_worker];
                     //----- Track Storage usage -----
                     BytesUsedReduction += BYTES_256*5+BYTES_256*2;
                     //----- Track Storage usage -----
@@ -1113,7 +1113,7 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
                 resetAttribute(worker_UUID, "commitHash");
                 resetAttribute(worker_UUID, "commitVote");
                 // clear UserVoteSubmission
-                delete UserVoteSubmission[_ModB(_ModB(_deletion_index))][_worker];
+                delete UserVoteSubmission[_ModB(_deletion_index)][_worker];
                 //----- Track Storage usage -----
                 BytesUsedReduction += BYTES_256*5+BYTES_256*2;
                 //----- Track Storage usage -----
