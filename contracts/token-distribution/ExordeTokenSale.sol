@@ -150,7 +150,7 @@ contract ExordeTokenSale is Context, ReentrancyGuard, Ownable, Pausable {
         require(msg.sender == whitelister_wallet, "sender is not allowed to modify whitelist");
         for (uint256 i = 0; i < _beneficiaries.length; i++) {
             whitelist[_beneficiaries[i]] = true;
-            emit AddressDeWhitelisted(_beneficiaries[i]);
+            emit AddressWhitelisted(_beneficiaries[i]);
         }
     }
 
