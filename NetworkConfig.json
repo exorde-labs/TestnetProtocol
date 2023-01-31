@@ -15,8 +15,7 @@
          "_networkId":"testnet-A",
          "_urlSkale1":"https://soft-legitimate-sarin-sync.skaletest.com/",
          "SyncNodeCount":"1",
-         /*
-         "_urlSkale1":"http://57.128.85.245:10259",
+         "_urlSkale0":"http://57.128.85.245:10259",
          "_urlSkale2":"http://57.128.84.254:10259",
          "_urlSkale3":"http://57.128.80.82:10259",
          "_urlSkale4":"http://35.84.228.194:10259",
@@ -24,7 +23,6 @@
          "_urlSkale6":"http://57.128.87.76:10259",
          "_urlSkale7":"http://57.128.82.225:10259",
          "_urlSkale8":"http://57.128.86.197:10259",
-         "SyncNodeCount":"9",*/
          "_urlTxSkale":"https://legacy-proxy.skalenodes.com/v1/soft-legitimate-sarin",
          "_chainID":"797272215",
          "_blockExplorer":"https://soft-legitimate-sarin.legacy-explorer.skalenodes.com/",
