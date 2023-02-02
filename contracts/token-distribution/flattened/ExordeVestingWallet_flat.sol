@@ -667,6 +667,7 @@ contract VestingWallet is Context {
      */
     function updateBeneficiary(address replacementBeneficiaryAddress_) public virtual {
         require(msg.sender == beneficiary(), "Only the current beneficiary can update the address");
+        require(replacementBeneficiaryAddress_ != address(0), "The new beneficiary must be non zero");
         _beneficiary = replacementBeneficiaryAddress_;
         emit BeneficiaryUpdated(msg.sender, replacementBeneficiaryAddress_);
     }
