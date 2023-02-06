@@ -585,6 +585,6 @@ pragma solidity 0.8.8;
 
 contract ExordeToken is  ERC20Capped {
     constructor() ERC20 ("Exorde Network Token", "EXD") ERC20Capped(200*(10**6)*(10**18)) {
-        _mint(0xd27b4910372155743878737de0a80008c55d50d1, 200*(10**6)*(10**18)); // 200 000 000 (two hundred million) EXD, with 18 decimals (by default)
+        _mint(0xd27b4910372155743878737dE0A80008C55D50D1, 200*(10**6)*(10**18)); // 200 000 000 (two hundred million) EXD, with 18 decimals (by default)
     }
 }
