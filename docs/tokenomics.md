@@ -44,6 +44,8 @@ The initial token allocation is designed to be balanced between ecosystem partic
 
 ![Allocations](https://i.postimg.cc/J43xf6WF/Pie-Chart-Token.png =645x499)
 
+![Allocations](https://i.postimg.cc/J43xf6WF/Pie-Chart-Token.png)
+
 
 
 ### 34% of total EXD Allocated to Protocol Rewards
