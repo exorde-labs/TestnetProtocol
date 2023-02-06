@@ -42,10 +42,7 @@ The Exorde Network Token has a fixed total supply of 200,000,000 EXD. The Exorde
 
 The initial token allocation is designed to be balanced between ecosystem participants (Protocol rewards), investors & backers, and the Exorde Labs team.
 
-![Allocations](https://i.postimg.cc/J43xf6WF/Pie-Chart-Token.png =645x499)
-
 ![Allocations](https://i.postimg.cc/J43xf6WF/Pie-Chart-Token.png)
-
 
 
 ### 34% of total EXD Allocated to Protocol Rewards
