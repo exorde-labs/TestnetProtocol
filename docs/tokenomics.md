@@ -1,4 +1,5 @@
 
+
 # Key Protocol Highlights
 
 Exorde is a decentralized data system, which operates an information processing pipeline at its core. This pipeline continuously receives the flix of the most recent data posted on the Internet (tweets, articles, blog posts, etc.) and processes it (translation, aggregation, curation, clustering) to produce reliable, relevant, and quality metadata, to provide accurate and real-time trend, source and sentiment analysis.
@@ -7,6 +8,15 @@ Exorde has **Spotters**, participants specialized in **spotting the newest and m
 
 The Exorde Protocol uses its **Exorde Network Token (EXD) as incentives**, to align all ecosystem participants interests and maximize the reactivity, scalability, and quality of Exorde's output data & internal processes. A as a decentralized protocol, Exorde **allows anyone to verify** its data stream and internal WorkSystems.
 
+# What is a Token? 
+
+## Utility Token
+
+The Exorde Network Token (EXD) is a type of token called a utility token, meaning it is used to access and pay for services within the Exorde platform. It acts as a form of payment that removes friction in transactions and allows for automation of the economy. The EXD token is necessary because it aligns the interests of all participants in the Exorde ecosystem, removes traditional payment issues, and maximizes the quality and efficiency of the data produced by the platform.
+
+## Is it just currency?
+
+A token like EXD in the Exorde Protocol cannot be replaced by fiat currency or traditional payment methods because it serves a unique purpose in the decentralized data economy. Unlike fiat currency, EXD is specifically designed to incentivize participation in the Exorde data pipeline and to pay for access to its data services. It also helps to align the interests of all participants in the ecosystem and ensure the accuracy, relevance, and quality of the output data. Tokens like EXD are not just a medium of exchange, but also a tool for securing and incentivizing the decentralized Exorde network, which cannot be achieved by traditional payments.
 
 # Key Token Utility
 
@@ -45,7 +55,14 @@ The initial token allocation is designed to be balanced between ecosystem partic
 ![Allocations](https://i.postimg.cc/J43xf6WF/Pie-Chart-Token.png)
 
 
-### 34% of total EXD Allocated to Protocol Rewards
+## 34% of total EXD Allocated to Protocol Rewards
+
+### What are Protocol Rewards?
+
+**Protocol rewards are digital incentives offered by the network for participating and contributing to the network.** These rewards are granted to users who submit, process or validate data, or make other valuable contributions to the Exorde network. Think of it as an automated system that rewards users for their work in maintaining and improving the network. **These rewards are meant to encourage users to participate in the network, which helps to ensure its security, stability, and growth.**
+
+### Protocol Rewards distribution
+
 1. **A third of the token supply is allocated to be distributed as rewards for Exorde Protocol participants.**
 2. **Rewards are distributed at a maximum rate of 30 000 EXD per day** (*1 250 EXD per hour*). 
 3. This **guarantees** a **maximum token inflation rate from the Protocol Rewards**.
@@ -57,7 +74,7 @@ Depending on the demand for Exorde's Token & Data (and other factors), the rewar
 
 *Exorde Labs will progressively enable Exorde's Governance to govern this rate (within the limitation of 30 000).*
 
-### Private Sale Participants
+## Private Sale Participants
 
 Private investors are composed of 30+ invidivudals and private investment funds focalised on Web3, blockchain and advanced data products. They have bought EXD token on presale at an average price of $0.15-0.20. 
 **Private sale investors have a 1-month cliff period and linear vesting of 24-months (2 years), without exception.**
@@ -93,6 +110,13 @@ The EXD token exist on **Ethereum Mainnet** as an ERC20 with a capped supply of 
 ### Audit
 Exorde Token, Vesting Wallets (for Team, Protocol Rewards, Private Sale investors, etc) and Token Sale contracts are audited by CertiK. The audits can be found at: https://www.certik.com/projects/exorde
 
+### Vesting: what is it?
+
+A vesting schedule is a plan for the release of tokens over time. It is a way to ensure that tokens are distributed gradually, rather than all at once. This helps to prevent the rapid dumping of tokens, which can lead to price volatility and negatively impact the stability of the network. In the context of Exorde, the vesting schedule applies to different groups of actors. The vesting schedule outlines the timeline for when these actors will be able to access their tokens and the conditions under which they will be released. This helps to align incentives and ensure the long-term health of the network.
+
+### Vesting smart contract: why is it important?
+
+Having a vesting schedule enforced by audited, public, immutable smart contracts adds transparency and accountability to a project and company. It ensures that the allocation of tokens is properly aligned with the long-term interests of the project and its stakeholders, and that the tokens are not released too quickly, which could negatively impact the stability and value of the token. Additionally, by having a vesting schedule implemented through smart contracts, it eliminates the possibility of manual errors or manipulation, making the process more secure, irrevokable and reliable.
 
 
 ### TECHNICAL GOVERNANCE
@@ -109,8 +133,6 @@ An EXD Token-based governance will be activated only during rare events (network
 
 
 # Token Sale: Opens on February 15th 2023
-
-
 
 **The Exorde Token Sale is expected to take place Feb 15th at 9am UTC.**
 
