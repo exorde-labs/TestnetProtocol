@@ -1,11 +1,12 @@
 
+  
 # Key Protocol Highlights
 
 Exorde is a decentralized data system, which operates an information processing pipeline at its core. This pipeline continuously receives the stream of the most recent data posted on the Internet (tweets, articles, blog posts, etc.) and processes it (translation, aggregation, curation, clustering) to produce reliable, relevant, and quality metadata. The output data stream from the Exorde Protocol is then used to extract real-time trends, source, and sentiment analysis.
 
 Exorde has **Spotters**, participants specialized in **spotting the newest and most relevant information online** (by providing URLs, detected language, and other content identifiers). The data is then fed into the Exorde Worksystems, composing the Exorde Data Pipeline. These Worksystems are forming a **streaming data pipeline** processing & **validating** the spotted information, by allocating sub-tasks to **Validators** in each WorkSystems. 
 
-The Exorde Protocol uses its **Exorde Network Token (EXD) as incentives**, to align all ecosystem participants' interests and maximize the reactivity, scalability, and quality of Exorde's output data & internal processes. As a decentralized protocol, Exorde **allows anyone to verify** its data stream and internal WorkSystems.
+The Exorde Protocol uses its **Exorde Network Token (EXD) as incentives**, to align all ecosystem participants' interests and maximize the reactivity, scalability, and quality of Exorde's output data & internal processes. As a decentralized Protocol, Exorde **allows anyone to verify** its data stream and internal WorkSystems.
 
 # What is a Token? 
 
@@ -67,7 +68,7 @@ The initial token allocation is designed to be balanced between ecosystem partic
 3. This **guarantees** a **maximum token inflation rate from the Protocol Rewards**.
 4. **EXD Rewards will be distributed until at least Q2 2029**. 
 
-*The demand for the protocol and its data services is expected to create a **sustainable** reward stream over time, complementing and then taking over the protocol's initial rewards pool.* 
+*The demand for the Protocol and its data services is expected to create a **sustainable** reward stream over time, complementing and then taking over the Protocol's initial rewards pool.* 
 
 Depending on the demand for Exorde's Token & Data (and other factors), the rewards rate is likely to be much lower than the maximum rate, offering a guaranteed source of rewards for at least 10 years.
 
@@ -90,12 +91,12 @@ Initially, only 12-15 million tokens will be in circulation. In May 2023, we exp
 - Airdrops and community bounties are to be distributed punctually over time.
 - All other allocations have no vesting period.
  
-**The above token distribution chart represents the maximum number of tokens in circulation.** Protocol Rewards are shown as being distributed at their maximum theoretical rate of 30k EXD per day (940k monthly). In practice, the protocol could issue its initial rewards for a longer time (e.g. 10-20 years). This chart does not include Airdrops, Bounties (Community Bounties, for various future events, open source work, community initiatives, ...), and Liquidity Provisioning (locked liquidity on Uniswap, market making, CEX liquidity). They add up to 6.5% of the EXD total supply. These 3 categories of token allocations will hit the circulating supply of EXD tokens over several years (Airdrops will be distributed mostly in the first two years, community bounties can be distributed over the next 5-10 years, locked liquidity can remain locked for 7+ years).
+**The above token distribution chart represents the maximum number of tokens in circulation.** Protocol Rewards are shown as being distributed at their maximum theoretical rate of 30k EXD per day (940k monthly). In practice, the Protocol could issue its initial rewards for a longer time (e.g. 10-20 years). This chart does not include Airdrops, Bounties (Community Bounties, for various future events, open source work, community initiatives, ...), and Liquidity Provisioning (locked liquidity on Uniswap, market making, CEX liquidity). They add up to 6.5% of the EXD total supply. These 3 categories of token allocations will hit the circulating supply of EXD tokens over several years (Airdrops will be distributed mostly in the first two years, community bounties can be distributed over the next 5-10 years, locked liquidity can remain locked for 7+ years).
 
 **Once deployed, Vesting contracts are non-revocable and immutable.**
 Exorde's initial distribution of 200,000,000 tokens and their lockups (vesting) reflect long-term commitments from the Exorde Labs team and their backers, investors & partners. 
 
-*Protocol Rewards case: Exorde Labs will manage the transfer of Protocol Rewards to the Protocol (on its execution layer) during the early life of the protocol. Then, the Vesting Contract ownership can be transferred to the Exorde Decentralized Governance.*
+*Protocol Rewards case: Exorde Labs will manage the transfer of Protocol Rewards to the Protocol (on its execution layer) during the early life of the Protocol. Then, the Vesting Contract ownership can be transferred to the Exorde Decentralized Governance.*
 
 # Key Technical Facts
 
@@ -157,7 +158,7 @@ It will last by default 1 month, if the sale does not close before, but this dur
 * **All buyers must be whitelisted (by going through a user-friendly standard KYC process, by sumsub.com)**
 * All buyers are limited to $50k ($50 000),  fifty thousand dollars of purchase, overall (they can buy multiple times).
 * A tier ends when all tokens have been sold. 
-* If tokens remain unsold after the sale, Exorde Labs can withdraw the remaining tokens & allocate them for future sales (or to protocol development).
+* If tokens remain unsold after the sale, Exorde Labs can withdraw the remaining tokens & allocate them for future sales (or to Network development).
 * Buyers get the EXD token instantly when buying. 
 * The contract handle buying overlaps between tiers automatically and also refunds if a user sends more than what remains in the sale.
 * The owner can pause the contract in case of emergency
