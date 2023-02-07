@@ -86,7 +86,7 @@ Initially, only 12-15 million tokens will be in circulation. In May 2023, we exp
 - Private investors have **2 years** of vesting.
 - The Exorde Team has **5 years** of vesting. 
 - Exorde Labs itself has **6 years** of vesting.
-- Protocol Rewards can't be released faster than **6.5 years**, most likely 10+ years
+- Protocol Rewards are released over at least **6.5 years**, most likely 10+ years. (from mid 2023 to 2029-2035+)
 - Airdrops and community bounties are to be distributed punctually over time.
 - All other allocations have no vesting period.
  
