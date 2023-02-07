@@ -58,7 +58,7 @@ The initial token allocation is designed to be balanced between ecosystem partic
 
 ### What are Protocol Rewards?
 
-**Protocol rewards are digital incentives offered by the network for participating and contributing to the network.** These rewards are granted to users who submit, process or validate data or make other valuable contributions to the Exorde network. Think of it as an automated system that rewards users for their work in maintaining and improving the network. **These rewards are meant to encourage users to participate in the network, which helps to ensure its security, stability, and growth.**
+**Protocol rewards are digital incentives offered by the network for participating and contributing to the network.** These rewards are granted to users who submit, process, or validate data or make other valuable contributions to the Exorde network. Think of it as an automated system that rewards users for their work in maintaining and improving the network. **These rewards are meant to encourage users to participate in the network, which helps to ensure its security, stability, and growth.**
 
 ### Protocol Rewards distribution
 
@@ -90,7 +90,7 @@ Initially, only 12-15 million tokens will be in circulation. In May 2023, we exp
 - Airdrops and community bounties are to be distributed punctually over time.
 - All other allocations have no vesting period.
  
-**Once deployed, Vesting contracts are non-revokable and immutable.**
+**Once deployed, Vesting contracts are non-revocable and immutable.**
 Exorde's initial distribution of 200,000,000 tokens and their lockups (vesting) reflect long-term commitments from the Exorde Labs team and their backers, investors & partners. 
 
 *Protocol Rewards case: Exorde Labs will manage the transfer of Protocol Rewards to the Protocol (on its execution layer) during the early life of the protocol. Then, the Vesting Contract ownership can be transferred to the Exorde Decentralized Governance.*
@@ -123,7 +123,7 @@ Having a vesting schedule enforced by audited, public, immutable smart contracts
 ### TECHNICAL GOVERNANCE
 
  **Exorde aims to be governed by Reputation (REP)**. 
-**REP** is a **non-transferable** score that is only earned by correctly participating in the Exorde Protocol. Reputation is a better indicator of currently active and involved actors of the Exorde ecosystem than Exorde Token Holders and allows to operate Technical Governance in a scalable manner. **REP is a relative unit of account, allowing for an accurate measure of the contribution of each actor of the ecosystem**
+**REP** is a **non-transferable** score that is only earned by correctly participating in the Exorde Protocol. Reputation is a better indicator of currently active and involved actors of the Exorde ecosystem than Exorde Token Holders and allows to operate Technical Governance in a scalable manner. **REP is a relative unit of account, allowing for an accurate measure of the contribution of each actor in the ecosystem**
 
 **As opposed to most DAOs of the past years, Token Holders will not be required to participate in highly technical proposals or frequent decision-making. Exorde is designed for a scalable and informed decision-making system!**
 
@@ -135,25 +135,24 @@ An EXD Token-based governance will be activated only during rare events (network
 
 # Token Sale: Opens on February 15th, 2023
 
-**The Exorde Token Sale is expected to take place Feb 15th at 9 am UTC.**
+**The Exorde Token Sale is expected to take place on Feb 15th at 9 am UTC.**
 
 The Token Sale is, by necessity, compliant with AML/KYC regulations. 
 The sale will be conducted on a dedicated Public Sale page at sale.exorde.network.
 The sale will accept only USDC, USDT, and DAI, all ERC20 tokens on Ethereum.
 
-**The Exorde Network Token (EXD) is  a 18-decimal, standard, supply-capped ERC20 token on Ethereum.**
+**The Exorde Network Token (EXD) is an 18-decimal, standard, supply-capped ERC20 token on Ethereum.**
 The EXD token is to be deployed soon.
-It will last at most 1 month, by default, but this can be extended by Exorde Labs, if necessary.
-
-**User will be able to pass the KYC before the start date, to be ready for the start date.**
+It will last by default 1 month, if the sale does not close before, but this duration can be extended.
+*Users will be able to pass the KYC before the start date, to be ready for the start date.*
 
 **The EXD Public Token Sale is a 3-Tiered Dollar-based Token Sale. The Tiers are automatically activated when a previous Tier is complete. FIRST COME FIRST SERVED.**
 *      Tier 1 = $0.33/EXD for the first 0.5 million (500 000) EXD tokens sold
 *      Tier 2 = $0.34/EXD for the next 1.5 million (1 500 000) EXD tokens sold
 *      Tier 3 = $0.35/EXD for the last 10 million (10 000 000) EXD tokens sold.
- **Total EXD sold (to be deposited in contract initially) = 12 000 000 EXD tokens. Twelve million.**
+ **Total EXD sold (in the Public Sale): 12 000 000 EXD tokens. (6% of the total supply)**
 
-* All buyers must be whitelisted by Exorde Labs, according to their KYC verification done on exorde.network
+* **All buyers must be whitelisted (by going through a user-friendly standard KYC process, by sumsub.com)**
 * All buyers are limited to $50k ($50 000),  fifty thousand dollars of purchase, overall (they can buy multiple times).
 * A tier ends when all tokens have been sold. 
 * If tokens remain unsold after the sale, Exorde Labs can withdraw the remaining tokens & allocate them for future sales (or to protocol development).
