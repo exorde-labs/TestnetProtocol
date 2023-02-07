@@ -1,4 +1,24 @@
 
+# Key Protocol Highlights
+
+Exorde is a decentralized data system, which operates an information processing pipeline at its core. This pipeline continuously receives the flix of the most recent data posted on the Internet (tweets, articles, blog posts, etc.) and processes it (translation, aggregation, curation, clustering) to produce reliable, relevant, and quality metadata, to provide accurate and real-time trend, source and sentiment analysis.
+
+Exorde has **Spotters**, participants specialized in **spotting the newest and most relevant information online** (by providing URLs, detected language, and other content identifiers). The data is then fed into the Exorde Worksystems, composing the Exorde Data Pipeline. These are forming a **streaming data pipeline** processing & **validating** the spotted information, by allocating sub-tasks to **Validators** in each WorkSystems. 
+
+The Exorde Protocol uses its **Exorde Network Token (EXD) as incentives**, to align all ecosystem participants' interests and maximize the reactivity, scalability, and quality of Exorde's output data & internal processes. As a decentralized protocol, Exorde **allows anyone to verify** its data stream and internal WorkSystems.
+
+# What is a Token? 
+
+## Utility Token
+
+The Exorde Network Token (EXD) is a type of token called a utility token, meaning it is used to access and pay for services within the Exorde platform. It acts as a form of payment that removes friction in transactions and allows for the automation of the economy. The EXD token is necessary because it aligns the interests of all participants in the Exorde ecosystem, removes traditional payment issues, and maximizes the quality and efficiency of the data produced by the platform.
+
+## Is it just currency?
+
+A token like EXD in the Exorde Protocol cannot be replaced by fiat currency or traditional payment methods because it serves a unique purpose in the decentralized data economy. Unlike fiat currency, EXD is specifically designed to incentivize participation in the Exorde data pipeline and to pay for access to its data services. It also helps to align the interests of all participants in the ecosystem and ensure the accuracy, relevance, and quality of the output data. Tokens like EXD are not just a medium of exchange, but also a tool for securing and incentivizing the decentralized Exorde network, which cannot be achieved by traditional payments.
+
+# Key Token Utility
+
 ## Exorde Network Token (EXD) is at the core of the Exorde Network data economy.
 
 EXD is a pure utility token steering Exorde's economy through 3 main utilities:
@@ -7,7 +27,7 @@ EXD is a pure utility token steering Exorde's economy through 3 main utilities:
 
 **Data Spotters and Validators are required to Stake EXD tokens** to participate in the Exorde Data Economy. There are 2 different aspects to EXD Staking:
 	- A **Minimum EXD Stake** is required to participate in the various tasks of the Protocol. This minimum level can be different depending on a given Protocol System and its importance.
-	- A **dynamic stake mechanism**: Data Spotter will need as many Staked EXD tokens as they are submitting data to Exorde. This mechanism de-incentivize data-spamming attacks and encourages the spotting of quality information. The stake is automatically unlocked after some time when a given work has been validated by the Exorde Network.
+	- A **dynamic stake mechanism**: Data Spotter will need as many Staked EXD tokens as they are submitting data to Exorde. This mechanism de-incentivize data-spamming attacks and encourages the spotting of quality information. Stakes are automatically unlocked after some time when a given work has been validated by the Exorde Network.
 	
 ![Données - Icônes entreprise gratuites](https://cdn-icons-png.flaticon.com/512/993/993762.png =50x50)2. **EXD is used to pay the Exorde's Data Services** through its Bounty System. 
 
@@ -55,7 +75,7 @@ Depending on the demand for Exorde's Token & Data (and other factors), the rewar
 
 ## Private Sale Participants
 
-Private investors are composed of 30+ individuals and private investment funds focalized on Web3, blockchain, and advanced data products. They have bought EXD tokens on presale at an average price of $0.12-0.22. 
+Private investors are composed of 30+ individuals and private investment funds specialized in Web3, blockchain, and advanced data products. They have bought EXD tokens on presale at an average price of $0.15-0.20. 
 **Private sale investors have a 1-month cliff period and linear vesting of 24 months (2 years), without exception.**
 
 # Token Distribution
@@ -79,10 +99,12 @@ Exorde's initial distribution of 200,000,000 tokens and their lockups (vesting) 
 
 
 ### ERC20 Token
-**Official Token Address: https://etherscan.io/token/0x02de007d412266a2e0fa9287c103474170f06560**
+Official EXD Token Address: 
+**0x02dE007D412266a2e0Fa9287C103474170F06560**
 
-The EXD token exists on **Ethereum Mainnet** as an ERC20 with a capped supply of 200 000 000 (*two hundred million *).
- **0x02dE007D412266a2e0Fa9287C103474170F06560 is the official contract address of the EXD Token.** 
+Etherscan link: https://etherscan.io/token/0x02de007d412266a2e0fa9287c103474170f06560
+
+The EXD token exists on **Ethereum Mainnet** as an ERC20 with a capped supply of 200 000 000 (*two hundred million*).
 
 *To be utilized, the token is expected to be bridged on the Exorde Execution layer (powered by the SKALE Network). Mainnet contracts and intermediary interfaces can be deployed later.*
 
@@ -116,12 +138,12 @@ An EXD Token-based governance will be activated only during rare events (network
 **The Exorde Token Sale is expected to take place Feb 15th at 9 am UTC.**
 
 The Token Sale is, by necessity, compliant with AML/KYC regulations. 
-The sale will be conducted on a dedicated Public Sale page on the exorde.network.
-The sale will accept only USDC, USDT, and DAI (ERC20 tokens on Ethereum).
-The Exorde Token Sale contract will be deployed on Ethereum.
+The sale will be conducted on a dedicated Public Sale page at sale.exorde.network.
+The sale will accept only USDC, USDT, and DAI, all ERC20 tokens on Ethereum.
 
 **The Exorde Network Token (EXD) is  a 18-decimal, standard, supply-capped ERC20 token on Ethereum.**
-The Sale will last at most 1 month, by default, but this can be extended by Exorde Labs, if necessary.
+The EXD token is to be deployed soon.
+It will last at most 1 month, by default, but this can be extended by Exorde Labs, if necessary.
 
 **User will be able to pass the KYC before the start date, to be ready for the start date.**
 
@@ -131,9 +153,10 @@ The Sale will last at most 1 month, by default, but this can be extended by Exor
 *      Tier 3 = $0.35/EXD for the last 10 million (10 000 000) EXD tokens sold.
  **Total EXD sold (to be deposited in contract initially) = 12 000 000 EXD tokens. Twelve million.**
 
-* All buyers must be whitelisted (through a KYC provider, *sumsub.com*) by Exorde Labs, according to their KYC verification done on exorde.network
+* All buyers must be whitelisted by Exorde Labs, according to their KYC verification done on exorde.network
 * All buyers are limited to $50k ($50 000),  fifty thousand dollars of purchase, overall (they can buy multiple times).
 * A tier ends when all tokens have been sold. 
-* If tokens remain unsold after the sale, Exorde Labs can withdraw the remaining tokens & allocate them for future private sales (or to the protocol, bounties, etc.).
-* Buyers get EXD tokens instantly when buying. 
+* If tokens remain unsold after the sale, Exorde Labs can withdraw the remaining tokens & allocate them for future sales (or to protocol development).
+* Buyers get the EXD token instantly when buying. 
 * The contract handle buying overlaps between tiers automatically and also refunds if a user sends more than what remains in the sale.
+* The owner can pause the contract in case of emergency
