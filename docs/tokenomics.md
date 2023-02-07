@@ -1,9 +1,9 @@
 
 # Key Protocol Highlights
 
-Exorde is a decentralized data system, which operates an information processing pipeline at its core. This pipeline continuously receives the flix of the most recent data posted on the Internet (tweets, articles, blog posts, etc.) and processes it (translation, aggregation, curation, clustering) to produce reliable, relevant, and quality metadata, to provide accurate and real-time trend, source and sentiment analysis.
+Exorde is a decentralized data system, which operates an information processing pipeline at its core. This pipeline continuously receives the stream of the most recent data posted on the Internet (tweets, articles, blog posts, etc.) and processes it (translation, aggregation, curation, clustering) to produce reliable, relevant, and quality metadata. The output data stream from the Exorde Protocol is then used to extract real-time trends, source, and sentiment analysis.
 
-Exorde has **Spotters**, participants specialized in **spotting the newest and most relevant information online** (by providing URLs, detected language, and other content identifiers). The data is then fed into the Exorde Worksystems, composing the Exorde Data Pipeline. These are forming a **streaming data pipeline** processing & **validating** the spotted information, by allocating sub-tasks to **Validators** in each WorkSystems. 
+Exorde has **Spotters**, participants specialized in **spotting the newest and most relevant information online** (by providing URLs, detected language, and other content identifiers). The data is then fed into the Exorde Worksystems, composing the Exorde Data Pipeline. These Worksystems are forming a **streaming data pipeline** processing & **validating** the spotted information, by allocating sub-tasks to **Validators** in each WorkSystems. 
 
 The Exorde Protocol uses its **Exorde Network Token (EXD) as incentives**, to align all ecosystem participants' interests and maximize the reactivity, scalability, and quality of Exorde's output data & internal processes. As a decentralized protocol, Exorde **allows anyone to verify** its data stream and internal WorkSystems.
 
