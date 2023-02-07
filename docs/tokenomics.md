@@ -90,6 +90,8 @@ Initially, only 12-15 million tokens will be in circulation. In May 2023, we exp
 - Airdrops and community bounties are to be distributed punctually over time.
 - All other allocations have no vesting period.
  
+**The above token distribution chart represents the maximum number of tokens in circulation.** Protocol Rewards are shown as being distributed at their maximum theoretical rate of 30k EXD per day (940k monthly). In practice, the protocol could issue its initial rewards for a longer time (e.g. 10-20 years). This chart does not include Airdrops, Bounties (Community Bounties, for various future events, open source work, community initiatives, ...), and Liquidity Provisioning (locked liquidity on Uniswap, market making, CEX liquidity). They add up to 6.5% of the EXD total supply. These 3 categories of token allocations will hit the circulating supply of EXD tokens over several years (Airdrops will be distributed mostly in the first two years, community bounties can be distributed over the next 5-10 years, locked liquidity can remain locked for 7+ years).
+
 **Once deployed, Vesting contracts are non-revocable and immutable.**
 Exorde's initial distribution of 200,000,000 tokens and their lockups (vesting) reflect long-term commitments from the Exorde Labs team and their backers, investors & partners. 
 
