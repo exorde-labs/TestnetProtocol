@@ -146,7 +146,7 @@ The EXD token is to be deployed soon.
 It will last by default 1 month, if the sale does not close before, but this duration can be extended.
 *Users will be able to pass the KYC before the start date, to be ready for the start date.*
 
-**The EXD Public Token Sale is a 3-Tiered Dollar-based Token Sale. The Tiers are automatically activated when a previous Tier is complete. FIRST COME FIRST SERVED.**
+**The Public Token Sale is a 3-Tiered Token Sale. The Tiers are automatically activated when a previous Tier is complete, in a "First come, first served" basis.**
 *      Tier 1 = $0.33/EXD for the first 0.5 million (500 000) EXD tokens sold
 *      Tier 2 = $0.34/EXD for the next 1.5 million (1 500 000) EXD tokens sold
 *      Tier 3 = $0.35/EXD for the last 10 million (10 000 000) EXD tokens sold.
