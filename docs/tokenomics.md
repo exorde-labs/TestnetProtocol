@@ -83,10 +83,10 @@ Private investors are composed of 30+ individuals and private investment funds s
 Initially, only 12-15 million tokens will be in circulation. In May 2023, we expect 10% of the supply to be in circulation (20 000 000 EXD).
 
 **Linear vestings schedules**: 
+- Private investors have **2 years** of vesting.
 - The Exorde Team has **5 years** of vesting. 
 - Exorde Labs itself has **6 years** of vesting.
-- Protocol Rewards can't be released faster than 6.2 years, most likely 10+ years
-- Private investors have 2 years of vesting.
+- Protocol Rewards can't be released faster than **6.5 years**, most likely 10+ years
 - Airdrops and community bounties are to be distributed punctually over time.
 - All other allocations have no vesting period.
  
