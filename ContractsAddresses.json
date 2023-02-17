@@ -29,6 +29,7 @@
       "RegistrarWalletScheme":"0x7c1c6814f8A4C4c5D5AC7422eC578C1aa19d80A5",
       "MasterWalletScheme":"0xDb8A552BC19afE1218C40aE2C94e1bCb9EdA8588",
       "QuickWalletScheme":"0x32dbb0e3E217b3925A2621F2975DbD20a9540a4e",
-      "Statistics":"0xF3cd1cB98181307e7Ad4E3Ec1aB9776CFc6481d5"
+      "Statistics":"0xF3cd1cB98181307e7Ad4E3Ec1aB9776CFc6481d5",
+      "sFuelDistribute":"0xCF69757e791666b5c4Cc976ce8D21bebDf115CE9"
    }
 }
