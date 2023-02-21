@@ -65,7 +65,6 @@ contract StakingManager is
     event Staked(address indexed account, uint256 amount);
     event AllocatedStake(address indexed account, uint256 amount);
     event DeallocatedStake(address indexed account, uint256 amount);
-    event AdminDeallocatedStake(address indexed account, uint256 amount);    
     event AdminWithdrawERC20(address indexed token_, address beneficiary_, uint256 amount);
     event Unstaked(address indexed account, uint256 amount);
     event SlashedOnSystemStake(address indexed account, address system, uint256 amount);
