@@ -397,7 +397,10 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
     // Initial storage variables: 64+16+16+15*256+256+256*12+4*256+128*9+256*10+16*2+6*8+16*4+256*1+256*2 bits
     // Approx. 404 bytes.
     uint256 public BytesUsed = 404;
-    uint256 public MaximumBytesTarget = 400*(10**6) ; //400 Mb
+    uint256 public MaximumBytesTarget = 20*(10**6) ; //400 Mb
+
+    uint128 public MAX_INDEX_RANGE_BATCHS = 30000;
+    uint128 public MAX_INDEX_RANGE_SPOTS = 30000*20;
 
     // ------ Vote related    
     uint16 constant APPROVAL_VOTE_MAPPING_  = 1;
@@ -619,6 +622,18 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
     //                         WORKER REGISTRATION & LOBBY MANAGEMENT
     // ================================================================================
 
+    /** @notice returns BatchId modulo MAX_INDEX_RANGE_BATCHS
+    */
+    function _ModB(uint128 BatchId) private view returns (uint128) {
+        return BatchId % MAX_INDEX_RANGE_BATCHS;
+    }
+
+    /** @notice returns SpotId modulo MAX_INDEX_RANGE_SPOTS
+    */
+    function _ModS(uint128 SpotId) private view returns (uint128) {
+        return SpotId % MAX_INDEX_RANGE_SPOTS;
+    }
+
     /**
   * @notice Checks if Worker is Available
   * @param _worker worker address
@@ -767,6 +782,7 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
         }
     }
 
+
     /**
      * @notice Check if worker allocated to batch _DataBatchId
                 There is no loop break here, because the number of 
@@ -778,7 +794,7 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
      */
     function isWorkerAllocatedToBatch(uint128 _DataBatchId, address _worker) public view returns (bool) {
         bool found = false;
-        address[] memory allocated_workers = WorkersPerBatch[_DataBatchId];
+        address[] memory allocated_workers = WorkersPerBatch[_ModB(_DataBatchId)];
         for (uint256 i = 0; i < allocated_workers.length; i++) {
             if (allocated_workers[i] == _worker) {
                 found = true;
@@ -1000,28 +1016,28 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
             for (uint128 i = 0; i < iteration_count; i++) {
                 _deletion_index = BatchDeletionCursor;
                 // First Delete Atomic Data composing the Batch, from start to end indices
-                uint128 start_batch_idx = DataBatch[_deletion_index].start_idx;
-                uint128 end_batch_idx = DataBatch[_deletion_index].start_idx 
-                                        +  DataBatch[_deletion_index].counter;
+                uint128 start_batch_idx = DataBatch[_ModB(_deletion_index)].start_idx;
+                uint128 end_batch_idx = DataBatch[_ModB(_deletion_index)].start_idx 
+                                        +  DataBatch[_ModB(_deletion_index)].counter;
                 for (uint128 l = start_batch_idx; l < end_batch_idx; l++) {
-                    delete SpotsMapping[l]; // delete SpotsMapping at index l                    
+                    delete SpotsMapping[_ModS(l)]; // delete SpotsMapping at index l                    
                     //----- Track Storage usage -----
                     BytesUsedReduction += BYTES_256*5;
                     //----- Track Storage usage -----
                 }
                 // delete the batch
-                delete DataBatch[_deletion_index];
+                delete DataBatch[_ModB(_deletion_index)];
                 //----- Track Storage usage -----
                 BytesUsedReduction += BYTES_256*4;
                 //----- Track Storage usage -----
                 // delete the BatchCommitedVoteCount && BatchRevealedVoteCount
-                delete BatchCommitedVoteCount[_deletion_index];
-                delete BatchRevealedVoteCount[_deletion_index];
+                delete BatchCommitedVoteCount[_ModB(_deletion_index)];
+                delete BatchRevealedVoteCount[_ModB(_deletion_index)];
                 //----- Track Storage usage -----
                 BytesUsedReduction += BYTES_128*2;
                 //----- Track Storage usage -----
                 // DELETE FOR ALL WORKERS
-                address[] memory allocated_workers = WorkersPerBatch[_deletion_index];
+                address[] memory allocated_workers = WorkersPerBatch[_ModB(_deletion_index)];
                 for (uint128 k = 0; k < allocated_workers.length; k++) {
                     //////////////////// FOR EACH WORKER ALLOCATED TO EACH BATCH
                     address _worker = allocated_workers[k];
@@ -1031,14 +1047,14 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
                     resetAttribute(worker_UUID, "commitHash");
                     resetAttribute(worker_UUID, "commitVote");
                     // clear UserVoteSubmission
-                    delete UserVoteSubmission[_deletion_index][_worker];
+                    delete UserVoteSubmission[_ModB(_deletion_index)][_worker];
                     //----- Track Storage usage -----
                     BytesUsedReduction += BYTES_256*5+BYTES_256*2;
                     //----- Track Storage usage -----
                 }
 
                 // clear WorkersPerBatch
-                delete WorkersPerBatch[_deletion_index];
+                delete WorkersPerBatch[_ModB(_deletion_index)];
 
                 //----- Track Storage usage -----
                 BytesUsedReduction += BYTES_256*allocated_workers.length;
@@ -1066,28 +1082,28 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
         for (uint128 i = 0; i < iteration_count; i++) {
             uint128 _deletion_index = startIdx+i;
             // First Delete Atomic Data composing the Batch, from start to end indices
-            uint128 start_batch_idx = DataBatch[_deletion_index].start_idx;
-            uint128 end_batch_idx = DataBatch[_deletion_index].start_idx 
-                                    +  DataBatch[_deletion_index].counter;
+            uint128 start_batch_idx = DataBatch[_ModB(_deletion_index)].start_idx;
+            uint128 end_batch_idx = DataBatch[_ModB(_deletion_index)].start_idx 
+                                    +  DataBatch[_ModB(_deletion_index)].counter;
             for (uint128 l = start_batch_idx; l < end_batch_idx; l++) {
-                delete SpotsMapping[l]; // delete SpotsMapping at index l                    
+                delete SpotsMapping[_ModS(l)]; // delete SpotsMapping at index l                    
                 //----- Track Storage usage -----
                 BytesUsedReduction += BYTES_256*5;
                 //----- Track Storage usage -----
             }
             // delete the batch
-            delete DataBatch[_deletion_index];
+            delete DataBatch[_ModB(_deletion_index)];
             //----- Track Storage usage -----
             BytesUsedReduction += BYTES_256*4;
             //----- Track Storage usage -----
             // delete the BatchCommitedVoteCount && BatchRevealedVoteCount
-            delete BatchCommitedVoteCount[_deletion_index];
-            delete BatchRevealedVoteCount[_deletion_index];
+            delete BatchCommitedVoteCount[_ModB(_deletion_index)];
+            delete BatchRevealedVoteCount[_ModB(_deletion_index)];
             //----- Track Storage usage -----
             BytesUsedReduction += BYTES_128*2;
             //----- Track Storage usage -----
             // DELETE FOR ALL WORKERS
-            address[] memory allocated_workers = WorkersPerBatch[_deletion_index];
+            address[] memory allocated_workers = WorkersPerBatch[_ModB(_deletion_index)];
             for (uint128 k = 0; k < allocated_workers.length; k++) {
                 //////////////////// FOR EACH WORKER ALLOCATED TO EACH BATCH
                 address _worker = allocated_workers[k];
@@ -1097,14 +1113,14 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
                 resetAttribute(worker_UUID, "commitHash");
                 resetAttribute(worker_UUID, "commitVote");
                 // clear UserVoteSubmission
-                delete UserVoteSubmission[_deletion_index][_worker];
+                delete UserVoteSubmission[_ModB(_deletion_index)][_worker];
                 //----- Track Storage usage -----
                 BytesUsedReduction += BYTES_256*5+BYTES_256*2;
                 //----- Track Storage usage -----
             }
 
             // clear WorkersPerBatch
-            delete WorkersPerBatch[_deletion_index];
+            delete WorkersPerBatch[_ModB(_deletion_index)];
 
             //----- Track Storage usage -----
             BytesUsedReduction += BYTES_256*allocated_workers.length;
@@ -1118,54 +1134,6 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
             BytesUsed = 0;
         }
     }
-
-
-    /**
-     * @dev Destroy Spot Data, important to release storage space if critical
-     *      To be used only if deleteOldData() failed to properly clean state
-     */
-    function deleteSpotData(uint128 spotIndexA, uint128 spotIndexB) public onlyOwner {
-        require(spotIndexA < spotIndexB, "spotIndexA must be <= spotIndexB");
-        for (uint128 i = spotIndexA; i < spotIndexB; i++) {
-            delete SpotsMapping[i]; // delete SpotsMapping at index l            
-            //----- Track Storage usage -----
-            uint256 BytesUsedReduction = BYTES_256*2;                
-            if( BytesUsed >= BytesUsedReduction ){
-                BytesUsed -= BytesUsedReduction;
-            }else{
-                BytesUsed = 0;
-            }
-            //----- Track Storage usage -----
-        }
-    }
-
-    /**
-     * @dev Destroy WorkersPerBatch, important to release storage space if critical
-     */
-    function deleteWorkersSubmission(uint128 batchToDeleteIndex) public onlyOwner {
-        address[] memory allocated_workers = WorkersPerBatch[batchToDeleteIndex];
-        for (uint128 k = 0; k < allocated_workers.length; k++) {
-            //////////////////// FOR EACH WORKER ALLOCATED TO EACH BATCH
-            address _worker = allocated_workers[k];
-            // clear store
-            bytes32 worker_UUID = attrUUID(_worker, batchToDeleteIndex);
-            resetAttribute(worker_UUID, "numTokens");
-            resetAttribute(worker_UUID, "commitHash");
-            resetAttribute(worker_UUID, "commitVote");
-            // clear UserVoteSubmission
-            delete UserVoteSubmission[batchToDeleteIndex][_worker];
-
-            //----- Track Storage usage -----
-            uint256 BytesUsedReduction = BYTES_256*5+BYTES_256*2;         
-            if( BytesUsed >= BytesUsedReduction ){
-                BytesUsed -= BytesUsedReduction;
-            }else{
-                BytesUsed = 0;
-            }
-            //----- Track Storage usage -----
-        }
-    }
-                    
 
     /**
      * @dev Destroy AllWorkersArray, important to release storage space if critical
@@ -1305,9 +1273,9 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
                 bool progress = false;
                 // IF CURRENT BATCH IS COMPLETE AND NOT ALLOCATED TO WORKERS TO BE CHECKED, THEN ALLOCATE!
                 if (
-                    DataBatch[AllocatedBatchCursor].allocated_to_work != true &&
+                    DataBatch[_ModB(AllocatedBatchCursor)].allocated_to_work != true &&
                     availableWorkers.length >= Parameters.get_SPOT_MIN_CONSENSUS_WORKER_COUNT() &&
-                    DataBatch[AllocatedBatchCursor].complete
+                    DataBatch[_ModB(AllocatedBatchCursor)].complete
                 ) {
                     AllocateWork();
                     progress = true;
@@ -1332,11 +1300,11 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
             uint128 CurrentCursor = PrevCursor + i;
             // IF CURRENT BATCH IS ALLOCATED TO WORKERS AND VOTE HAS ENDED, THEN CHECK IT & MOVE ON!
             if (
-                DataBatch[CurrentCursor].allocated_to_work &&
-                (DataEnded(CurrentCursor) || (DataBatch[CurrentCursor].unrevealed_workers == 0))
+                DataBatch[_ModB(CurrentCursor)].allocated_to_work &&
+                (DataEnded(CurrentCursor) || (DataBatch[_ModB(CurrentCursor)].unrevealed_workers == 0))
             )  {	
                 // check if the batch is already validated	
-                if (!DataBatch[CurrentCursor].checked) {	
+                if (!DataBatch[_ModB(CurrentCursor)].checked) {	
                     ValidateDataBatch(CurrentCursor);	
                 }	
                 // increment BatchCheckingCursor if possible	
@@ -1376,13 +1344,13 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
         require(Parameters.getRepManager() != address(0), "RepManager is null in Parameters");
         require(Parameters.getRewardManager() != address(0), "RewardManager is null in Parameters");
         require(
-            DataEnded(_DataBatchId) || (DataBatch[_DataBatchId].unrevealed_workers == 0),
+            DataEnded(_DataBatchId) || (DataBatch[_ModB(_DataBatchId)].unrevealed_workers == 0),
             "_DataBatchId has not ended, or not every voters have voted"
         ); // votes needs to be closed
-        require(!DataBatch[_DataBatchId].checked, 
+        require(!DataBatch[_ModB(_DataBatchId)].checked, 
             "_DataBatchId is already validated"); // votes needs to be closed
 
-        address[] memory allocated_workers = WorkersPerBatch[_DataBatchId];
+        address[] memory allocated_workers = WorkersPerBatch[_ModB(_DataBatchId)];
         string[] memory proposedNewFiles = new string[](allocated_workers.length);
         uint32[] memory proposedBatchCounts = new uint32[](allocated_workers.length);
 
@@ -1391,8 +1359,8 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
 
         for (uint256 i = 0; i < allocated_workers.length; i++) {
             address worker_addr_ = allocated_workers[i];
-            string memory worker_proposed_new_file_ = UserVoteSubmission[_DataBatchId][worker_addr_].newFile;
-            uint32 worker_proposed_new_count_ = UserVoteSubmission[_DataBatchId][worker_addr_].batchCount;
+            string memory worker_proposed_new_file_ = UserVoteSubmission[_ModB(_DataBatchId)][worker_addr_].newFile;
+            uint32 worker_proposed_new_count_ = UserVoteSubmission[_ModB(_DataBatchId)][worker_addr_].batchCount;
             proposedNewFiles[i] = worker_proposed_new_file_;
             proposedBatchCounts[i] = worker_proposed_new_count_;
         }
@@ -1448,7 +1416,7 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
 
         // Force the protocol to validate a batch with at least 1 vote (and 1 non-null file hash)
         if (FORCE_VALIDATE_BATCH_FILE) {
-            BatchMetadata memory batch_ = DataBatch[_DataBatchId];
+            BatchMetadata memory batch_ = DataBatch[_ModB(_DataBatchId)];
             if (batch_.votesFor > 0) {
                 // FORCE PASS ON BATCH
                 isCheckPassed = true;
@@ -1457,7 +1425,7 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
             if (AreStringsEqual(majorityNewFile, "")) {
                 //If majorityNewFile is null, find a submitted file to replace it
                 for (uint256 i = 0; i < allocated_workers.length; i++) {                    
-                    if (!UserVoteSubmission[_DataBatchId][allocated_workers[i]].revealed) {
+                    if (!UserVoteSubmission[_ModB(_DataBatchId)][allocated_workers[i]].revealed) {
                         continue; // if user has not even voted, skip.
                     }
                     // if majorityNewFile was null, find a replacement
@@ -1484,14 +1452,14 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
             // Cap the Batch Count to [Maximum Nb of files in batch * SPOT_FILE_SIZE)] (there can't be more item)
             majorityBatchCount = uint32(
                 Math.min( 
-                    uint32(DataBatch[_DataBatchId].counter * SPOT_FILE_SIZE),
+                    uint32(DataBatch[_ModB(_DataBatchId)].counter * SPOT_FILE_SIZE),
                     majorityBatchCount));
         }
 
         for (uint256 i = 0; i < allocated_workers.length; i++) {
             address worker_addr_ = allocated_workers[i];
-            uint256 worker_vote_ = UserVoteSubmission[_DataBatchId][worker_addr_].vote;
-            bool has_worker_voted_ = UserVoteSubmission[_DataBatchId][worker_addr_].revealed;
+            uint256 worker_vote_ = UserVoteSubmission[_ModB(_DataBatchId)][worker_addr_].vote;
+            bool has_worker_voted_ = UserVoteSubmission[_ModB(_DataBatchId)][worker_addr_].revealed;
 
             // Worker state update
             WorkerState storage worker_state = WorkersState[worker_addr_];
@@ -1554,21 +1522,21 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
         }
         // -------------------------------------------------------------
         // BATCH STATE UPDATE: mark it checked, final.
-        DataBatch[_DataBatchId].checked = true;
-        DataBatch[_DataBatchId].batchIPFSfile = majorityNewFile;
-        DataBatch[_DataBatchId].item_count = majorityBatchCount;
+        DataBatch[_ModB(_DataBatchId)].checked = true;
+        DataBatch[_ModB(_DataBatchId)].batchIPFSfile = majorityNewFile;
+        DataBatch[_ModB(_DataBatchId)].item_count = majorityBatchCount;
 
         // -------------------------------------------------------------
         // IF THE DATA BLOCK IS ACCEPTED
         if (isCheckPassed) {
             // Reward Spotters involved in the Batch
-            uint128 start_batch_idx = DataBatch[_DataBatchId].start_idx;
-            uint128 end_batch_idx = DataBatch[_DataBatchId].start_idx + DataBatch[_DataBatchId].counter;
+            uint128 start_batch_idx = DataBatch[_ModB(_DataBatchId)].start_idx;
+            uint128 end_batch_idx = DataBatch[_ModB(_DataBatchId)].start_idx + DataBatch[_ModB(_DataBatchId)].counter;
 
             // -------------------------------------------------------------
             // Rewards Spot Authors, one by one, for the batch
             for (uint128 l = start_batch_idx; l < end_batch_idx; l++) {
-                address spot_author_ = SpotsMapping[l].author;
+                address spot_author_ = SpotsMapping[_ModS(l)].author;
                 IAddressManager _AddressManager = IAddressManager(Parameters.getAddressManager());
                 IRepManager _RepManager = IRepManager(Parameters.getRepManager());
                 IRewardManager _RewardManager = IRewardManager(Parameters.getRewardManager());
@@ -1592,7 +1560,7 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
                 }
             }
             // UPDATE BATCH STATE
-            DataBatch[_DataBatchId].status = DataStatus.APPROVED;
+            DataBatch[_ModB(_DataBatchId)].status = DataStatus.APPROVED;
             AcceptedBatchsCounter += 1;
 
             //----- Track Storage usage -----
@@ -1612,16 +1580,16 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
         // -------------------------------------------------------------
         // IF THE DATA BLOCK IS REJECTED
         else {
-            DataBatch[_DataBatchId].status = DataStatus.REJECTED;
+            DataBatch[_ModB(_DataBatchId)].status = DataStatus.REJECTED;
             RejectedBatchsCounter += 1;
         }
         // ---------------- GLOBAL STATE UPDATE ----------------
         AllTxsCounter += 1;
-        AllItemCounter += DataBatch[_DataBatchId].item_count;
-        ItemFlowManager[ItemFlowManager.length - 1].counter +=  DataBatch[_DataBatchId].item_count;
+        AllItemCounter += DataBatch[_ModB(_DataBatchId)].item_count;
+        ItemFlowManager[ItemFlowManager.length - 1].counter +=  DataBatch[_ModB(_DataBatchId)].item_count;
         updateItemCount();
-        NotCommitedCounter += DataBatch[_DataBatchId].uncommited_workers;
-        NotRevealedCounter += DataBatch[_DataBatchId].unrevealed_workers;
+        NotCommitedCounter += DataBatch[_ModB(_DataBatchId)].uncommited_workers;
+        NotRevealedCounter += DataBatch[_ModB(_DataBatchId)].unrevealed_workers;
 
 
         emit _BatchValidated(_DataBatchId, majorityNewFile, isCheckPassed);
@@ -1631,9 +1599,9 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
   * @notice Allocate last data batch to be checked by K out N currently available workers.
   */
     function AllocateWork() internal {
-        require(DataBatch[AllocatedBatchCursor].complete, "Can't allocate work, the current batch is not complete");
+        require(DataBatch[_ModB(AllocatedBatchCursor)].complete, "Can't allocate work, the current batch is not complete");
         require(
-            !DataBatch[AllocatedBatchCursor].allocated_to_work,
+            !DataBatch[_ModB(AllocatedBatchCursor)].allocated_to_work,
             "Can't allocate work, the current batch is already allocated"
         );
         uint16 selected_k = uint16(Math.max(
@@ -1648,13 +1616,13 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
         if ((uint64(block.timestamp) - LastAllocationTime) >= Parameters.get_SPOT_INTER_ALLOCATION_DURATION()) {
             uint128 _allocated_batch_cursor = AllocatedBatchCursor;
             ///////////////////////////// BATCH UPDATE STATE /////////////////////////////
-            DataBatch[_allocated_batch_cursor].unrevealed_workers = selected_k;
-            DataBatch[_allocated_batch_cursor].uncommited_workers = selected_k;
+            DataBatch[_ModB(_allocated_batch_cursor)].unrevealed_workers = selected_k;
+            DataBatch[_ModB(_allocated_batch_cursor)].uncommited_workers = selected_k;
             uint64 _commitEndDate = uint64(block.timestamp + Parameters.get_SPOT_COMMIT_ROUND_DURATION());
             uint64 _revealEndDate = uint64(_commitEndDate + Parameters.get_SPOT_REVEAL_ROUND_DURATION());
-            DataBatch[_allocated_batch_cursor].commitEndDate = _commitEndDate;
-            DataBatch[_allocated_batch_cursor].revealEndDate = _revealEndDate;
-            DataBatch[_allocated_batch_cursor].allocated_to_work = true;
+            DataBatch[_ModB(_allocated_batch_cursor)].commitEndDate = _commitEndDate;
+            DataBatch[_ModB(_allocated_batch_cursor)].revealEndDate = _revealEndDate;
+            DataBatch[_ModB(_allocated_batch_cursor)].allocated_to_work = true;
             //////////////////////////////////////////////////////////////////////////////
 
             //----- Track Storage usage -----
@@ -1677,12 +1645,12 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
                 address selected_worker_ = selected_workers_addresses[i];
                 WorkerState storage worker_state = WorkersState[selected_worker_];
                 // clear existing values
-                UserVoteSubmission[_allocated_batch_cursor][selected_worker_].commited = false;
-                UserVoteSubmission[_allocated_batch_cursor][selected_worker_].revealed = false;
+                UserVoteSubmission[_ModB(_allocated_batch_cursor)][selected_worker_].commited = false;
+                UserVoteSubmission[_ModB(_allocated_batch_cursor)][selected_worker_].revealed = false;
                 ///// worker swapping from available to busy, not to be picked again while working.
                 PopFromAvailableWorkers(selected_worker_);
                 PushInBusyWorkers(selected_worker_); //set worker as busy
-                WorkersPerBatch[_allocated_batch_cursor].push(selected_worker_);
+                WorkersPerBatch[_ModB(_allocated_batch_cursor)].push(selected_worker_);
                 ///// allocation
                 worker_state.allocated_work_batch = _allocated_batch_cursor;
                 worker_state.allocated_batch_counter += 1;
@@ -1892,7 +1860,7 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
                 string memory URL_domain_ = URL_domains_[i];
                 uint64 item_count_ = item_counts_[i];
 
-                SpotsMapping[DataNonce] = SpottedData({
+                SpotsMapping[_ModS(DataNonce)] = SpottedData({
                     ipfs_hash: file_hash,
                     author: msg.sender,
                     timestamp: uint64(block.timestamp),
@@ -1907,7 +1875,7 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
                 //----- Track Storage usage -----
 
                 // UPDATE STREAMING DATA BATCH STRUCTURE
-                BatchMetadata storage current_data_batch = DataBatch[_batch_counter];
+                BatchMetadata storage current_data_batch = DataBatch[_ModB(_batch_counter)];
                 if (current_data_batch.counter < Parameters.get_SPOT_DATA_BATCH_SIZE()) {
                     current_data_batch.counter += 1;
                 }
@@ -1917,7 +1885,7 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
                     current_data_batch.checked = false;
                     LastBatchCounter += 1;
                     // we indicate that the first spot of the new batch, is the one we just built
-                    DataBatch[_batch_counter].start_idx = DataNonce; 
+                    DataBatch[_ModB(_batch_counter)].start_idx = DataNonce; 
                     //----- Track Storage usage -----
                     BytesUsed += BYTES_8+BYTES_128; //bool + start_idx
                     //----- Track Storage usage -----
@@ -2001,7 +1969,7 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
     {
         require(IParametersManager(address(0)) != Parameters, "Parameters Manager must be set.");
         require(commitPeriodActive(_DataBatchId), "commit period needs to be open for this batchId");
-        require(!UserVoteSubmission[_DataBatchId][msg.sender].commited, "User has already commited to this batchId");
+        require(!UserVoteSubmission[_ModB(_DataBatchId)][msg.sender].commited, "User has already commited to this batchId");
         require(
             isWorkerAllocatedToBatch(_DataBatchId, msg.sender),
             "User needs to be allocated to this batch to commit on it"
@@ -2045,15 +2013,15 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
         setAttribute(UUID, "commitHash", uint256(_encryptedHash));
         setAttribute(UUID, "commitVote", uint256(_encryptedVote));
 
-        UserVoteSubmission[_DataBatchId][msg.sender].batchCount = _BatchCount; //1 slot
-        UserVoteSubmission[_DataBatchId][msg.sender].batchFrom = _From; //1 slot
-        BatchCommitedVoteCount[_DataBatchId] += 1;
+        UserVoteSubmission[_ModB(_DataBatchId)][msg.sender].batchCount = _BatchCount; //1 slot
+        UserVoteSubmission[_ModB(_DataBatchId)][msg.sender].batchFrom = _From; //1 slot
+        BatchCommitedVoteCount[_ModB(_DataBatchId)] += 1;
 
         // ----------------------- WORKER STATE UPDATE -----------------------
         WorkerState storage worker_state = WorkersState[msg.sender];
-        DataBatch[_DataBatchId].uncommited_workers = DataBatch[_DataBatchId].uncommited_workers - 1;
+        DataBatch[_ModB(_DataBatchId)].uncommited_workers = DataBatch[_ModB(_DataBatchId)].uncommited_workers - 1;
         worker_state.last_interaction_date = uint64(block.timestamp);
-        UserVoteSubmission[_DataBatchId][msg.sender].commited = true;
+        UserVoteSubmission[_ModB(_DataBatchId)][msg.sender].commited = true;
                 
         //----- Track Storage usage -----
         BytesUsed += BYTES_128+BYTES_256; //dllMap
@@ -2082,9 +2050,9 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
     {
         // Make sure the reveal period is active
         require(revealPeriodActive(_DataBatchId), "Reveal period not open for this DataID");
-        require(UserVoteSubmission[_DataBatchId][msg.sender].commited, 
+        require(UserVoteSubmission[_ModB(_DataBatchId)][msg.sender].commited, 
         "User has not commited before, thus can't reveal");
-        require(!UserVoteSubmission[_DataBatchId][msg.sender].revealed, "User has already revealed, thus can't reveal");
+        require(!UserVoteSubmission[_ModB(_DataBatchId)][msg.sender].revealed, "User has already revealed, thus can't reveal");
         require(
             getEncryptedStringHash(_clearIPFSHash, _salt) == getCommitIPFSHash(msg.sender, _DataBatchId),
             "Not the same hash than commited, impossible to match with given _salt & _clearIPFSHash"
@@ -2096,16 +2064,16 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
 
         if (_clearVote == APPROVAL_VOTE_MAPPING_) {
             // apply numTokens to appropriate SpottedData choice
-            DataBatch[_DataBatchId].votesFor += 1;
+            DataBatch[_ModB(_DataBatchId)].votesFor += 1;
         } else {
-            DataBatch[_DataBatchId].votesAgainst += 1;
+            DataBatch[_ModB(_DataBatchId)].votesAgainst += 1;
         }
 
         // ----------------------- USER STATE UPDATE -----------------------
-        UserVoteSubmission[_DataBatchId][msg.sender].revealed = true;
-        UserVoteSubmission[_DataBatchId][msg.sender].vote = _clearVote;
-        UserVoteSubmission[_DataBatchId][msg.sender].newFile = _clearIPFSHash; //2 slots
-        BatchRevealedVoteCount[_DataBatchId] += 1;
+        UserVoteSubmission[_ModB(_DataBatchId)][msg.sender].revealed = true;
+        UserVoteSubmission[_ModB(_DataBatchId)][msg.sender].vote = _clearVote;
+        UserVoteSubmission[_ModB(_DataBatchId)][msg.sender].newFile = _clearIPFSHash; //2 slots
+        BatchRevealedVoteCount[_ModB(_DataBatchId)] += 1;
 
         //----- Track Storage usage -----
         BytesUsed += BYTES_8*2+BYTES_256*2; //boolean + vote + hash
@@ -2113,7 +2081,7 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
 
         // ----------------------- WORKER STATE UPDATE -----------------------
         WorkerState storage worker_state = WorkersState[msg.sender];
-        DataBatch[_DataBatchId].unrevealed_workers = DataBatch[_DataBatchId].unrevealed_workers - 1;
+        DataBatch[_ModB(_DataBatchId)].unrevealed_workers = DataBatch[_ModB(_DataBatchId)].unrevealed_workers - 1;
 
         worker_state.last_interaction_date = uint64(block.timestamp);
 
@@ -2155,7 +2123,7 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
         }
 
         // Move directly to Validation if everyone revealed.
-        if (VALIDATE_ON_LAST_REVEAL && DataBatch[_DataBatchId].unrevealed_workers == 0) {
+        if (VALIDATE_ON_LAST_REVEAL && DataBatch[_ModB(_DataBatchId)].unrevealed_workers == 0) {
             ValidateDataBatch(_DataBatchId);
         }
 
@@ -2163,8 +2131,8 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
         _retrieveSFuel();
         emit _SpotCheckRevealed(
             _DataBatchId,
-            DataBatch[_DataBatchId].votesFor,
-            DataBatch[_DataBatchId].votesAgainst,
+            DataBatch[_ModB(_DataBatchId)].votesFor,
+            DataBatch[_ModB(_DataBatchId)].votesAgainst,
             _clearVote,
             msg.sender
         );
@@ -2253,7 +2221,7 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
   */
     function rescueTokens(uint128 _DataBatchId) public {
         require(
-            DataBatch[_DataBatchId].status == DataStatus.APPROVED,
+            DataBatch[_ModB(_DataBatchId)].status == DataStatus.APPROVED,
             "given DataBatch should be APPROVED, and it is not"
         );
         require(dllMap[msg.sender].contains(_DataBatchId), "dllMap: does not cointain _DataBatchId for the msg sender");
@@ -2294,14 +2262,14 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
   */
     function getIPFShashesForBatch(uint128 _DataBatchId) public view returns (string[] memory) {
         require(DataExists(_DataBatchId), "_DataBatchId must exist");
-        BatchMetadata memory batch_ = DataBatch[_DataBatchId];
+        BatchMetadata memory batch_ = DataBatch[_ModB(_DataBatchId)];
         uint256 batch_size = batch_.counter;
 
         string[] memory ipfs_hash_list = new string[](batch_size);
 
         for (uint128 i = 0; i < batch_size; i++) {
             uint128 k = batch_.start_idx + i;
-            string memory ipfs_hash_ = SpotsMapping[k].ipfs_hash;
+            string memory ipfs_hash_ = SpotsMapping[_ModS(k)].ipfs_hash;
             ipfs_hash_list[i] = ipfs_hash_;
         }
 
@@ -2322,17 +2290,17 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
         uint128 _ipfs_hash_count = 0;
 
         for (uint128 batchI = _DataBatchId_a; batchI < _DataBatchId_b + 1; batchI++) {
-            BatchMetadata memory batch_ = DataBatch[batchI];
+            BatchMetadata memory batch_ = DataBatch[_ModB(batchI)];
             _ipfs_hash_count += batch_.counter;
         }
         string[] memory ipfs_hash_list = new string[](_ipfs_hash_count);
 
         uint128 c = 0;
         for (uint128 batchI = _DataBatchId_a; batchI < _DataBatchId_b + 1; batchI++) {
-            BatchMetadata memory batch_ = DataBatch[batchI];
+            BatchMetadata memory batch_ = DataBatch[_ModB(batchI)];
             for (uint128 i = 0; i < batch_.counter; i++) {
                 uint128 k = batch_.start_idx + i;
-                string memory ipfs_hash_ = SpotsMapping[k].ipfs_hash;
+                string memory ipfs_hash_ = SpotsMapping[_ModS(k)].ipfs_hash;
                 ipfs_hash_list[c] = ipfs_hash_;
                 c += 1;
             }
@@ -2359,7 +2327,7 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
         uint128[] memory _batch_counts_list = new uint128[](_batch_amount);
 
         for (uint128 i = 0; i < _batch_amount ; i++) {
-            BatchMetadata memory batch_ = DataBatch[i+_DataBatchId_a];
+            BatchMetadata memory batch_ = DataBatch[_ModB(i+_DataBatchId_a)];
             _total_batchs_count += batch_.item_count;
             _batch_counts_list[i] = batch_.item_count;
         }
@@ -2375,14 +2343,14 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
   */
     function getDomainsForBatch(uint128 _DataBatchId) public view returns (string[] memory) {
         require(DataExists(_DataBatchId), "_DataBatchId must exist");
-        BatchMetadata memory batch_ = DataBatch[_DataBatchId];
+        BatchMetadata memory batch_ = DataBatch[_ModB(_DataBatchId)];
         uint128 batch_size = batch_.counter;
 
         string[] memory ipfs_hash_list = new string[](batch_size);
 
         for (uint128 i = 0; i < batch_size; i++) {
             uint128 k = batch_.start_idx + i;
-            string memory ipfs_hash_ = SpotsMapping[k].URL_domain;
+            string memory ipfs_hash_ = SpotsMapping[_ModS(k)].URL_domain;
             ipfs_hash_list[i] = ipfs_hash_;
         }
 
@@ -2396,11 +2364,11 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
     function getFromsForBatch(uint128 _DataBatchId) public view returns (string[] memory) {
         require(DataExists(_DataBatchId), "_DataBatchId must exist");
 
-        address[] memory allocated_workers = WorkersPerBatch[_DataBatchId];
+        address[] memory allocated_workers = WorkersPerBatch[_ModB(_DataBatchId)];
         string[] memory from_list = new string[](allocated_workers.length);
 
         for (uint128 i = 0; i < allocated_workers.length; i++) {
-            from_list[i] = UserVoteSubmission[_DataBatchId][allocated_workers[i]].batchFrom;
+            from_list[i] = UserVoteSubmission[_ModB(_DataBatchId)][allocated_workers[i]].batchFrom;
         }
         return from_list;
     }
@@ -2412,11 +2380,11 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
     function getVotesForBatch(uint128 _DataBatchId) public view returns (uint128[] memory) {
         require(DataExists(_DataBatchId), "_DataBatchId must exist");
 
-        address[] memory allocated_workers = WorkersPerBatch[_DataBatchId];
+        address[] memory allocated_workers = WorkersPerBatch[_ModB(_DataBatchId)];
         uint128[] memory votes_list = new uint128[](allocated_workers.length);
 
         for (uint128 i = 0; i < allocated_workers.length; i++) {
-            votes_list[i] = UserVoteSubmission[_DataBatchId][allocated_workers[i]].vote;
+            votes_list[i] = UserVoteSubmission[_ModB(_DataBatchId)][allocated_workers[i]].vote;
         }
         return votes_list;
     }
@@ -2428,11 +2396,11 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
     function getSubmittedFilesForBatch(uint128 _DataBatchId) public view returns (string[] memory) {
         require(DataExists(_DataBatchId), "_DataBatchId must exist");
 
-        address[] memory allocated_workers = WorkersPerBatch[_DataBatchId];
+        address[] memory allocated_workers = WorkersPerBatch[_ModB(_DataBatchId)];
         string[] memory files_list = new string[](allocated_workers.length);
 
         for (uint256 i = 0; i < allocated_workers.length; i++) {
-            files_list[i] = UserVoteSubmission[_DataBatchId][allocated_workers[i]].newFile;
+            files_list[i] = UserVoteSubmission[_ModB(_DataBatchId)][allocated_workers[i]].newFile;
         }
         return files_list;
     }
@@ -2491,7 +2459,7 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
   * @param _DataBatchId Integer identifier associated with target SpottedData
   */
     function isPassed(uint128 _DataBatchId) public view returns (bool passed) {
-        BatchMetadata memory batch_ = DataBatch[_DataBatchId];
+        BatchMetadata memory batch_ = DataBatch[_ModB(_DataBatchId)];
         return (100 * batch_.votesFor) > (Parameters.getVoteQuorum() * (batch_.votesFor + batch_.votesAgainst));
     }
 
@@ -2506,7 +2474,7 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
         uint256 _salt
     ) public view returns (uint256 numTokens) {
         require(DataEnded(_DataBatchId), "_DataBatchId checking vote must have ended");
-        require(UserVoteSubmission[_DataBatchId][_voter].revealed, "user must have revealed in this given Batch");
+        require(UserVoteSubmission[_ModB(_DataBatchId)][_voter].revealed, "user must have revealed in this given Batch");
 
         uint16 winningChoice = isPassed(_DataBatchId) ? 1 : 0;
         bytes32 winnerHash = keccak256(abi.encodePacked(winningChoice, _salt));
@@ -2525,8 +2493,8 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
     function DataEnded(uint128 _DataBatchId) public view returns (bool ended) {
         require(DataExists(_DataBatchId), "Data must exist");
 
-        return isExpired(DataBatch[_DataBatchId].revealEndDate)
-                || (commitPeriodOver(_DataBatchId) && BatchCommitedVoteCount[_DataBatchId] == 0);
+        return isExpired(DataBatch[_ModB(_DataBatchId)].revealEndDate)
+                || (commitPeriodOver(_DataBatchId) && BatchCommitedVoteCount[_ModB(_DataBatchId)] == 0);
     }
 
     /**
@@ -2567,7 +2535,7 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
   */
     function getBatchByID(uint128 _DataBatchId) public view returns (BatchMetadata memory batch) {
         require(DataExists(_DataBatchId));
-        return DataBatch[_DataBatchId];
+        return DataBatch[_ModB(_DataBatchId)];
     }
 
     /**
@@ -2576,7 +2544,7 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
   */
     function getBatchIPFSFileByID(uint128 _DataBatchId) public view returns (string memory batch) {
         require(DataExists(_DataBatchId));
-        return DataBatch[_DataBatchId].batchIPFSfile;
+        return DataBatch[_ModB(_DataBatchId)].batchIPFSfile;
     }
     
     /**
@@ -2595,7 +2563,7 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
         uint128 _array_size = _DataBatchId_b - _DataBatchId_a+1;
         string[] memory ipfs_hash_list = new string[](_array_size);
         for (uint128 i = 0; i < _array_size; i++) {
-            ipfs_hash_list[i] = DataBatch[_DataBatchId_a + i].batchIPFSfile;
+            ipfs_hash_list[i] = DataBatch[_ModB(_DataBatchId_a + i)].batchIPFSfile;
         }
         return ipfs_hash_list;
     }
@@ -2630,7 +2598,7 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
   * @return data as SpottedData struct
   */
     function getDataByID(uint128 _DataId) public view returns (SpottedData memory data) {
-        return SpotsMapping[_DataId];
+        return SpotsMapping[_ModS(_DataId)];
     }
 
     /**
@@ -2656,7 +2624,7 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
     function DataCommitEndDate(uint128 _DataBatchId) public view returns (uint256 commitEndDate) {
         require(DataExists(_DataBatchId), "_DataBatchId must exist");
 
-        return DataBatch[_DataBatchId].commitEndDate;
+        return DataBatch[_ModB(_DataBatchId)].commitEndDate;
     }
 
     /**
@@ -2666,7 +2634,7 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
     function DataRevealEndDate(uint128 _DataBatchId) public view returns (uint256 revealEndDate) {
         require(DataExists(_DataBatchId), "_DataBatchId must exist");
 
-        return DataBatch[_DataBatchId].revealEndDate;
+        return DataBatch[_ModB(_DataBatchId)].revealEndDate;
     }
 
     /**
@@ -2678,7 +2646,7 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
     function commitPeriodActive(uint128 _DataBatchId) public view returns (bool active) {
         require(DataExists(_DataBatchId), "_DataBatchId must exist");
 
-        return !isExpired(DataBatch[_DataBatchId].commitEndDate) && (DataBatch[_DataBatchId].uncommited_workers > 0);
+        return !isExpired(DataBatch[_ModB(_DataBatchId)].commitEndDate) && (DataBatch[_ModB(_DataBatchId)].uncommited_workers > 0);
     }
 
     /**
@@ -2692,7 +2660,7 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
             return false;
         } else {
             // a commitPeriod is Over if : time has expired OR if revealPeriod for the same _DataBatchId is true
-            return isExpired(DataBatch[_DataBatchId].commitEndDate) || revealPeriodActive(_DataBatchId);
+            return isExpired(DataBatch[_ModB(_DataBatchId)].commitEndDate) || revealPeriodActive(_DataBatchId);
         }
     }
 
@@ -2706,7 +2674,7 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
         require(DataExists(_DataBatchId), "_DataBatchId must exist");
         uint64 _remainingTime = 0;
         if (commitPeriodActive(_DataBatchId)) {
-            _remainingTime = DataBatch[_DataBatchId].commitEndDate - uint64(block.timestamp);
+            _remainingTime = DataBatch[_ModB(_DataBatchId)].commitEndDate - uint64(block.timestamp);
         }
         return _remainingTime;
     }
@@ -2719,7 +2687,7 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
     function revealPeriodActive(uint128 _DataBatchId) public view returns (bool active) {
         require(DataExists(_DataBatchId), "_DataBatchId must exist");
 
-        return !isExpired(DataBatch[_DataBatchId].revealEndDate) && !commitPeriodActive(_DataBatchId);
+        return !isExpired(DataBatch[_ModB(_DataBatchId)].revealEndDate) && !commitPeriodActive(_DataBatchId);
     }
 
     /**
@@ -2732,7 +2700,7 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
             return false;
         } else {
             // a commitPeriod is Over if : time has expired OR if revealPeriod for the same _DataBatchId is true
-            return isExpired(DataBatch[_DataBatchId].revealEndDate) || DataBatch[_DataBatchId].unrevealed_workers == 0;
+            return isExpired(DataBatch[_ModB(_DataBatchId)].revealEndDate) || DataBatch[_ModB(_DataBatchId)].unrevealed_workers == 0;
         }
     }
 
@@ -2746,7 +2714,7 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
         require(DataExists(_DataBatchId), "_DataBatchId must exist");
         uint256 _remainingTime = 0;
         if (revealPeriodActive(_DataBatchId)) {
-            _remainingTime = DataBatch[_DataBatchId].revealEndDate - block.timestamp;
+            _remainingTime = DataBatch[_ModB(_DataBatchId)].revealEndDate - block.timestamp;
         }
         return _remainingTime;
     }
@@ -2760,8 +2728,8 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
     function didCommit(address _voter, uint128 _DataBatchId) public view returns (bool committed) {
         require(DataExists(_DataBatchId), "_DataBatchId must exist");
 
-        // return SpotsMapping[_DataBatchId].didCommit[_voter];
-        return UserVoteSubmission[_DataBatchId][_voter].commited;
+        // return SpotsMapping[_ModS(_DataBatchId)].didCommit[_voter];
+        return UserVoteSubmission[_ModB(_DataBatchId)][_voter].commited;
     }
 
     /**
@@ -2773,8 +2741,8 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
     function didReveal(address _voter, uint128 _DataBatchId) public view returns (bool revealed) {
         require(DataExists(_DataBatchId), "_DataBatchId must exist");
 
-        // return SpotsMapping[_DataBatchId].didReveal[_voter];
-        return UserVoteSubmission[_DataBatchId][_voter].revealed;
+        // return SpotsMapping[_ModS(_DataBatchId)].didReveal[_voter];
+        return UserVoteSubmission[_ModB(_DataBatchId)][_voter].revealed;
     }
 
     
@@ -2785,7 +2753,7 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
   * @return exists Boolean Indicates whether a SpottedData exists for the provided DataID
   */
     function DataExists(uint128 _DataBatchId) public view returns (bool exists) {
-        return (DataBatch[_DataBatchId].complete);
+        return (DataBatch[_ModB(_DataBatchId)].complete);
     }
 
     function AmIRegistered() public view returns (bool passed) {

@@ -22,9 +22,9 @@ contract RewardsManager is Ownable {
 
     // Cap rewards at 30k EXD per 24 hours, and 1.25k per hour
     uint16 constant NB_TIMEFRAMES_HOURLY = 15;
-    uint16 constant TIMEFRAMES_HOURLY_DURATION = 240; // 240*15 = 3600s = 1 hour
+    uint16 constant FOUR_MINUTES_DURATION = 240; // 240*15 = 3600s = 1 hour
     uint16 constant NB_TIMEFRAMES_DAILY = 24;
-    uint16 constant TIMEFRAMES_HOURLY_DAILY = 3600; // 3600*24 = 1 day
+    uint16 constant ONE_HOUR_DURATION = 3600; // 3600*24 = 1 day
     TimeframeCounter[NB_TIMEFRAMES_HOURLY] public HourlyRewardsFlowManager;
     TimeframeCounter[NB_TIMEFRAMES_DAILY] public DailyRewardsFlowManager;
 
@@ -140,7 +140,7 @@ contract RewardsManager is Ownable {
     /**
      * @notice Updates the hourly sliding rewards counter: an array counting distributed rewards per slots of 4 min
      *         -> The goal is to get the total amount of distributed rewards per hour, by summing the array's elements
-     *         If >TIMEFRAMES_HOURLY_DURATION (e.g. 4min) has elasped since latest timestamp in the sliding counter
+     *         If >FOUR_MINUTES_DURATION (e.g. 4min) has elasped since latest timestamp in the sliding counter
      *         THEN shift all sliding counters array elements to the left
      *         -> Operates a left-cycling of array values, to implement the sliding aspect of the counter
      *         -> Overwrite the most left-wise element of the array
@@ -148,7 +148,7 @@ contract RewardsManager is Ownable {
     function updateHourlyRewardsCount() public {
         uint256 last_timeframe_idx_ = HourlyRewardsFlowManager.length - 1;
         uint256 mostRecentTimestamp_ = HourlyRewardsFlowManager[last_timeframe_idx_].timestamp;
-        if ((uint64(block.timestamp) - mostRecentTimestamp_) > TIMEFRAMES_HOURLY_DURATION) {
+        if ((uint64(block.timestamp) - mostRecentTimestamp_) > FOUR_MINUTES_DURATION) {
             // cycle & move periods to the left
             for (uint256 i = 0; i < (HourlyRewardsFlowManager.length - 1); i++) {
                 HourlyRewardsFlowManager[i] = HourlyRewardsFlowManager[i + 1];
@@ -163,7 +163,7 @@ contract RewardsManager is Ownable {
     /**
      * @notice Updates the daily sliding rewards counter: an array counting distributed rewards per slots of 1 hour
      *         -> The goal is to get the total amount of distributed rewards per day, by summing the array's elements
-     *         If >TIMEFRAMES_HOURLY_DAILY (e.g. 1hour) has elasped since latest timestamp in the sliding counter
+     *         If >ONE_HOUR_DURATION (e.g. 1hour) has elasped since latest timestamp in the sliding counter
      *         THEN shift all sliding counters array elements to the left
      *         -> Operates a left-cycling of array values, to implement the sliding aspect of the counter
      *         -> Overwrite the most left-wise element of the array
@@ -171,7 +171,7 @@ contract RewardsManager is Ownable {
     function updateDailyRewardsCount() public {
         uint256 last_timeframe_idx_ = DailyRewardsFlowManager.length - 1;
         uint256 mostRecentTimestamp_ = DailyRewardsFlowManager[last_timeframe_idx_].timestamp;
-        if ((uint64(block.timestamp) - mostRecentTimestamp_) > TIMEFRAMES_HOURLY_DAILY) {
+        if ((uint64(block.timestamp) - mostRecentTimestamp_) > ONE_HOUR_DURATION) {
             // cycle & move periods to the left
             for (uint256 i = 0; i < (DailyRewardsFlowManager.length - 1); i++) {
                 DailyRewardsFlowManager[i] = DailyRewardsFlowManager[i + 1];

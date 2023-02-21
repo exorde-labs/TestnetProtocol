@@ -156,8 +156,10 @@ contract StakingManager is
         emit StakeSlashingUnWhitelisted(_address, false);
     }
     
-    // -------
-    // update the slashed stake sink address (receving slashed stakes)
+    /**
+     * @notice update the slashed stake sink address (receving slashed stakes)
+     * @param _new_sink_address The new sink address
+     */
     function updateSlashedSinkAddress(address _new_sink_address) public onlyOwner {
         address previous_address = slashedStakeSinkAddress;
         slashedStakeSinkAddress = _new_sink_address;
