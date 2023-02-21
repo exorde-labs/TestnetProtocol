@@ -222,7 +222,9 @@ contract StakingManager is
     // ---------- EXTERNAL STAKE ALLOCATIONS ----------
 
     /**
-     * @notice A method for a verified whitelisted contract to allocate for itself some stake // nonReentrant()
+     * @notice A method for a verified whitelisted contract to allocate for itself some stake
+     * @param _StakeAllocation The amount to allocate
+     * @param _stakeholder The address of the stakeholder
      */
     function ProxyStakeAllocate(uint256 _StakeAllocation, address _stakeholder) public returns (bool) {
         require(isStakeWhitelisted(msg.sender), "isStakeWhitelisted must be true for Sender");
@@ -244,9 +246,11 @@ contract StakingManager is
     }
 
     /**
-     * @notice A method for a verified whitelisted contract to allocate for itself some stake
+     * @notice A method for a verified whitelisted contract to deallocate stake from itself
      * _StakeToDeallocate has to be equal to the amount of at least one ALLOCATED allocation
-     * else the procedure will fail
+     * else the procedure will fail.
+     * @param _StakeToDeallocate The amount to deallocate
+     * @param _stakeholder The address of the stakeholder
      */
     function ProxyStakeDeallocate(uint256 _StakeToDeallocate, address _stakeholder) public returns (bool) {
         // msg.sender is the sub-system calling this proxy function
@@ -270,9 +274,12 @@ contract StakingManager is
     }
 
     /**
-     * @notice A method for a verified whitelisted contract to allocate for itself some stake
-     * _StakeToDeallocate has to be equal to the amount of at least one ALLOCATED allocation
-     * else the procedure will fail
+     * @notice A method for a verified whitelisted contract to slash _StakeToSlash
+     * _StakeToSlash is either taken on the staked balance of the _stakeholder to slash, 
+     * or from its allocated balance on _system_address
+     * @param _StakeToSlash The amount to slash
+     * @param _stakeholder The address of the stakeholder
+     * @param _system_address The address of the system contract
      */
     function ProxyStakeSlash(uint256 _StakeToSlash, address _stakeholder, address _system_address) 
     public returns (bool) {
@@ -313,22 +320,6 @@ contract StakingManager is
     }
 
     // ---------- SUB-STAKE MANAGEMENT ----------
-
-    /**
-     * @notice A method for a stakeholder to close all available stakes
-     */
-    function AdminUserDeallocate(uint256 _StakeToDeallocate, address _stakeholder) public onlyOwner {
-        require(balances[_stakeholder].staked_balance >= _StakeToDeallocate, "deposited stake is too low");
-        // Global state update
-        if ( UserStakeAllocations[_stakeholder][msg.sender] >= _StakeToDeallocate ){
-            UserStakeAllocations[_stakeholder][msg.sender]  -= _StakeToDeallocate;            
-        }
-        if ( TotalAllocationsPerSystem[msg.sender] >= _StakeToDeallocate ){
-            TotalAllocationsPerSystem[msg.sender]  -= _StakeToDeallocate;            
-        }
-        balances[_stakeholder].staked_balance += _StakeToDeallocate;
-        emit AdminDeallocatedStake(_stakeholder, _StakeToDeallocate);
-    }
 
     /**
      * @notice gets the total amount of stakes allocated to a given sub system (a contract, e.g. a WorkSystem)
