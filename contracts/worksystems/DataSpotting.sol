@@ -397,7 +397,7 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
     // Initial storage variables: 64+16+16+15*256+256+256*12+4*256+128*9+256*10+16*2+6*8+16*4+256*1+256*2 bits
     // Approx. 404 bytes.
     uint256 public BytesUsed = 404;
-    uint256 public MaximumBytesTarget = 20*(10**6) ; //400 Mb
+    uint256 public MaximumBytesTarget = 20*(10**6) ; //20 Mb
 
     uint128 public MAX_INDEX_RANGE_BATCHS = 30000;
     uint128 public MAX_INDEX_RANGE_SPOTS = 30000*20;
@@ -411,6 +411,7 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
     bool public TRIGGER_WITH_SPOTDATA_TOGGLE_ENABLED = false;
     bool public VALIDATE_ON_LAST_REVEAL = false;
     bool public FORCE_VALIDATE_BATCH_FILE = true;
+    bool public DELETION_ENABLED = false;
     bool public InstantSpotRewards = true;
     bool public InstantRevealRewards = true;
     uint16 public InstantSpotRewardsDivider = 3;
@@ -492,6 +493,13 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
         FORCE_VALIDATE_BATCH_FILE = toggle_;
     }
 
+    /**
+  * @notice Enable or disable Forcing the Validation of a Batch File in some conditions
+  * @param toggle_ boolean
+  */
+    function toggleDeletion(bool toggle_) public onlyOwner {
+        DELETION_ENABLED = toggle_;
+    }
     // ================================================================================
     //                             ADMIN Updaters
     // ================================================================================
@@ -1241,7 +1249,9 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
         // Update the Spot Flow System
         updateGlobalSpotFlow();
         updateItemCount();
-        deleteOldData(iteration_count);
+        if(DELETION_ENABLED){
+            deleteOldData(iteration_count);
+        }
         TriggerValidation(iteration_count);
         // Log off waiting users first
         processLogoffRequests(iteration_count);
@@ -1884,6 +1894,7 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
                     current_data_batch.complete = true;
                     current_data_batch.checked = false;
                     LastBatchCounter += 1;
+                    delete DataBatch[_ModB(_batch_counter)];
                     // we indicate that the first spot of the new batch, is the one we just built
                     DataBatch[_ModB(_batch_counter)].start_idx = DataNonce; 
                     //----- Track Storage usage -----
