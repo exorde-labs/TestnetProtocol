@@ -399,8 +399,8 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
     uint256 public BytesUsed = 404;
     uint256 public MaximumBytesTarget = 20*(10**6) ; //20 Mb
 
-    uint128 public MAX_INDEX_RANGE_BATCHS = 30000;
-    uint128 public MAX_INDEX_RANGE_SPOTS = 30000*20;
+    uint128 public MAX_INDEX_RANGE_BATCHS = 2000;
+    uint128 public MAX_INDEX_RANGE_SPOTS = 2000*10;
 
     // ------ Vote related    
     uint16 constant APPROVAL_VOTE_MAPPING_  = 1;
@@ -1894,7 +1894,7 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
                     current_data_batch.complete = true;
                     current_data_batch.checked = false;
                     LastBatchCounter += 1;
-                    delete DataBatch[_ModB(_batch_counter)];
+                    delete DataBatch[_ModB(LastBatchCounter)];
                     // we indicate that the first spot of the new batch, is the one we just built
                     DataBatch[_ModB(_batch_counter)].start_idx = DataNonce; 
                     //----- Track Storage usage -----
