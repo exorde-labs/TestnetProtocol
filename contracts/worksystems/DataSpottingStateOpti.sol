@@ -397,26 +397,28 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
     // Initial storage variables: 64+16+16+15*256+256+256*12+4*256+128*9+256*10+16*2+6*8+16*4+256*1+256*2 bits
     // Approx. 404 bytes.
     uint256 public BytesUsed = 404;
-    uint256 public MaximumBytesTarget = 50*(10**6) ; //400 Mb
+    uint256 public MaximumBytesTarget = 500*(10**6) ; //500 Mb
 
-    uint128 public MAX_INDEX_RANGE_BATCHS = 10000;
-    uint128 public MAX_INDEX_RANGE_SPOTS = 10000*50;
+    uint128 public MAX_INDEX_RANGE_BATCHS = 15000;
+    uint128 public MAX_INDEX_RANGE_SPOTS = 15000*10;
 
     // ------ Vote related    
     uint16 constant APPROVAL_VOTE_MAPPING_  = 1;
-    uint16 constant MAX_WORKER_ALLOCATED_PER_BATCH = 50;
+    uint16 constant MAX_WORKER_ALLOCATED_PER_BATCH = 40;
 
     // ------------ Rewards & Work allocation related
     bool public STAKING_REQUIREMENT_TOGGLE_ENABLED = false;
     bool public TRIGGER_WITH_SPOTDATA_TOGGLE_ENABLED = false;
     bool public VALIDATE_ON_LAST_REVEAL = false;
     bool public FORCE_VALIDATE_BATCH_FILE = true;
+    bool public DELETION_ENABLED = false;
     bool public InstantSpotRewards = true;
     bool public InstantRevealRewards = true;
-    uint16 public InstantSpotRewardsDivider = 3;
+    uint16 public InstantSpotRewardsDivider = 2;
     uint16 public InstantRevealRewardsDivider = 1;
     uint16 public MaxPendingDataBatchCount = 1000;
     uint16 public SPOT_FILE_SIZE = 100;
+	uint256 public MAX_ONGOING_JOBS = 1500;
 
     // ------ Addresses & Interfaces
     IERC20 public token;
@@ -459,39 +461,45 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
         emit ParametersUpdated(addr);
     }
 
+//     /**
+//   * @notice Enable or disable Required Staking for participation 
+//   * @param toggle_ boolean
+//   */
+//     function toggleRequiredStaking(bool toggle_) public onlyOwner {
+//         STAKING_REQUIREMENT_TOGGLE_ENABLED = toggle_;
+//     }
 
-    /**
-  * @notice Enable or disable Required Staking for participation 
-  * @param toggle_ boolean
-  */
-    function toggleRequiredStaking(bool toggle_) public onlyOwner {
-        STAKING_REQUIREMENT_TOGGLE_ENABLED = toggle_;
-    }
+//     /**
+//   * @notice Enable or disable Triggering Updates when Spotting Data
+//   * @param toggle_ boolean
+//   */
+//     function toggleTriggerSpotData(bool toggle_) public onlyOwner {
+//         TRIGGER_WITH_SPOTDATA_TOGGLE_ENABLED = toggle_;
+//     }
 
-    /**
-  * @notice Enable or disable Triggering Updates when Spotting Data
-  * @param toggle_ boolean
-  */
-    function toggleTriggerSpotData(bool toggle_) public onlyOwner {
-        TRIGGER_WITH_SPOTDATA_TOGGLE_ENABLED = toggle_;
-    }
+//     /**
+//   * @notice Enable or disable Automatic Batch Validation when last to reveal
+//   * @param toggle_ boolean
+//   */
+//     function toggleValidateLastReveal(bool toggle_) public onlyOwner {
+//         VALIDATE_ON_LAST_REVEAL = toggle_;
+//     }
 
-    /**
-  * @notice Enable or disable Automatic Batch Validation when last to reveal
-  * @param toggle_ boolean
-  */
-    function toggleValidateLastReveal(bool toggle_) public onlyOwner {
-        VALIDATE_ON_LAST_REVEAL = toggle_;
-    }
+//     /**
+//   * @notice Enable or disable Forcing the Validation of a Batch File in some conditions
+//   * @param toggle_ boolean
+//   */
+//     function toggleForceValidateBatchFile(bool toggle_) public onlyOwner {
+//         FORCE_VALIDATE_BATCH_FILE = toggle_;
+//     }
 
     /**
   * @notice Enable or disable Forcing the Validation of a Batch File in some conditions
   * @param toggle_ boolean
   */
-    function toggleForceValidateBatchFile(bool toggle_) public onlyOwner {
-        FORCE_VALIDATE_BATCH_FILE = toggle_;
+    function toggleDeletion(bool toggle_) public onlyOwner {
+        DELETION_ENABLED = toggle_;
     }
-
     // ================================================================================
     //                             ADMIN Updaters
     // ================================================================================
@@ -931,7 +939,7 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
     function UnregisterWorker() public {
         WorkerState storage worker_state = WorkersState[msg.sender];
         require(worker_state.registered, "Worker is not registered so can't unregister");
-        require(worker_state.registration_date > block.timestamp + MIN_REGISTRATION_DURATION, 
+        require(worker_state.registration_date < block.timestamp + MIN_REGISTRATION_DURATION, 
         "Worker must wait some time to unregister");
 
         if (
@@ -1241,7 +1249,9 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
         // Update the Spot Flow System
         updateGlobalSpotFlow();
         updateItemCount();
-        deleteOldData(iteration_count);
+        if(DELETION_ENABLED){
+            deleteOldData(iteration_count);
+        }
         TriggerValidation(iteration_count);
         // Log off waiting users first
         processLogoffRequests(iteration_count);
@@ -1255,7 +1265,9 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
   */
     function TriggerDeletion(uint128 iteration_count) public {
         require(IParametersManager(address(0)) != Parameters, "Parameters Manager must be set.");
-        deleteOldData(iteration_count);
+        if(DELETION_ENABLED){
+            deleteOldData(iteration_count);
+        }
         _retrieveSFuel();
     }
 
@@ -1275,7 +1287,8 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
                 if (
                     DataBatch[_ModB(AllocatedBatchCursor)].allocated_to_work != true &&
                     availableWorkers.length >= Parameters.get_SPOT_MIN_CONSENSUS_WORKER_COUNT() &&
-                    DataBatch[_ModB(AllocatedBatchCursor)].complete
+                    DataBatch[_ModB(AllocatedBatchCursor)].complete &&
+                    (AllocatedBatchCursor - BatchCheckingCursor <= MAX_ONGOING_JOBS) // number of allocated/processed batchs must not exceed this number
                 ) {
                     AllocateWork();
                     progress = true;
@@ -1884,6 +1897,7 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
                     current_data_batch.complete = true;
                     current_data_batch.checked = false;
                     LastBatchCounter += 1;
+                    delete DataBatch[_ModB(LastBatchCounter)];
                     // we indicate that the first spot of the new batch, is the one we just built
                     DataBatch[_ModB(_batch_counter)].start_idx = DataNonce; 
                     //----- Track Storage usage -----
