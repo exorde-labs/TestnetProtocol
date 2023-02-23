@@ -397,14 +397,14 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
     // Initial storage variables: 64+16+16+15*256+256+256*12+4*256+128*9+256*10+16*2+6*8+16*4+256*1+256*2 bits
     // Approx. 404 bytes.
     uint256 public BytesUsed = 404;
-    uint256 public MaximumBytesTarget = 20*(10**6) ; //20 Mb
+    uint256 public MaximumBytesTarget = 500*(10**6) ; //500 Mb
 
-    uint128 public MAX_INDEX_RANGE_BATCHS = 2000;
-    uint128 public MAX_INDEX_RANGE_SPOTS = 2000*10;
+    uint128 public MAX_INDEX_RANGE_BATCHS = 15000;
+    uint128 public MAX_INDEX_RANGE_SPOTS = 15000*10;
 
     // ------ Vote related    
     uint16 constant APPROVAL_VOTE_MAPPING_  = 1;
-    uint16 constant MAX_WORKER_ALLOCATED_PER_BATCH = 50;
+    uint16 constant MAX_WORKER_ALLOCATED_PER_BATCH = 40;
 
     // ------------ Rewards & Work allocation related
     bool public STAKING_REQUIREMENT_TOGGLE_ENABLED = false;
@@ -414,10 +414,11 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
     bool public DELETION_ENABLED = false;
     bool public InstantSpotRewards = true;
     bool public InstantRevealRewards = true;
-    uint16 public InstantSpotRewardsDivider = 3;
+    uint16 public InstantSpotRewardsDivider = 2;
     uint16 public InstantRevealRewardsDivider = 1;
     uint16 public MaxPendingDataBatchCount = 1000;
     uint16 public SPOT_FILE_SIZE = 100;
+	uint256 public MAX_ONGOING_JOBS = 1000;
 
     // ------ Addresses & Interfaces
     IERC20 public token;
@@ -458,6 +459,15 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
         require(addr != address(0), "addr must be non zero");
         Parameters = IParametersManager(addr);
         emit ParametersUpdated(addr);
+    }
+
+    /**
+   * @notice Updates MAX_ONGOING_JOBS
+   * @param MAX_ONGOING_JOBS_ new value
+  */
+    function updateMaximumOngoingJobs(uint256 MAX_ONGOING_JOBS_) public onlyOwner {        
+        require(MAX_ONGOING_JOBS_ > 100, "MAX_ONGOING_JOBS must be > 100");
+        MAX_ONGOING_JOBS = MAX_ONGOING_JOBS_;
     }
 
 
@@ -1265,7 +1275,9 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
   */
     function TriggerDeletion(uint128 iteration_count) public {
         require(IParametersManager(address(0)) != Parameters, "Parameters Manager must be set.");
-        deleteOldData(iteration_count);
+        if(DELETION_ENABLED){
+            deleteOldData(iteration_count);
+        }
         _retrieveSFuel();
     }
 
@@ -1285,7 +1297,8 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
                 if (
                     DataBatch[_ModB(AllocatedBatchCursor)].allocated_to_work != true &&
                     availableWorkers.length >= Parameters.get_SPOT_MIN_CONSENSUS_WORKER_COUNT() &&
-                    DataBatch[_ModB(AllocatedBatchCursor)].complete
+                    DataBatch[_ModB(AllocatedBatchCursor)].complete &&
+                    (AllocatedBatchCursor - BatchCheckingCursor <= MAX_ONGOING_JOBS) // number of allocated/processed batchs must not exceed this number
                 ) {
                     AllocateWork();
                     progress = true;
