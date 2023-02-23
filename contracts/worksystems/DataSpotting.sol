@@ -418,7 +418,7 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
     uint16 public InstantRevealRewardsDivider = 1;
     uint16 public MaxPendingDataBatchCount = 1000;
     uint16 public SPOT_FILE_SIZE = 100;
-	uint256 public MAX_ONGOING_JOBS = 1000;
+	uint256 public MAX_ONGOING_JOBS = 1500;
 
     // ------ Addresses & Interfaces
     IERC20 public token;
@@ -460,16 +460,6 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
         Parameters = IParametersManager(addr);
         emit ParametersUpdated(addr);
     }
-
-    /**
-   * @notice Updates MAX_ONGOING_JOBS
-   * @param MAX_ONGOING_JOBS_ new value
-  */
-    function updateMaximumOngoingJobs(uint256 MAX_ONGOING_JOBS_) public onlyOwner {        
-        require(MAX_ONGOING_JOBS_ > 100, "MAX_ONGOING_JOBS must be > 100");
-        MAX_ONGOING_JOBS = MAX_ONGOING_JOBS_;
-    }
-
 
     /**
   * @notice Enable or disable Required Staking for participation 
