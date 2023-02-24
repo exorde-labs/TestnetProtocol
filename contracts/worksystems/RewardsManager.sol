@@ -95,6 +95,7 @@ contract RewardsManager is Ownable {
         // ---- Pre rewards distribution limitation check
         require(getDailyRewardsCount() < MAX_DAILY_EXD_REWARDS, "Daily Total Rewards exceed!");
         require(getHourlyRewardsCount() < MAX_HOURLY_EXD_REWARDS, "Hourly Total Rewards exceed!");
+        bool success = false;
         // ---- Pre rewards distribution limitation check
         // check if the contract calling this method has rights to allocate from user Rewards
         if (ManagerBalance >= _RewardsAllocation) {
@@ -103,7 +104,7 @@ contract RewardsManager is Ownable {
             TotalRewards += _RewardsAllocation;
             // ---- EVENT EMISSION        
             emit AddedRewards(_user, _RewardsAllocation);
-            return true;
+            success = true;
         }
         HourlyRewardsFlowManager[HourlyRewardsFlowManager.length - 1].counter +=  _RewardsAllocation;
         DailyRewardsFlowManager[DailyRewardsFlowManager.length - 1].counter +=  _RewardsAllocation;
@@ -112,7 +113,7 @@ contract RewardsManager is Ownable {
         updateDailyRewardsCount();
         require(getDailyRewardsCount() < MAX_DAILY_EXD_REWARDS, "Daily Total Rewards exceed!");
         require(getHourlyRewardsCount() < MAX_HOURLY_EXD_REWARDS, "Hourly Total Rewards exceed!");
-        return false;
+        return success;
     }
 
     /**
