@@ -1,5 +1,6 @@
 {
-  "gas_cap_min":"1300000",
-  "default_gas_amount":"1300000",
-  "default_gas_price ":"100000"
+  "gas_cap_min":1300000,
+  "wait_time":5,
+  "default_gas_amount":1300000,
+  "default_gas_price ":100000
 }
