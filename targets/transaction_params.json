@@ -1,4 +1,5 @@
 {
   "gas_cap_min":"1300000",
+  "default_gas_amount":"1300000",
   "default_gas_price ":"100000"
 }
