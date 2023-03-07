@@ -397,7 +397,6 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
     // Initial storage variables: 64+16+16+15*256+256+256*12+4*256+128*9+256*10+16*2+6*8+16*4+256*1+256*2 bits
     // Approx. 404 bytes.
     uint256 public BytesUsed = 404;
-    uint256 public MaximumBytesTarget = 500*(10**6) ; //500 Mb
 
     uint128 public MAX_INDEX_RANGE_BATCHS = 8000;
     uint128 public MAX_INDEX_RANGE_SPOTS = 8000*30;
@@ -408,7 +407,6 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
 
     // ------------ Rewards & Work allocation related
     bool public STAKING_REQUIREMENT_TOGGLE_ENABLED = false;
-    bool public TRIGGER_WITH_SPOTDATA_TOGGLE_ENABLED = false;
     bool public VALIDATE_ON_LAST_REVEAL = false;
     bool public FORCE_VALIDATE_BATCH_FILE = true;
     bool public DELETION_ENABLED = false;
@@ -462,14 +460,6 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
     }
 
 
-    /**
-  * @notice Enable or disable Triggering Updates when Spotting Data
-  * @param toggle_ boolean
-  */
-    function toggleTriggerSpotData(bool toggle_) public onlyOwner {
-        TRIGGER_WITH_SPOTDATA_TOGGLE_ENABLED = toggle_;
-    }
-
     // ================================================================================
     //                             ADMIN Updaters
     // ================================================================================
@@ -511,13 +501,6 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
         SPOT_FILE_SIZE = file_size_;
     }
 
-    /**
-  * @notice update MaximumBytesTarget, the max target of storage used by the contract (in bytes)
-  * @param new_limit_ in bytes
-  */
-    function updateMaximumBytesTarget(uint256 new_limit_) public onlyOwner {
-        MaximumBytesTarget = new_limit_;
-    }
 
     // ================================================================================
     //                             Library Related
@@ -1797,23 +1780,6 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
                     );
                 }
 
-                // ---- TRIGGER UPDATES ON ALL SYSTEMS ----
-
-                if (TRIGGER_WITH_SPOTDATA_TOGGLE_ENABLED) {
-                    TriggerUpdate(1);
-                    IFollowingSystem _ComplianceSystem = IFollowingSystem(Parameters.getComplianceSystem());
-                    try _ComplianceSystem.TriggerUpdate(1) {} catch (bytes memory err) {
-                        emit BytesFailure(err);
-                    }
-                    IFollowingSystem _IndexingSystem = IFollowingSystem(Parameters.getIndexingSystem());
-                    try _IndexingSystem.TriggerUpdate(1) {} catch (bytes memory err) {
-                        emit BytesFailure(err);
-                    }
-                    IFollowingSystem _ArchivingSystem = IFollowingSystem(Parameters.getArchivingSystem());
-                    try _ArchivingSystem.TriggerUpdate(1) {} catch (bytes memory err) {
-                        emit BytesFailure(err);
-                    }
-                }
                 // ---- Emit event
                 emit _SpotSubmitted(DataNonce, file_hash, URL_domain_, _selectedAddress);
             }
