@@ -399,8 +399,8 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
     uint256 public BytesUsed = 404;
     uint256 public MaximumBytesTarget = 500*(10**6) ; //500 Mb
 
-    uint128 public MAX_INDEX_RANGE_BATCHS = 10000;
-    uint128 public MAX_INDEX_RANGE_SPOTS = 10000*25;
+    uint128 public MAX_INDEX_RANGE_BATCHS = 8000;
+    uint128 public MAX_INDEX_RANGE_SPOTS = 8000*30;
 
     // ------ Vote related    
     uint16 constant APPROVAL_VOTE_MAPPING_  = 1;
