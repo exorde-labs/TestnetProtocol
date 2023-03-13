@@ -1,0 +1,124 @@
+[
+	{
+		"inputs": [
+			{
+				"internalType": "contract IERC20",
+				"name": "token_",
+				"type": "address"
+			},
+			{
+				"internalType": "address",
+				"name": "beneficiary_",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "tokenAmount_",
+				"type": "uint256"
+			}
+		],
+		"name": "adminWithdrawERC20",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "token_",
+				"type": "address"
+			},
+			{
+				"internalType": "address[]",
+				"name": "_addresses",
+				"type": "address[]"
+			},
+			{
+				"internalType": "uint256[]",
+				"name": "_amounts",
+				"type": "uint256[]"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_amountSum",
+				"type": "uint256"
+			}
+		],
+		"name": "multiTransferToken",
+		"outputs": [],
+		"stateMutability": "payable",
+		"type": "function"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "previousOwner",
+				"type": "address"
+			},
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "newOwner",
+				"type": "address"
+			}
+		],
+		"name": "OwnershipTransferred",
+		"type": "event"
+	},
+	{
+		"inputs": [],
+		"name": "renounceOwnership",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "newOwner",
+				"type": "address"
+			}
+		],
+		"name": "transferOwnership",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256[]",
+				"name": "_amounts",
+				"type": "uint256[]"
+			}
+		],
+		"name": "getTotalFromAmountList",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "owner",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	}
+]
