@@ -24,6 +24,7 @@ contract MonthlyPayout is Ownable {
      */
     uint256 public monthlyAmount;
     uint256 public userCount = 0;
+    uint256 public initialTimestamp = 1678888800;
 
     mapping(address => uint256) public percentages; // out of 10000 (1% = 100, 1.33% = 133)
     mapping(address => uint256) public lastPayout;
@@ -75,11 +76,27 @@ contract MonthlyPayout is Ownable {
     }
 
     /**
+     * @dev Allows the contract owner to update initialTimestamp
+     * @param initialTimestamp_ The new initialTimestamp
+     */
+    function updateInitialTimestamp(uint256 initialTimestamp_) public 
+    onlyOwner {
+        initialTimestamp = initialTimestamp_;
+    }
+
+
+    /**
      * @dev Allows a beneficiary to claim their share of the monthly distribution.
      */
     function claim() external {
         require(percentages[msg.sender] > 0, "user has no percentage");
-        uint256 monthsSinceLastPayout = (block.timestamp - lastPayout[msg.sender]) / 30 days;
+        uint256 monthsSinceLastPayout;
+        if (lastPayout[msg.sender] == 0){
+            monthsSinceLastPayout = (block.timestamp - initialTimestamp) / 30.42 days;
+        }
+        else{
+            monthsSinceLastPayout = (block.timestamp - lastPayout[msg.sender]) / 30.42 days;
+        }
         uint256 totalAmount = monthlyAmount * percentages[msg.sender] / MAX_PERCENTAGE * (monthsSinceLastPayout + 1);
         lastPayout[msg.sender] = block.timestamp;
         require(totalAmount > 0, "Nothing to claim");
