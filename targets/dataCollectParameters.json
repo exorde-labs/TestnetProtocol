@@ -1,6 +1,6 @@
 {
   "minutes_diff_max":"120",
   "collect_amount":"50",
-  "inter_collect_delay_min":"250",
-  "inter_collect_delay_max":"600"
+  "inter_collect_delay_min":"150",
+  "inter_collect_delay_max":"400"
 }
