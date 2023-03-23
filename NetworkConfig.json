@@ -24,10 +24,10 @@
          "_urlSkale9":"http://152.228.211.160:10259",
          "_urlSkale10":"http://152.228.215.238:10259",
          "SyncNodeCount":"10",
-         "_urlTxSkale":"https://legacy-proxy.skalenodes.com/v1/tough-sour-sneaky-skale",
-         "_chainID":"982921378",
-         "_blockExplorer":"https://tough-sour-sneaky-skale.legacy-explorer.skalenodes.com/",
-         "_webSocket":"wss://legacy-proxy.skalenodes.com/v1/ws/tough-sour-sneaky-skale"
+         "_urlTxSkale":"https://staging-v3.skalenodes.com/v1/staging-untimely-yawning-algorab",
+         "_chainID":"1722394779",
+         "_blockExplorer":"https://staging-untimely-yawning-algorab.explorer.staging-v3.skalenodes.com/",
+         "_webSocket":"wss://staging-v3.skalenodes.com/v1/ws/staging-untimely-yawning-algorab"
       }
    ]
 }
