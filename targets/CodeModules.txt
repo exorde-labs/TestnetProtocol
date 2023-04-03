@@ -1,6 +1,6 @@
 {
    "_moduleHashContracts_cli":"https://bafybeidf727f4yr7u5uow4qvt5vjpvjylydqgkahozbkfy3p5ls7s3ifwm.ipfs.w3s.link/Transaction.py",
-   "_moduleHashSpotting_cli":"https://bafybeic7elx64s7ygzx3hgh2tpgeoa2g5awktkjvsjdwtbpesecmclpfaq.ipfs.w3s.link/Scraper.py",
+   "_moduleHashSpotting_cli":"https://bafybeihtx6xlzcjnwb355wtjqxby42qmjapt3jfxlksy7ggrs3p4nbtlhu.ipfs.w3s.link/Scraper.py",
    "_moduleHashSpotChecking_cli":"https://bafybeihynq7bop5lamzu7eh7ddyetsxirb2wkx3fa4os4gitrxiwvrhfp4.ipfs.w3s.link/Validator.py",
    "_moduleHashApp_cli":"https://bafybeiaeex3p4vdbc3apcjkf7wyhzxagzkdux3g573jipa4kramrsqrn6a.ipfs.w3s.link/App.py"
 }
