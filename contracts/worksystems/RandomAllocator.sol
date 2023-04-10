@@ -9,8 +9,6 @@ pragma solidity 0.8.8;
 */
 contract RandomAllocator {
 
-    uint256 constant EXTRA_ITERATIONS_  = 20;    
-
     /**
      * @notice Get Native RNG Seed endpoint from SKALE chain
      * @return addr bytes32 seed output
@@ -45,65 +43,46 @@ contract RandomAllocator {
     }
 
     /**
-     * @notice generate _k integers from 0 to N
-     * @param _k integer (should be low)
-     * @param N_range integer Should be low (<100)
+     * @notice Generate _k unique integers from 0 to N_range
+     * @param _k uint256 (should be low)
+     * @param N_range uint256 Should be low (<100)
      * @return randomly generated integers array of size _k
      */
     function generateIntegers(uint256 _k, uint256 N_range) public view returns (uint256[] memory) {
         require(N_range > 0 && _k <= N_range && _k >= 1, "k or N are not OK for RNG");
+
+        // Initialize a seed and create an array to store unique integers
         uint256 seed = uint256(keccak256(abi.encodePacked(uint256(keccak256(abi.encodePacked(getRandom()))))));
         uint256[] memory integers = new uint256[](_k);
 
-        uint256 c = 0;
-        uint256 nb_iterations = _k + EXTRA_ITERATIONS_;
+        uint256 c = 0; // Counter for unique integers found
+        uint256 nb_iterations = _k * 2; // Double the number of iterations to ensure enough unique integers are found
 
-                // This loop can be considered O(1) because nb_iterations is always low
-
+        // Iterate through the random numbers, considering O(1) complexity because nb_iterations is always low
         for (uint256 l = 0; l < nb_iterations; l++) {
-            if (N_range > (uint256(keccak256(abi.encodePacked(seed + l * l))))){
-                // if N_range is larger than the value on the right, 
-                // then the modulo below will just return the first hash, which leads to weak randomness
-                // So in that case we continue: this case should be very rare
-                continue;
-            }
             uint256 randNumber = (uint256(keccak256(abi.encodePacked(seed + l * l)))) % N_range;
             bool already_exists = false;
-            // check if already generated
+
+            // Check if the random number is already generated
             for (uint256 i = 0; i < c; i++) {
                 if (integers[i] == randNumber) {
                     already_exists = true;
                     break;
                 }
             }
+
+            // If the random number is not already generated, add it to the array
             if (!already_exists) {
                 integers[c] = randNumber;
                 c = c + 1;
             }
+
+            // If we have found _k unique integers, break the loop
             if (c >= _k) {
                 break;
             }
         }
 
-        if (c < _k) {
-            for (uint256 k = 0; k < N_range; k++) {
-                uint256 newNumber = k;
-                bool already_exists = false;
-                for (uint256 i = 0; i < c; i++) {
-                    if (integers[i] == newNumber) {
-                        already_exists = true;
-                        break;
-                    }
-                }
-                if (!already_exists) {
-                    integers[c] = newNumber;
-                    c = c + 1;
-                }
-                if (c >= _k) {
-                    break;
-                }
-            }
-        }
         require(c == _k, "RNG insufficient");
         return integers;
     }
