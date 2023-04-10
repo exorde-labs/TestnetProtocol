@@ -33,9 +33,7 @@ contract RandomAllocator {
             keccak256(
                 abi.encodePacked(
                     block.timestamp +
-                        uint256(keccak256(abi.encodePacked(getSeed()))) +
-                        block.difficulty +
-                        ((uint256(keccak256(abi.encodePacked(block.coinbase)))) / (block.timestamp))
+                        uint256(keccak256(abi.encodePacked(getSeed())))
                 )
             )
         );
