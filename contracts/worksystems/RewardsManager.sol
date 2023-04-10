@@ -29,8 +29,11 @@ contract RewardsManager is Ownable {
     TimeframeCounter[NB_TIMEFRAMES_DAILY] public DailyRewardsFlowManager;
 
     // Hardcoded limit of rewards per hour & day, to limit protocol inflation & rewards exploits
-    uint256 public MAX_HOURLY_EXD_REWARDS = 1250*(10**18);
-    uint256 public MAX_DAILY_EXD_REWARDS = 30000*(10**18); 
+    uint256 public MAX_HOURLY_EXD_REWARDS = 1250*(10**18); // 10**18 because EXD has 18 decimals
+    uint256 public MAX_DAILY_EXD_REWARDS = 30000*(10**18); // -> 1250 EXD/hour and 30000 EXD/day, hardcoded theoretical protocol limit.    
+    // the actual rate can be lower, as set initially
+    uint256 public CURRENT_HOURLY_EXD_REWARDS = 210*(10**18);
+    uint256 public CURRENT_DAILY_EXD_REWARDS = 500*(10**18);
 
     constructor(
         address EXD_token
@@ -52,6 +55,8 @@ contract RewardsManager is Ownable {
     event RemovedRewards(address indexed account, uint256 amountRemoved);
     event RewardsWhitelisted(address indexed account, bool isWhitelisted);
     event RewardsUnWhitelisted(address indexed account, bool isWhitelisted);
+    event HourlyRewardsRateUpdated(uint256 _newDailyRate);
+    event DailyRewardsRateUpdated(uint256 _newDailyRate);
 
     /**
      * @notice Returns if a contract address (or user) is whitelisted to interact with rewards
@@ -83,6 +88,49 @@ contract RewardsManager is Ownable {
 
     // ---------- EXTERNAL Rewards ALLOCATIONS ----------
 
+        /**
+    * @notice Update the current hourly EXD rewards rate
+    * @dev Only callable by the contract owner, within the hardcoded max hourly rewards limit
+    * @param _newHourlyRate The new hourly EXD rewards rate to be set
+    */
+    function updateCurrentHourlyEXDRewards(uint256 _newHourlyRate) external onlyOwner {
+        // Ensure the new hourly rate is within the max hourly rewards limit
+        require(
+            _newHourlyRate <= MAX_HOURLY_EXD_REWARDS,
+            "RewardsManager: new hourly rate must be within the max hourly rewards limit"
+        );
+
+        // Set the new hourly rate
+        CURRENT_HOURLY_EXD_REWARDS = _newHourlyRate;
+
+        // Emit an event to log the change
+        emit HourlyRewardsRateUpdated(_newHourlyRate);
+    }
+
+    /**
+    * @notice Update the current daily EXD rewards rate
+    * @dev Only callable by the contract owner, within the hardcoded max daily rewards limit
+    * @param _newDailyRate The new daily EXD rewards rate to be set
+    */
+    function updateCurrentDailyEXDRewards(uint256 _newDailyRate) external onlyOwner {
+        // Ensure the new daily rate is within the max daily rewards limit
+        require(
+            _newDailyRate <= MAX_DAILY_EXD_REWARDS,
+            "RewardsManager: new daily rate must be within the max daily rewards limit"
+        );
+
+        // Set the new daily rate
+        CURRENT_DAILY_EXD_REWARDS = _newDailyRate;
+
+        // Emit an event to log the change
+        emit DailyRewardsRateUpdated(_newDailyRate);
+    }
+
+    function updateSlidingCounters(uint256 _amount) internal{        
+        HourlyRewardsFlowManager[HourlyRewardsFlowManager.length - 1].counter +=  _amount;
+        DailyRewardsFlowManager[DailyRewardsFlowManager.length - 1].counter +=  _amount;
+    }
+
     /**
      * @notice A method for a verified whitelisted contract to allocate some Rewards
      * @param _RewardsAllocation The rewards to allocate (distribute)
@@ -92,27 +140,25 @@ contract RewardsManager is Ownable {
         require(isRewardsWhitelisted(msg.sender), "RewardsManager: sender must be whitelisted to Proxy act");
         // require(ManagerBalance >=  _RewardsAllocation);
         require(_RewardsAllocation > 0, "rewards to allocate must be positive..");
-        // ---- Pre rewards distribution limitation check
-        require(getDailyRewardsCount() < MAX_DAILY_EXD_REWARDS, "Daily Total Rewards exceed!");
-        require(getHourlyRewardsCount() < MAX_HOURLY_EXD_REWARDS, "Hourly Total Rewards exceed!");
         bool success = false;
         // ---- Pre rewards distribution limitation check
         // check if the contract calling this method has rights to allocate from user Rewards
         if (ManagerBalance >= _RewardsAllocation) {
             ManagerBalance -= _RewardsAllocation;
+            // ---- credit user rewards balance with _RewardsAllocation
             rewards[_user] +=  _RewardsAllocation;
             TotalRewards += _RewardsAllocation;
             // ---- EVENT EMISSION        
             emit AddedRewards(_user, _RewardsAllocation);
             success = true;
         }
-        HourlyRewardsFlowManager[HourlyRewardsFlowManager.length - 1].counter +=  _RewardsAllocation;
-        DailyRewardsFlowManager[DailyRewardsFlowManager.length - 1].counter +=  _RewardsAllocation;
+        // ---- update the sliding counters
+        updateSlidingCounters(_RewardsAllocation);
         // ---- Post rewards distribution limitation check
         updateHourlyRewardsCount();
         updateDailyRewardsCount();
-        require(getDailyRewardsCount() < MAX_DAILY_EXD_REWARDS, "Daily Total Rewards exceed!");
-        require(getHourlyRewardsCount() < MAX_HOURLY_EXD_REWARDS, "Hourly Total Rewards exceed!");
+        require(getDailyRewardsCount() < CURRENT_DAILY_EXD_REWARDS, "Daily Total Rewards exceed!");
+        require(getHourlyRewardsCount() < CURRENT_HOURLY_EXD_REWARDS, "Hourly Total Rewards exceed!");
         return success;
     }
 
@@ -128,7 +174,7 @@ contract RewardsManager is Ownable {
             // transfer Rewards
             rewards[_initial] = 0;
             rewards[_receiving] += _amount_to_transfer;
-            // ---- EVENT EMISSION        
+            // ---- event emission   
             emit TransferedRewards(_initial, _receiving, _amount_to_transfer);
             return true;
         }
