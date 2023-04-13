@@ -15,7 +15,7 @@
       "RegistrarWalletScheme":"0x255271b65654370E9c21DF6A7Cb3C20B7B9a695b",
       "MasterWalletScheme":"0x3030E5754aAf2fA77380209029bA5c9150A1be58",
       "QuickWalletScheme":"0x626Ef88a240c546Fb4e79553D4C5005F791895b0"
-},
+   },
    "testnet-A":{
       "Reputation":"0xbFD6FfA424730817D6b3f7Bf429DE961A7163b21",
       "EXDT":"0x6d115193d5b699916106603B810EAEcC4D2fCA51",
