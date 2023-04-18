@@ -1,11 +1,10 @@
 // SPDX-License-Identifier: GPL-3.0
-
-pragma solidity 0.8.8;
+pragma solidity 0.8 .8;
 
 /**
-* @title WorkSystem Spot v1.3.4a
-* @author Mathias Dail - CTO @ Exorde Labs 2022
-*/
+ * @title WorkSystem Spot v1.3.4a
+ * @author Mathias Dail - CTO @ Exorde Labs 2022
+ */
 
 // File: dll/DLL.sol
 
@@ -21,11 +20,11 @@ library DLL {
         mapping(uint128 => Node) dll;
     }
 
-    function isEmpty(SpottedData storage self) public view returns (bool) {
+    function isEmpty(SpottedData storage self) public view returns(bool) {
         return getStart(self) == NULL_NODE_ID;
     }
 
-    function contains(SpottedData storage self, uint128 _curr) public view returns (bool) {
+    function contains(SpottedData storage self, uint128 _curr) public view returns(bool) {
         if (isEmpty(self) || _curr == NULL_NODE_ID) {
             return false;
         }
@@ -35,19 +34,19 @@ library DLL {
         return isSingleNode || !isNullNode;
     }
 
-    function getNext(SpottedData storage self, uint128 _curr) public view returns (uint128) {
+    function getNext(SpottedData storage self, uint128 _curr) public view returns(uint128) {
         return self.dll[_curr].next;
     }
 
-    function getPrev(SpottedData storage self, uint128 _curr) public view returns (uint128) {
+    function getPrev(SpottedData storage self, uint128 _curr) public view returns(uint128) {
         return self.dll[_curr].prev;
     }
 
-    function getStart(SpottedData storage self) public view returns (uint128) {
+    function getStart(SpottedData storage self) public view returns(uint128) {
         return getNext(self, NULL_NODE_ID);
     }
 
-    function getEnd(SpottedData storage self) public view returns (uint256) {
+    function getEnd(SpottedData storage self) public view returns(uint256) {
         return getPrev(self, NULL_NODE_ID);
     }
 
@@ -98,81 +97,81 @@ library DLL {
 
 interface IParametersManager {
     // -------------- GETTERS : GENERAL --------------------
-    function getMaxTotalWorkers() external view returns (uint256);
+    function getMaxTotalWorkers() external view returns(uint256);
 
-    function getVoteQuorum() external view returns (uint256);
+    function getVoteQuorum() external view returns(uint256);
 
-    function get_MAX_UPDATE_ITERATIONS() external view returns (uint256);
+    function get_MAX_UPDATE_ITERATIONS() external view returns(uint256);
 
-    function get_MAX_CONTRACT_STORED_BATCHES() external view returns (uint256);
+    function get_MAX_CONTRACT_STORED_BATCHES() external view returns(uint256);
 
-    function get_MAX_SUCCEEDING_NOVOTES() external view returns (uint256);
+    function get_MAX_SUCCEEDING_NOVOTES() external view returns(uint256);
 
-    function get_NOVOTE_REGISTRATION_WAIT_DURATION() external view returns (uint256);
+    function get_NOVOTE_REGISTRATION_WAIT_DURATION() external view returns(uint256);
 
     // -------------- GETTERS : ADDRESSES --------------------
-    function getStakeManager() external view returns (address);
+    function getStakeManager() external view returns(address);
 
-    function getRepManager() external view returns (address);
+    function getRepManager() external view returns(address);
 
-    function getAddressManager() external view returns (address);
+    function getAddressManager() external view returns(address);
 
-    function getRewardManager() external view returns (address);
+    function getRewardManager() external view returns(address);
 
-    function getArchivingSystem() external view returns (address);
+    function getArchivingSystem() external view returns(address);
 
-    function getSpottingSystem() external view returns (address);
+    function getSpottingSystem() external view returns(address);
 
-    function getComplianceSystem() external view returns (address);
+    function getComplianceSystem() external view returns(address);
 
-    function getIndexingSystem() external view returns (address);
+    function getIndexingSystem() external view returns(address);
 
-    function getsFuelSystem() external view returns (address);
+    function getsFuelSystem() external view returns(address);
 
-    function getExordeToken() external view returns (address);
+    function getExordeToken() external view returns(address);
 
     // -------------- GETTERS : SPOTTING --------------------
-    function get_SPOT_DATA_BATCH_SIZE() external view returns (uint256);
+    function get_SPOT_DATA_BATCH_SIZE() external view returns(uint256);
 
-    function get_SPOT_MIN_STAKE() external view returns (uint256);
+    function get_SPOT_MIN_STAKE() external view returns(uint256);
 
-    function get_SPOT_MIN_CONSENSUS_WORKER_COUNT() external view returns (uint256);
+    function get_SPOT_MIN_CONSENSUS_WORKER_COUNT() external view returns(uint256);
 
-    function get_SPOT_MAX_CONSENSUS_WORKER_COUNT() external view returns (uint256);
+    function get_SPOT_MAX_CONSENSUS_WORKER_COUNT() external view returns(uint256);
 
-    function get_SPOT_COMMIT_ROUND_DURATION() external view returns (uint256);
+    function get_SPOT_COMMIT_ROUND_DURATION() external view returns(uint256);
 
-    function get_SPOT_REVEAL_ROUND_DURATION() external view returns (uint256);
+    function get_SPOT_REVEAL_ROUND_DURATION() external view returns(uint256);
 
-    function get_SPOT_MIN_REP_SpotData() external view returns (uint256);
+    function get_SPOT_MIN_REP_SpotData() external view returns(uint256);
 
-    function get_SPOT_MIN_REWARD_SpotData() external view returns (uint256);
+    function get_SPOT_MIN_REWARD_SpotData() external view returns(uint256);
 
-    function get_SPOT_MIN_REP_DataValidation() external view returns (uint256);
+    function get_SPOT_MIN_REP_DataValidation() external view returns(uint256);
 
-    function get_SPOT_MIN_REWARD_DataValidation() external view returns (uint256);
+    function get_SPOT_MIN_REWARD_DataValidation() external view returns(uint256);
 
-    function get_SPOT_INTER_ALLOCATION_DURATION() external view returns (uint256);
+    function get_SPOT_INTER_ALLOCATION_DURATION() external view returns(uint256);
 
-    function get_SPOT_TOGGLE_ENABLED() external view returns (bool);
+    function get_SPOT_TOGGLE_ENABLED() external view returns(bool);
 
-    function get_SPOT_TIMEFRAME_DURATION() external view returns (uint256);
+    function get_SPOT_TIMEFRAME_DURATION() external view returns(uint256);
 
-    function get_SPOT_GLOBAL_MAX_SPOT_PER_PERIOD() external view returns (uint256);
+    function get_SPOT_GLOBAL_MAX_SPOT_PER_PERIOD() external view returns(uint256);
 
-    function get_SPOT_MAX_SPOT_PER_USER_PER_PERIOD() external view returns (uint256);
+    function get_SPOT_MAX_SPOT_PER_USER_PER_PERIOD() external view returns(uint256);
 
-    function get_SPOT_NB_TIMEFRAMES() external view returns (uint256);
+    function get_SPOT_NB_TIMEFRAMES() external view returns(uint256);
 }
 
 interface IStakeManager {
-    function ProxyStakeAllocate(uint256 _StakeAllocation, address _stakeholder) external returns (bool);
+    function ProxyStakeAllocate(uint256 _StakeAllocation, address _stakeholder) external returns(bool);
 
-    function ProxyStakeDeallocate(uint256 _StakeToDeallocate, address _stakeholder) external returns (bool);
+    function ProxyStakeDeallocate(uint256 _StakeToDeallocate, address _stakeholder) external returns(bool);
 
-    function AvailableStakedAmountOf(address _stakeholder) external view returns (uint256);
+    function AvailableStakedAmountOf(address _stakeholder) external view returns(uint256);
 
-    function AllocatedStakedAmountOf(address _stakeholder) external view returns (uint256);
+    function AllocatedStakedAmountOf(address _stakeholder) external view returns(uint256);
 }
 
 interface IRepManager {
@@ -180,31 +179,31 @@ interface IRepManager {
         uint256 _amount,
         address _beneficiary,
         bytes32
-    ) external returns (bool);
+    ) external returns(bool);
 
     function burnReputationForWork(
         uint256 _amount,
         address _beneficiary,
         bytes32
-    ) external returns (bool);
+    ) external returns(bool);
 }
 
 interface IRewardManager {
-    function ProxyAddReward(uint256 _RewardsAllocation, address user_) external returns (bool);
+    function ProxyAddReward(uint256 _RewardsAllocation, address user_) external returns(bool);
 }
 
 interface IAddressManager {
-    function isMasterOf(address _master, address _address) external returns (bool);
+    function isMasterOf(address _master, address _address) external returns(bool);
 
-    function isSubWorkerOf(address _master, address _address) external returns (bool);
+    function isSubWorkerOf(address _master, address _address) external returns(bool);
 
-    function AreMasterSubLinked(address _master, address _address) external returns (bool);
+    function AreMasterSubLinked(address _master, address _address) external returns(bool);
 
-    function getMasterSubs(address _master) external view returns (address);
+    function getMasterSubs(address _master) external view returns(address);
 
-    function getMaster(address _worker) external view returns (address);
+    function getMaster(address _worker) external view returns(address);
 
-    function FetchHighestMaster(address _worker) external view returns (address);
+    function FetchHighestMaster(address _worker) external view returns(address);
 }
 
 interface IFollowingSystem {
@@ -220,9 +219,9 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "./RandomAllocator.sol";
 
 /**
-* @title WorkSystem Spot v1.3.4a
-* @author Mathias Dail - CTO @ Exorde Labs
-*/
+ * @title WorkSystem Spot v1.3.4a
+ * @author Mathias Dail - CTO @ Exorde Labs
+ */
 contract DataSpotting is Ownable, RandomAllocator, Pausable {
     // ============ EVENTS ============
     event _SpotSubmitted(uint256 indexed DataID, string file_hash, string URL_domain, address indexed sender);
@@ -241,14 +240,15 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
     event _StakeAllocated(uint256 numTokens, address indexed voter);
     event _VotingRightsWithdrawn(uint256 numTokens, address indexed voter);
     event _TokensRescued(uint256 indexed DataID, address indexed voter);
-    event _DataBatchDeleted(uint256 indexed batchID);    
+    event _DataBatchDeleted(uint256 indexed batchID);
     event ParametersUpdated(address parameters);
 
     event BytesFailure(bytes bytesFailure);
 
     // ============ LIBRARIES ============
     // using AttributeStore for AttributeStore.SpottedData;
-    using DLL for DLL.SpottedData;
+    using DLL
+    for DLL.SpottedData;
 
     // ============ DATA STRUCTURES ============
 
@@ -342,7 +342,7 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
     TimeframeCounter[NB_TIMEFRAMES] public ItemFlowManager; // NB_TIMEFRAMES*2 slots per user
 
     // ------ User Submissions & Voting related structure
-    mapping(uint128 => mapping(address => VoteSubmission)) public UserVoteSubmission; 
+    mapping(uint128 => mapping(address => VoteSubmission)) public UserVoteSubmission;
 
     // ------ Backend Data Stores
     mapping(bytes32 => uint256) store;
@@ -357,13 +357,13 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
 
     // ------ Worker management structures
     mapping(address => WorkerStatus) public WorkersStatus;
-    mapping(uint128 => address[]) public WorkersPerBatch;    
-    mapping(uint128 => uint16) public BatchCommitedVoteCount; 
-    mapping(uint128 => uint16) public BatchRevealedVoteCount; 
+    mapping(uint128 => address[]) public WorkersPerBatch;
+    mapping(uint128 => uint16) public BatchCommitedVoteCount;
+    mapping(uint128 => uint16) public BatchRevealedVoteCount;
 
     uint16 constant MIN_REGISTRATION_DURATION = 120; // in seconds
 
-    uint32 private REMOVED_WORKER_INDEX_VALUE = 2**32-1;
+    uint32 private REMOVED_WORKER_INDEX_VALUE = 2 ** 32 - 1;
 
     address[] public availableWorkers;
     address[] public busyWorkers;
@@ -398,11 +398,11 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
     uint256 public BytesUsed = 404;
 
     uint128 public MAX_INDEX_RANGE_BATCHS = 10000;
-    uint128 public MAX_INDEX_RANGE_SPOTS = 10000*30;
+    uint128 public MAX_INDEX_RANGE_SPOTS = 10000 * 30;
 
     // ------ Vote related    
-    uint16 constant APPROVAL_VOTE_MAPPING_  = 1;
-    uint16 constant MAX_WORKER_ALLOCATED_PER_BATCH = 30;
+    uint16 constant APPROVAL_VOTE_MAPPING_ = 1;
+    uint16 immutable MAX_WORKER_ALLOCATED_PER_BATCH = 30;
 
     // ------------ Rewards & Work allocation related
     bool public STAKING_REQUIREMENT_TOGGLE_ENABLED = false;
@@ -414,9 +414,9 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
     uint16 public InstantRevealRewardsDivider = 1;
     uint16 public MaxPendingDataBatchCount = 750;
     uint16 public SPOT_FILE_SIZE = 100;
-	uint256 public MAX_ONGOING_JOBS = 750;
+    uint256 public MAX_ONGOING_JOBS = 750;
     uint256 public NB_BATCH_TO_TRIGGER_GARBAGE_COLLECTION = 1000;
-    uint256 private MIN_OFFSET_DELETION_CURSOR = 50;	
+    uint256 private MIN_OFFSET_DELETION_CURSOR = 50;
 
     // ---------------------
 
@@ -427,10 +427,10 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
     // ================================================================================
     //                             Constructor
     // ================================================================================
-    
+
     /**
-  * @dev Initializer. Can only be called once.
-  */
+     * @dev Initializer. Can only be called once.
+     */
     constructor(address EXDT_token_) {
         require(address(EXDT_token_) != address(0));
         token = IERC20(EXDT_token_);
@@ -441,21 +441,21 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
     // ================================================================================
 
     /**
-   * @notice Pause or unpause the contract
-  */
-    function toggleSystemPause() public onlyOwner {        
-        if(paused()){
+     * @notice Pause or unpause the contract
+     */
+    function toggleSystemPause() public onlyOwner {
+        if (paused()) {
             _unpause();
-        }else{
+        } else {
             _pause();
         }
     }
 
     /**
-   * @notice Updates Parameters Manager
-   * @param addr address of the Parameter Contract
-  */
-    function updateParametersManager(address addr) public onlyOwner {        
+     * @notice Updates Parameters Manager
+     * @param addr address of the Parameter Contract
+     */
+    function updateParametersManager(address addr) public onlyOwner {
         require(addr != address(0), "addr must be non zero");
         Parameters = IParametersManager(addr);
         emit ParametersUpdated(addr);
@@ -467,44 +467,44 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
     // ================================================================================
 
     /**
-  * @notice Enable or disable instant rewards when SpottingData (Testnet)
-  * @param state_ boolean
-  * @param divider_ base rewards divider
-  */
+     * @notice Enable or disable instant rewards when SpottingData (Testnet)
+     * @param state_ boolean
+     * @param divider_ base rewards divider
+     */
     function updateInstantSpotRewards(bool state_, uint16 divider_) public onlyOwner {
         InstantSpotRewards = state_;
         InstantSpotRewardsDivider = divider_;
     }
 
     /**
-  * @notice Enable or disable instant rewards when Revealing (Testnet)
-  * @param state_ boolean
-  * @param divider_ base rewards divider
-  */
+     * @notice Enable or disable instant rewards when Revealing (Testnet)
+     * @param state_ boolean
+     * @param divider_ base rewards divider
+     */
     function updateInstantRevealRewards(bool state_, uint16 divider_) public onlyOwner {
         InstantRevealRewards = state_;
         InstantRevealRewardsDivider = divider_;
     }
 
     /**
-  * @notice update MaxPendingDataBatchCount, limiting the queue of data to validate
-  * @param MaxPendingDataBatchCount_ max queue size
-  */
+     * @notice update MaxPendingDataBatchCount, limiting the queue of data to validate
+     * @param MaxPendingDataBatchCount_ max queue size
+     */
     function updateMaxPendingDataBatch(uint16 MaxPendingDataBatchCount_) public onlyOwner {
         MaxPendingDataBatchCount = MaxPendingDataBatchCount_;
     }
 
     /**
-  * @notice update MAX_ONGOING_JOBS, limiting the number of parallel jobs in the system
-  * @param MAX_ONGOING_JOBS_ max jobs in processing at any time 
-  */
+     * @notice update MAX_ONGOING_JOBS, limiting the number of parallel jobs in the system
+     * @param MAX_ONGOING_JOBS_ max jobs in processing at any time 
+     */
     function updateMaxOngoingWorks(uint16 MAX_ONGOING_JOBS_) public onlyOwner {
         MAX_ONGOING_JOBS = MAX_ONGOING_JOBS_;
     }
     /**
-  * @notice update MaxPendingDataBatchCount, limiting the queue of data to validate
-  * @param NewGarbageCollectTreshold_ new threshold for deletion of batchs data
-  */
+     * @notice update MaxPendingDataBatchCount, limiting the queue of data to validate
+     * @param NewGarbageCollectTreshold_ new threshold for deletion of batchs data
+     */
     function updateGarbageCollectionThreshold(uint256 NewGarbageCollectTreshold_) public onlyOwner {
         require(NewGarbageCollectTreshold_ > 100, "NewGarbageCollectTreshold_ must be > 100");
         NB_BATCH_TO_TRIGGER_GARBAGE_COLLECTION = NewGarbageCollectTreshold_;
@@ -517,21 +517,21 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
     // ================================================================================
 
     /**
-  * @notice getAttribute from UUID and attrName
-  * @param _UUID unique identifier
-  * @param _attrName name of the attribute
-  */
-    function getAttribute(bytes32 _UUID, string memory _attrName) public view returns (uint256) {
+     * @notice getAttribute from UUID and attrName
+     * @param _UUID unique identifier
+     * @param _attrName name of the attribute
+     */
+    function getAttribute(bytes32 _UUID, string memory _attrName) public view returns(uint256) {
         bytes32 key = keccak256(abi.encodePacked(_UUID, _attrName));
         return store[key];
     }
 
     /**
-  * @notice setAttribute from UUID , attrName & attrVal
-  * @param _UUID unique identifier
-  * @param _attrName name of the attribute
-  * @param _attrVal value of the attribute
-  */
+     * @notice setAttribute from UUID , attrName & attrVal
+     * @param _UUID unique identifier
+     * @param _attrName name of the attribute
+     * @param _attrVal value of the attribute
+     */
     function setAttribute(
         bytes32 _UUID,
         string memory _attrName,
@@ -543,10 +543,10 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
     }
 
     /**
-  * @notice resetAttribute
-  * @param _UUID unique identifier
-  * @param _attrName name of the attribute
-  */
+     * @notice resetAttribute
+     * @param _UUID unique identifier
+     * @param _attrName name of the attribute
+     */
     function resetAttribute(
         bytes32 _UUID,
         string memory _attrName
@@ -560,8 +560,8 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
     // ================================================================================
 
     /**
-  * @notice Refill the msg.sender with sFuel. Skale gasless "gas station network" equivalent
-  */
+     * @notice Refill the msg.sender with sFuel. Skale gasless "gas station network" equivalent
+     */
     function _retrieveSFuel() internal {
         require(IParametersManager(address(0)) != Parameters, "Parameters Manager must be set.");
         address sFuelAddress;
@@ -579,43 +579,43 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
     // ================================================================================
 
     /** @notice returns BatchId modulo MAX_INDEX_RANGE_BATCHS
-    */
-    function _ModB(uint128 BatchId) private view returns (uint128) {
+     */
+    function _ModB(uint128 BatchId) private view returns(uint128) {
         return BatchId % MAX_INDEX_RANGE_BATCHS;
     }
 
     /** @notice returns SpotId modulo MAX_INDEX_RANGE_SPOTS
-    */
-    function _ModS(uint128 SpotId) private view returns (uint128) {
+     */
+    function _ModS(uint128 SpotId) private view returns(uint128) {
         return SpotId % MAX_INDEX_RANGE_SPOTS;
     }
 
     /**
-  * @notice Checks if Worker is Available
-  * @param _worker worker address
-  */
-    function isInAvailableWorkers(address _worker) public view returns (bool) {
+     * @notice Checks if Worker is Available
+     * @param _worker worker address
+     */
+    function isInAvailableWorkers(address _worker) public view returns(bool) {
         return WorkersStatus[_worker].isAvailableWorker;
     }
 
     /**
-  * @notice Checks if Worker is Busy
-  * @param _worker worker address
-  */
-    function isInBusyWorkers(address _worker) public view returns (bool) {
+     * @notice Checks if Worker is Busy
+     * @param _worker worker address
+     */
+    function isInBusyWorkers(address _worker) public view returns(bool) {
         return WorkersStatus[_worker].isBusyWorker;
     }
 
     /**
-  * @notice Checks if Worker in the "to log off" list
-  */
-    function IsInLogoffList(address _worker) public view returns (bool) {
+     * @notice Checks if Worker in the "to log off" list
+     */
+    function IsInLogoffList(address _worker) public view returns(bool) {
         return WorkersStatus[_worker].isToUnregisterWorker;
     }
 
     /**
-  * @notice Pop _worker from the Available workers
-  */
+     * @notice Pop _worker from the Available workers
+     */
     function PopFromAvailableWorkers(address _worker) internal {
         WorkerStatus storage workerStatus = WorkersStatus[_worker];
         if (workerStatus.isAvailableWorker) {
@@ -635,10 +635,10 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
             availableWorkers.pop(); // pop last worker          
 
             //----- Track Storage usage -----
-            uint256 BytesUsedReduction = BYTES_256;           
-            if( BytesUsed >= BytesUsedReduction ){
+            uint256 BytesUsedReduction = BYTES_256;
+            if (BytesUsed >= BytesUsedReduction) {
                 BytesUsed -= BytesUsedReduction;
-            }else{
+            } else {
                 BytesUsed = 0;
             }
             //----- Track Storage usage -----
@@ -646,8 +646,8 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
     }
 
     /**
-  * @notice Pop worker from the Busy workers
-  */
+     * @notice Pop worker from the Busy workers
+     */
     function PopFromBusyWorkers(address _worker) internal {
         WorkerStatus storage workerStatus = WorkersStatus[_worker];
         if (workerStatus.isBusyWorker) {
@@ -667,10 +667,10 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
             busyWorkers.pop(); // pop last worker    
 
             //----- Track Storage usage -----
-            uint256 BytesUsedReduction = BYTES_256;           
-            if( BytesUsed >= BytesUsedReduction ){
+            uint256 BytesUsedReduction = BYTES_256;
+            if (BytesUsed >= BytesUsedReduction) {
                 BytesUsed -= BytesUsedReduction;
-            }else{
+            } else {
                 BytesUsed = 0;
             }
             //----- Track Storage usage -----
@@ -696,10 +696,10 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
             toUnregisterWorkers.pop(); // pop last worker
 
             //----- Track Storage usage -----
-            uint256 BytesUsedReduction = BYTES_256;           
-            if( BytesUsed >= BytesUsedReduction ){
+            uint256 BytesUsedReduction = BYTES_256;
+            if (BytesUsed >= BytesUsedReduction) {
                 BytesUsed -= BytesUsedReduction;
-            }else{
+            } else {
                 BytesUsed = 0;
             }
             //----- Track Storage usage -----
@@ -707,7 +707,7 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
     }
 
     function PushInAvailableWorkers(address _worker) internal {
-        require(_worker != address(0),"Error: Can't push the null address in available workers");
+        require(_worker != address(0), "Error: Can't push the null address in available workers");
         if (!isInAvailableWorkers(_worker)) {
             availableWorkers.push(_worker);
 
@@ -717,13 +717,13 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
 
             // Update Worker State
             WorkersStatus[_worker].isAvailableWorker = true;
-            WorkersStatus[_worker].availableWorkersIndex = uint32(availableWorkers.length - 1); 
+            WorkersStatus[_worker].availableWorkersIndex = uint32(availableWorkers.length - 1);
             // we can cast safely because availableWorkers.length << 2**32
         }
     }
 
     function PushInBusyWorkers(address _worker) internal {
-        require(_worker != address(0),"Error: Can't push the null address in busy workers");
+        require(_worker != address(0), "Error: Can't push the null address in busy workers");
         if (!isInBusyWorkers(_worker)) {
             busyWorkers.push(_worker);
 
@@ -731,7 +731,7 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
             BytesUsed += BYTES_256; //address added
             //----- Track Storage usage -----
 
-            
+
             // Update Worker State
             WorkersStatus[_worker].isBusyWorker = true;
             WorkersStatus[_worker].busyWorkersIndex = uint32(busyWorkers.length - 1);
@@ -748,7 +748,7 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
      * @param _worker address
      * @return bool if worker allocated to batch
      */
-    function isWorkerAllocatedToBatch(uint128 _DataBatchId, address _worker) public view returns (bool) {
+    function isWorkerAllocatedToBatch(uint128 _DataBatchId, address _worker) public view returns(bool) {
         bool found = false;
         address[] memory allocated_workers = WorkersPerBatch[_ModB(_DataBatchId)];
         for (uint256 i = 0; i < allocated_workers.length; i++) {
@@ -764,7 +764,7 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
         Select Address for a worker address, between itself and a potential Master Address    
     Crawl up the tree of master (depth can be max 3: worker -> master-worker -> main address)
     */
-    function SelectAddressForUser(address _worker, uint256 _TokensAmountToAllocate) public view returns (address) {
+    function SelectAddressForUser(address _worker, uint256 _TokensAmountToAllocate) public view returns(address) {
         require(IParametersManager(address(0)) != Parameters, "Parameters Manager must be set.");
         require(Parameters.getAddressManager() != address(0), "AddressManager is null in Parameters");
         require(Parameters.getStakeManager() != address(0), "StakeManager is null in Parameters");
@@ -789,8 +789,8 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
                 SystemStakedTokenBalance[_CurrentAddress] <= _TokensAmountToAllocate &&
                 SystemStakedTokenBalance[_CurrentAddress] > 0
             ) {
-                uint256 remainderAmountToAllocate = _TokensAmountToAllocate
-                    - SystemStakedTokenBalance[_CurrentAddress] ;
+                uint256 remainderAmountToAllocate = _TokensAmountToAllocate -
+                    SystemStakedTokenBalance[_CurrentAddress];
                 if (_CurrentAvailableStake >= remainderAmountToAllocate) {
                     // There is enough in the AvailableStake to allocate, return this address
                     _SelectedAddress = _CurrentAddress;
@@ -814,31 +814,29 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
         return _SelectedAddress;
     }
 
-    function IsAddressKicked(address user_) public view returns(bool status){
+    function IsAddressKicked(address user_) public view returns(bool status) {
         bool status_ = false;
         WorkerState memory worker_state = WorkersState[user_];
-        if(     (   worker_state.succeeding_novote_count >= Parameters.get_MAX_SUCCEEDING_NOVOTES() 
-                && ((block.timestamp - worker_state.registration_date) <
-                    Parameters.get_NOVOTE_REGISTRATION_WAIT_DURATION()))
-        )
-        {
+        if ((worker_state.succeeding_novote_count >= Parameters.get_MAX_SUCCEEDING_NOVOTES() &&
+                ((block.timestamp - worker_state.registration_date) <
+                    Parameters.get_NOVOTE_REGISTRATION_WAIT_DURATION()))) {
             status_ = true;
         }
         return status_;
     }
 
-    function AmIKicked() public view returns(bool status){        
+    function AmIKicked() public view returns(bool status) {
         return IsAddressKicked(msg.sender);
     }
 
     /* Register worker (online) */
-    function RegisterWorker() public {
+    function _RegisterWorker() public {
         WorkerState storage worker_state = WorkersState[msg.sender];
-        if ( !worker_state.isWorkerSeen ){
+        if (!worker_state.isWorkerSeen) {
             AllWorkersList.push(msg.sender);
             worker_state.isWorkerSeen = true;
             //----- Track Storage usage -----
-            BytesUsed += BYTES_256 + BYTES_8 + BYTES_256*NB_TIMEFRAMES; 
+            BytesUsed += BYTES_256 + BYTES_8 + BYTES_256 * NB_TIMEFRAMES;
             //----- Track Storage usage -----
         }
         require(IParametersManager(address(0)) != Parameters, "Parameters Manager must be set.");
@@ -875,7 +873,7 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
         worker_state.succeeding_novote_count = 0; // reset the novote counter
 
         //----- Track Storage usage -----
-        BytesUsed += BYTES_256*2; // WorkerState is packed in 2 slots
+        BytesUsed += BYTES_256 * 2; // WorkerState is packed in 2 slots
         //----- Track Storage usage -----
 
         AllTxsCounter += 1;
@@ -884,11 +882,11 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
     }
 
     /* Unregister worker (offline) */
-    function UnregisterWorker() public {
+    function _UnregisterWorker() public {
         WorkerState storage worker_state = WorkersState[msg.sender];
         require(worker_state.registered, "Worker is not registered so can't unregister");
-        require(worker_state.registration_date < block.timestamp + MIN_REGISTRATION_DURATION, 
-        "Worker must wait some time to unregister");
+        require(worker_state.registration_date < block.timestamp + MIN_REGISTRATION_DURATION,
+            "Worker must wait some time to unregister");
 
         if (
             worker_state.allocated_work_batch != 0 &&
@@ -900,7 +898,7 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
             toUnregisterWorkers.push(msg.sender);
             //----- Track Storage usage -----
             // toUnregisterWorkers push
-            BytesUsed += BYTES_256*1;
+            BytesUsed += BYTES_256 * 1;
             //----- Track Storage usage -----
             WorkersStatus[msg.sender].isToUnregisterWorker = true;
         }
@@ -933,21 +931,158 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
                 PopFromBusyWorkers(worker_addr_);
                 WorkersStatus[worker_addr_].isToUnregisterWorker = false;
                 emit _WorkerUnregistered(worker_addr_, block.timestamp);
-        
+
                 //----- Track Storage usage -----
                 // boolean reset
-                uint256 BytesUsedReduction = BYTES_8*3;
-                if( BytesUsed >= BytesUsedReduction ){
+                uint256 BytesUsedReduction = BYTES_8 * 3;
+                if (BytesUsed >= BytesUsedReduction) {
                     BytesUsed -= BytesUsedReduction;
-                }else{
+                } else {
                     BytesUsed = 0;
                 }
                 //----- Track Storage usage -----
             }
         }
-        if(toUnregisterWorkers.length == 0){
+        if (toUnregisterWorkers.length == 0) {
             delete toUnregisterWorkers;
         }
+    }
+
+    /* Register worker (online) */
+    function RegisterWorker() public {
+        WorkerState storage worker_state = WorkersState[msg.sender];
+        require(IParametersManager(address(0)) != Parameters, "Parameters Manager must be set.");
+
+        // Check if worker can register
+        require(canWorkerRegister(worker_state), "Worker cannot register");
+
+        // Handle staking requirements
+        handleStakingRequirement(msg.sender);
+
+        // Add worker to availableWorkers list
+        PushInAvailableWorkers(msg.sender);
+
+        // Update worker state on registration
+        updateWorkerStateOnRegistration(msg.sender, worker_state);
+
+        //----- Track Storage usage -----
+        BytesUsed += BYTES_256 * 2; // WorkerState is packed in 2 slots
+        //----- Track Storage usage -----
+
+        AllTxsCounter += 1;
+        _retrieveSFuel();
+        emit _WorkerRegistered(msg.sender, block.timestamp);
+    }
+
+    function UnregisterWorker() public {
+        WorkerState storage worker_state = WorkersState[msg.sender];
+
+        // Check if worker can unregister
+        require(canWorkerUnregister(worker_state), "Worker cannot unregister");
+
+        if (shouldRequestUnregistration(worker_state)) {
+            // Request unregistration
+            requestUnregistration(msg.sender, worker_state);
+        } else {
+            // Update worker state on unregistration
+            unregisterWorkerAndUpdateState(msg.sender, worker_state);
+            emit _WorkerUnregistered(msg.sender, block.timestamp);
+        }
+
+        AllTxsCounter += 1;
+        _retrieveSFuel();
+    }
+
+    // Check if the worker can unregister
+    function canWorkerUnregister(WorkerState storage worker_state) internal view returns(bool) {
+        require(worker_state.registered, "Worker is not registered so can't unregister");
+        require(worker_state.registration_date < block.timestamp + MIN_REGISTRATION_DURATION,
+            "Worker must wait some time to unregister");
+        return true;
+    }
+
+    // Check if the worker should request unregistration
+    function shouldRequestUnregistration(WorkerState storage worker_state) internal view returns(bool) {
+        return worker_state.allocated_work_batch != 0 &&
+            !worker_state.unregistration_request && !IsInLogoffList(msg.sender);
+    }
+
+    function requestUnregistration(address worker, WorkerState storage worker_state) internal {
+        worker_state.unregistration_request = true;
+        toUnregisterWorkers.push(worker);
+        BytesUsed += BYTES_256;
+        WorkersStatus[worker].isToUnregisterWorker = true;
+    }
+
+    function unregisterWorkerAndUpdateState(address worker, WorkerState storage worker_state) internal {
+        PopFromAvailableWorkers(worker);
+        PopFromBusyWorkers(worker);
+        PopFromLogoffList(worker);
+        worker_state.last_interaction_date = uint64(block.timestamp);
+        WorkersStatus[worker].isToUnregisterWorker = false;
+        worker_state.registered = false;
+    }
+
+    // Check if the worker can register
+    function canWorkerRegister(WorkerState storage worker_state) internal view returns(bool) {
+        require(
+            (availableWorkers.length + busyWorkers.length) < Parameters.getMaxTotalWorkers(),
+            "Maximum registered workers already"
+        );
+        // Check if worker not at all in any ongoing process
+        require(!isInAvailableWorkers(msg.sender) && !isInBusyWorkers(msg.sender),
+            "Worker is already registered (2)");
+        // Check if worker not temporarily kicked
+        require(
+            !(worker_state.succeeding_novote_count >= Parameters.get_MAX_SUCCEEDING_NOVOTES() &&
+                (block.timestamp - worker_state.registration_date) <
+                Parameters.get_NOVOTE_REGISTRATION_WAIT_DURATION()),
+            "Address kicked temporarily from participation"
+        );
+        return !worker_state.registered;
+    }
+
+
+    // Handle staking requirements for the worker
+    // -> Master/SubWorker Stake Management
+    // -> _numTokens The number of tokens to be allocated
+    function handleStakingRequirement(address worker) internal {
+        if (STAKING_REQUIREMENT_TOGGLE_ENABLED) {
+            uint256 _numTokens = Parameters.get_SPOT_MIN_STAKE();
+            address _selectedAddress = SelectAddressForUser(worker, _numTokens);
+
+            // if tx sender has a master, then interact with his master's stake, or himself
+            if (SystemStakedTokenBalance[_selectedAddress] < _numTokens) {
+                uint256 remainder = _numTokens - SystemStakedTokenBalance[_selectedAddress];
+                requestAllocatedStake(remainder, _selectedAddress);
+            }
+        }
+    }
+
+
+    function updateWorkerStateOnRegistration(address worker, WorkerState storage worker_state) internal {
+        // Update worker state on successful registration
+        if (!worker_state.isWorkerSeen) {
+            AllWorkersList.push(worker);
+            worker_state.isWorkerSeen = true;
+            BytesUsed += BYTES_256 + BYTES_8 + BYTES_256 * NB_TIMEFRAMES;
+        }
+        worker_state.registered = true;
+        worker_state.unregistration_request = false;
+        worker_state.registration_date = uint64(block.timestamp);
+        worker_state.succeeding_novote_count = 0;
+    }
+
+    // Update worker state on unregistration
+    function updateWorkerStateOnUnregistration(address worker, WorkerState storage worker_state) internal {
+        worker_state.last_interaction_date = uint64(block.timestamp);
+        WorkersStatus[worker].isToUnregisterWorker = false;
+        worker_state.registered = false;
+    }
+
+    function isWorkerRegistered(address worker) internal view returns(bool) {
+        WorkerState storage worker_state = WorkersState[worker];
+        return worker_state.registered;
     }
 
     // ================================================================================	
@@ -955,51 +1090,50 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
     // ================================================================================	
 
     /**	
-  * @notice Delete Data	
-  */	
-    function deleteOldData(uint128 iteration_count) internal {	
+     * @notice Delete Data	
+     */
+    function deleteOldData(uint128 iteration_count) internal {
         // Rolling delete of previous data	
-        uint128 _deletion_index;	
+        uint128 _deletion_index;
         // make the system store at least this many batchs (offset between DeletionCursor & CheckingCursor)
-        if (( BatchDeletionCursor < (BatchCheckingCursor - MIN_OFFSET_DELETION_CURSOR))	
-            ) {	
+        if ((BatchDeletionCursor < (BatchCheckingCursor - MIN_OFFSET_DELETION_CURSOR))) {
             // Here the amount of iterations is capped by get_MAX_UPDATE_ITERATIONS	
-            for (uint128 i = 0; i < iteration_count; i++) {	
-                _deletion_index = BatchDeletionCursor;	
+            for (uint128 i = 0; i < iteration_count; i++) {
+                _deletion_index = BatchDeletionCursor;
                 // First Delete Atomic Data composing the Batch, from start to end indices	
-                uint128 start_batch_idx = DataBatch[_ModB(_deletion_index)].start_idx;	
-                uint128 end_batch_idx = DataBatch[_ModB(_deletion_index)].start_idx 	
-                                        +  DataBatch[_ModB(_deletion_index)].counter;	
-                for (uint128 l = start_batch_idx; l < end_batch_idx; l++) {	
+                uint128 start_batch_idx = DataBatch[_ModB(_deletion_index)].start_idx;
+                uint128 end_batch_idx = DataBatch[_ModB(_deletion_index)].start_idx +
+                    DataBatch[_ModB(_deletion_index)].counter;
+                for (uint128 l = start_batch_idx; l < end_batch_idx; l++) {
                     delete SpotsMapping[_ModS(l)]; // delete SpotsMapping at index l                    
-                }	
+                }
                 // delete the batch	
-                delete DataBatch[_ModB(_deletion_index)];	
+                delete DataBatch[_ModB(_deletion_index)];
                 // delete the BatchCommitedVoteCount && BatchRevealedVoteCount	
-                delete BatchCommitedVoteCount[_ModB(_deletion_index)];	
-                delete BatchRevealedVoteCount[_ModB(_deletion_index)];	
+                delete BatchCommitedVoteCount[_ModB(_deletion_index)];
+                delete BatchRevealedVoteCount[_ModB(_deletion_index)];
                 // DELETE FOR ALL WORKERS	
-                address[] memory allocated_workers = WorkersPerBatch[_ModB(_deletion_index)];	
-                for (uint128 k = 0; k < allocated_workers.length; k++) {	
+                address[] memory allocated_workers = WorkersPerBatch[_ModB(_deletion_index)];
+                for (uint128 k = 0; k < allocated_workers.length; k++) {
                     //////////////////// FOR EACH WORKER ALLOCATED TO EACH BATCH	
-                    address _worker = allocated_workers[k];	
+                    address _worker = allocated_workers[k];
                     // clear store	
-                    bytes32 worker_UUID = attrUUID(_worker, _deletion_index);	
-                    resetAttribute(worker_UUID, "numTokens");	
-                    resetAttribute(worker_UUID, "commitHash");	
-                    resetAttribute(worker_UUID, "commitVote");	
+                    bytes32 worker_UUID = attrUUID(_worker, _deletion_index);
+                    resetAttribute(worker_UUID, "numTokens");
+                    resetAttribute(worker_UUID, "commitHash");
+                    resetAttribute(worker_UUID, "commitVote");
                     // clear UserVoteSubmission	
-                    delete UserVoteSubmission[_ModB(_deletion_index)][_worker];	
-                }	
+                    delete UserVoteSubmission[_ModB(_deletion_index)][_worker];
+                }
                 // clear WorkersPerBatch	
-                delete WorkersPerBatch[_ModB(_deletion_index)];	
-                emit _DataBatchDeleted(_deletion_index);	
+                delete WorkersPerBatch[_ModB(_deletion_index)];
+                emit _DataBatchDeleted(_deletion_index);
                 // Update Global Variable	
-                BatchDeletionCursor = BatchDeletionCursor + 1;	
-                require(BatchDeletionCursor < BatchCheckingCursor, 
-                "BatchDeletionCursor < BatchCheckingCursor assert invalidated");
+                BatchDeletionCursor = BatchDeletionCursor + 1;
+                require(BatchDeletionCursor < BatchCheckingCursor,
+                    "BatchDeletionCursor < BatchCheckingCursor assert invalidated");
             }
-        }	
+        }
     }
 
 
@@ -1007,7 +1141,7 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
      * @dev Destroy AllWorkersArray, important to release storage space if critical
      */
     function deleteWorkersAtIndex(uint256 index_) public onlyOwner {
-        address worker_at_index =  AllWorkersList[index_];
+        address worker_at_index = AllWorkersList[index_];
         address SwappedWorkerAtIndex = AllWorkersList[AllWorkersList.length - 1];
         if (AllWorkersList.length >= 2) {
             AllWorkersList[index_] = SwappedWorkerAtIndex; // swap last worker to this new position
@@ -1019,10 +1153,10 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
         deleteWorkersStatus(worker_at_index);
 
         //----- Track Storage usage -----
-        uint256 BytesUsedReduction = BYTES_256;   
-        if( BytesUsed >= BytesUsedReduction ){
+        uint256 BytesUsedReduction = BYTES_256;
+        if (BytesUsed >= BytesUsedReduction) {
             BytesUsed -= BytesUsedReduction;
-        }else{
+        } else {
             BytesUsed = 0;
         }
     }
@@ -1031,33 +1165,33 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
      * @dev Destroy WorkersStatus for users_ array, important to release storage space if critical
      */
     function deleteManyWorkersAtIndex(uint256[] memory indices_) public onlyOwner {
-        for (uint256 i = 0; i < indices_.length; i++){
+        for (uint256 i = 0; i < indices_.length; i++) {
             uint256 _index = indices_[i];
             deleteWorkersAtIndex(_index);
         }
-        
+
     }
     /**
      * @dev Destroy WorkersStatus, important to release storage space if critical
      */
     function deleteWorkersStatus(address user_) public onlyOwner {
-        delete WorkersStatus[user_];  
+        delete WorkersStatus[user_];
         //----- Track Storage usage -----
         uint256 BytesUsedReduction = BYTES_256;
-        if( BytesUsed >= BytesUsedReduction ){
+        if (BytesUsed >= BytesUsedReduction) {
             BytesUsed -= BytesUsedReduction;
-        }else{
+        } else {
             BytesUsed = 0;
         }
         //----- Track Storage usage -----
     }
 
-    
+
     /**
      * @dev Destroy WorkersStatus for users_ array, important to release storage space if critical
      */
     function deleteManyWorkersStatus(address[] memory users_) public onlyOwner {
-        for (uint256 i = 0; i < users_.length; i++){
+        for (uint256 i = 0; i < users_.length; i++) {
             address _user = users_[i];
             deleteWorkersStatus(_user);
         }
@@ -1067,15 +1201,15 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
      * @dev Destroy WorkersState, important to release storage space if critical
      */
     function deleteWorkersState(address user_) public onlyOwner {
-        delete WorkersState[user_];  
+        delete WorkersState[user_];
         delete dllMap[user_];
         delete WorkersSpotFlowManager[user_];
-        delete SystemStakedTokenBalance[user_];        
+        delete SystemStakedTokenBalance[user_];
         //----- Track Storage usage -----
-        uint256 BytesUsedReduction = BYTES_256*(2+1+15*2+1);
-        if( BytesUsed >= BytesUsedReduction ){
+        uint256 BytesUsedReduction = BYTES_256 * (2 + 1 + 15 * 2 + 1);
+        if (BytesUsed >= BytesUsedReduction) {
             BytesUsed -= BytesUsedReduction;
-        }else{
+        } else {
             BytesUsed = 0;
         }
         //----- Track Storage usage -----
@@ -1085,7 +1219,7 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
      * @dev Destroy WorkersStatus for users_ array, important to release storage space if critical
      */
     function deleteManyWorkersState(address[] memory users_) public onlyOwner {
-        for (uint256 i = 0; i < users_.length; i++){
+        for (uint256 i = 0; i < users_.length; i++) {
             address _user = users_[i];
             deleteWorkersState(_user);
         }
@@ -1097,9 +1231,9 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
 
 
     /**
-  * @notice Trigger potential Data Batches Validations & Work Allocations
-  * @param iteration_count max number of iterations
-  */
+     * @notice Trigger potential Data Batches Validations & Work Allocations
+     * @param iteration_count max number of iterations
+     */
     function TriggerUpdate(uint128 iteration_count) public {
         require(IParametersManager(address(0)) != Parameters, "Parameters Manager must be set.");
         // Update the Spot Flow System
@@ -1113,9 +1247,9 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
     }
 
     /**
-  * @notice Trigger at most iteration_count Work Allocations (N workers on a Batch)
-  * @param iteration_count max number of iterations
-  */
+     * @notice Trigger at most iteration_count Work Allocations (N workers on a Batch)
+     * @param iteration_count max number of iterations
+     */
     function TriggerAllocations(uint128 iteration_count) public {
         require(IParametersManager(address(0)) != Parameters, "Parameters Manager must be set.");
         // Log off waiting users first
@@ -1129,7 +1263,7 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
                     DataBatch[_ModB(AllocatedBatchCursor)].allocated_to_work != true &&
                     availableWorkers.length >= Parameters.get_SPOT_MIN_CONSENSUS_WORKER_COUNT() &&
                     DataBatch[_ModB(AllocatedBatchCursor)].complete &&
-                    (AllocatedBatchCursor - BatchCheckingCursor <= MAX_ONGOING_JOBS) 
+                    (AllocatedBatchCursor - BatchCheckingCursor <= MAX_ONGOING_JOBS)
                     // number of allocated/processed batchs must not exceed this number
                 ) {
                     AllocateWork();
@@ -1145,9 +1279,9 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
     }
 
     /**
-  * @notice Trigger at most iteration_count Ended DataBatch validations
-  * @param iteration_count max number of iterations
-  */
+     * @notice Trigger at most iteration_count Ended DataBatch validations
+     * @param iteration_count max number of iterations
+     */
     function TriggerValidation(uint128 iteration_count) public {
         require(IParametersManager(address(0)) != Parameters, "Parameters Manager must be set.");
         uint128 PrevCursor = BatchCheckingCursor;
@@ -1157,31 +1291,31 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
             if (
                 DataBatch[_ModB(CurrentCursor)].allocated_to_work &&
                 (DataEnded(CurrentCursor) || (DataBatch[_ModB(CurrentCursor)].unrevealed_workers == 0))
-            )  {	
+            ) {
                 // check if the batch is already validated	
-                if (!DataBatch[_ModB(CurrentCursor)].checked) {	
-                    ValidateDataBatch(CurrentCursor);	
-                }	
+                if (!DataBatch[_ModB(CurrentCursor)].checked) {
+                    ValidateDataBatch(CurrentCursor);
+                }
                 // increment BatchCheckingCursor if possible	
-                if (CurrentCursor == BatchCheckingCursor + 1) {	
-                    BatchCheckingCursor = BatchCheckingCursor + 1;	                    
-                    require(BatchCheckingCursor < AllocatedBatchCursor, 
-                    "BatchCheckingCursor < AllocatedBatchCursor assert invalidated");
-                }	
-            }                
+                if (CurrentCursor == BatchCheckingCursor + 1) {
+                    BatchCheckingCursor = BatchCheckingCursor + 1;
+                    require(BatchCheckingCursor < AllocatedBatchCursor,
+                        "BatchCheckingCursor < AllocatedBatchCursor assert invalidated");
+                }
+            }
             // Garbage collect if the offset [Deletion - Checking Cursor] > NB_BATCH_TO_TRIGGER_GARBAGE_COLLECTION
-            if( BatchDeletionCursor + NB_BATCH_TO_TRIGGER_GARBAGE_COLLECTION < BatchCheckingCursor ){
+            if (BatchDeletionCursor + NB_BATCH_TO_TRIGGER_GARBAGE_COLLECTION < BatchCheckingCursor) {
                 deleteOldData(1);
             }
         }
     }
 
     /**
-  * @notice Checks if two strings are equal
-  * @param _a string
-  * @param _b string
-  */
-    function AreStringsEqual(string memory _a, string memory _b) public pure returns (bool) {
+     * @notice Checks if two strings are equal
+     * @param _a string
+     * @param _b string
+     */
+    function AreStringsEqual(string memory _a, string memory _b) public pure returns(bool) {
         if (keccak256(abi.encodePacked(_a)) == keccak256(abi.encodePacked(_b))) {
             return true;
         } else {
@@ -1189,51 +1323,115 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
         }
     }
 
-    
+
     // ================================================================================
     //                             Validate Data Batch
     // ================================================================================
+    /**
+     * @notice Validate data for the specified data batch.
+     * @param _DataBatchId The ID of the data batch to be validated.
+     */
+    function ValidateDataBatch(uint128 _DataBatchId) internal {
+        BatchMetadata storage batch_ = DataBatch[_ModB(_DataBatchId)];
+        // 0. Check if initial conditions are met before validation process
+        requireInitialConditions(_DataBatchId, batch_);
 
+        // 1. Get allocated workers
+        address[] memory allocated_workers = WorkersPerBatch[_ModB(_DataBatchId)];
+
+        // 2. Gather user submissions and vote inputs for the DataBatch
+        (string[] memory proposedNewFiles, uint32[] memory proposedBatchCounts) =
+        gatherUserSubmissionsAndVoteInputs(_DataBatchId, allocated_workers);
+
+        // 3. Compute the majority submission & vote for the DataBatch
+        (string memory majorityNewFile, uint32 majorityBatchCount) =
+        computeMajorityQuorum(allocated_workers, proposedNewFiles, proposedBatchCounts);
+
+        // 4. Check if the validation process has passed the required conditions
+        bool isCheckPassed = isValidationCheckPassed(_DataBatchId, majorityNewFile, majorityBatchCount);
+
+        // 5. If FORCE_VALIDATE_BATCH_FILE is set to true, handle forced validation
+        (majorityNewFile, majorityBatchCount, isCheckPassed) = handleForcedValidation(_DataBatchId, batch_,
+            allocated_workers,
+            majorityNewFile, majorityBatchCount, proposedNewFiles, proposedBatchCounts, isCheckPassed);
+
+        // 6. Update the majorityBatchCount based on the validation result
+        majorityBatchCount = updateMajorityBatchCount(batch_, majorityBatchCount, isCheckPassed);
+
+        // 7. Iterate through the allocated workers and process their votes
+        for (uint256 i = 0; i < allocated_workers.length; i++) {
+            address worker_addr_ = allocated_workers[i];
+            uint256 worker_vote_ = UserVoteSubmission[_ModB(_DataBatchId)][worker_addr_].vote;
+            bool has_worker_voted_ = UserVoteSubmission[_ModB(_DataBatchId)][worker_addr_].revealed;
+
+            // 9. Handle worker vote, update worker state and perform necessary actions
+            handleWorkerVote(worker_addr_, majorityBatchCount, worker_vote_, has_worker_voted_, isCheckPassed);
+        }
+
+        // 10. Update the DataBatch state and counters based on the validation results
+        updateValidatedBatchState(batch_, majorityNewFile, majorityBatchCount, isCheckPassed);
+
+        emit _BatchValidated(_DataBatchId, majorityNewFile, isCheckPassed);
+    }
 
     /**
-  * @notice Trigger the validation of DataBatch
-  * @param _DataBatchId Integer identifier associated with target SpottedData
-  */
-    function ValidateDataBatch(uint128 _DataBatchId) internal {
+     * @notice Ensure the initial conditions are met for the data batch validation.
+     * @param _DataBatchId The ID of the data batch.
+     * @param batch_ BatchMetadata storage reference for the data batch.
+     */
+    function requireInitialConditions(uint128 _DataBatchId, BatchMetadata storage batch_) private view {
         require(IParametersManager(address(0)) != Parameters, "Parameters Manager must be set.");
         require(Parameters.getAddressManager() != address(0), "AddressManager is null in Parameters");
         require(Parameters.getRepManager() != address(0), "RepManager is null in Parameters");
         require(Parameters.getRewardManager() != address(0), "RewardManager is null in Parameters");
         require(
-            DataEnded(_DataBatchId) || (DataBatch[_ModB(_DataBatchId)].unrevealed_workers == 0),
+            DataEnded(_DataBatchId) || (batch_.unrevealed_workers == 0),
             "_DataBatchId has not ended, or not every voters have voted"
-        ); // votes needs to be closed
-        require(!DataBatch[_ModB(_DataBatchId)].checked, 
-            "_DataBatchId is already validated"); // votes needs to be closed
+        ); // votes need to be closed
+        require(!batch_.checked,
+            "_DataBatchId is already validated"); // votes need to be closed
+    }
 
-        address[] memory allocated_workers = WorkersPerBatch[_ModB(_DataBatchId)];
+    /**
+     * @notice Gather user submissions and vote inputs for the data batch validation.
+     * @param _DataBatchId The ID of the data batch.
+     * @param allocated_workers Array of worker addresses allocated to the data batch.
+     */
+    function gatherUserSubmissionsAndVoteInputs(uint128 _DataBatchId, address[] memory allocated_workers)
+    public view returns(string[] memory, uint32[] memory) {
         string[] memory proposedNewFiles = new string[](allocated_workers.length);
         uint32[] memory proposedBatchCounts = new uint32[](allocated_workers.length);
 
-        // -------------------------------------------------------------
-        // GATHER USER SUBMISSIONS AND VOTE INPUTS BEFORE ASSESSMENT
-
+        // Iterate through all allocated workers
         for (uint256 i = 0; i < allocated_workers.length; i++) {
             address worker_addr_ = allocated_workers[i];
+
+            // Retrieve worker's submitted new file and batch count
             string memory worker_proposed_new_file_ = UserVoteSubmission[_ModB(_DataBatchId)][worker_addr_].newFile;
             uint32 worker_proposed_new_count_ = UserVoteSubmission[_ModB(_DataBatchId)][worker_addr_].batchCount;
+
+            // Store the worker's submitted new file and batch count in the respective arrays
             proposedNewFiles[i] = worker_proposed_new_file_;
             proposedBatchCounts[i] = worker_proposed_new_count_;
         }
 
-        // -------------------------------------------------------------
-        // MAJORITY QUORUM COMPUTATION
+        return (proposedNewFiles, proposedBatchCounts);
+    }
+
+    /**
+     * @notice Compute the majority quorum for the data batch validation.
+     * @param allocated_workers Array of worker addresses allocated to the data batch.
+     * @param proposedNewFiles Array of proposed new file strings.
+     * @param proposedBatchCounts Array of proposed batch count values.
+     * @return The majority new file and the majority batch count.
+     */
+    function computeMajorityQuorum(address[] memory allocated_workers, string[] memory proposedNewFiles,
+        uint32[] memory proposedBatchCounts) internal view returns(string memory, uint32) {
         uint256 majority_min_count = Math.max((allocated_workers.length * Parameters.getVoteQuorum()) / 100, 1);
 
-        // GET THE MAJORITY NEW HASH IPFS FILE
-        string memory majorityNewFile = ""; //take first file by default, just in case
+        // Calculate the majority new IPFS file
+        string memory majorityNewFile = "";
         for (uint256 k = 0; k < proposedNewFiles.length; k++) {
-            // count if this given New File is submitted by a majority
             uint256 counter = 0;
             for (uint256 l = 0; l < proposedNewFiles.length; l++) {
                 if (AreStringsEqual(proposedNewFiles[k], proposedNewFiles[l])) {
@@ -1249,10 +1447,9 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
             }
         }
 
-        // GET THE MAJORITY BATCH COUNT
-        uint32 majorityBatchCount = 0; //take first file by default, just in case
+        // Calculate the majority batch count
+        uint32 majorityBatchCount = 0;
         for (uint32 k = 0; k < proposedBatchCounts.length; k++) {
-            // count if this given New File is submitted by a majority
             uint256 counter = 0;
             for (uint256 l = 0; l < proposedBatchCounts.length; l++) {
                 if (proposedBatchCounts[k] == proposedBatchCounts[l]) {
@@ -1268,24 +1465,48 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
             }
         }
 
-        // -------------------------------------------------------------
-        // ASSESS VOTE RESULT AND REWARD USERS ACCORDINGLY
-        // IMPORTANT: AND IF MAJORITY EXISTS
-        bool isCheckPassed = isPassed(_DataBatchId) &&
-            (!AreStringsEqual(majorityNewFile, "")) &&
-            (majorityBatchCount != 0);
+        return (majorityNewFile, majorityBatchCount);
+    }
 
-        // Force the protocol to validate a batch with at least 1 vote (and 1 non-null file hash)
+    /**
+     * @notice Check if the validation process has passed for a given data batch.
+     * @param _DataBatchId The ID of the data batch to be checked.
+     * @param majorityNewFile The majority new file string.
+     * @param majorityBatchCount The majority batch count.
+     * @return bool True if the validation check passed, otherwise false.
+     */
+    function isValidationCheckPassed(uint128 _DataBatchId, string memory majorityNewFile,
+        uint32 majorityBatchCount) internal view returns(bool) {
+        return isPassed(_DataBatchId) && !AreStringsEqual(majorityNewFile, "") && majorityBatchCount != 0;
+    }
+
+    /**
+     * @notice Handle forced validation for the data batch.
+     * @param _DataBatchId The ID of the data batch.
+     * @param batch_ BatchMetadata storage reference for the data batch.
+     * @param allocated_workers Array of worker addresses allocated to the data batch.
+     * @param majorityNewFile The majority new file string.
+     * @param majorityBatchCount The majority batch count.
+     * @param proposedNewFiles Array of proposed new file strings.
+     * @param proposedBatchCounts Array of proposed batch count values.
+     * @param isCheckPassed True if the previous validation check passed, otherwise false.
+     * @return (majorityNewFile_replacement, majorityBatchCount_replacement)
+     */
+    function handleForcedValidation(uint128 _DataBatchId, BatchMetadata storage batch_,
+        address[] memory allocated_workers, string memory majorityNewFile, uint32 majorityBatchCount,
+        string[] memory proposedNewFiles, uint32[] memory proposedBatchCounts, bool isCheckPassed)
+    internal view returns(string memory, uint32, bool) {
+
+
         if (FORCE_VALIDATE_BATCH_FILE) {
-            BatchMetadata memory batch_ = DataBatch[_ModB(_DataBatchId)];
             if (batch_.votesFor > 0) {
-                // FORCE PASS ON BATCH
+                // FORCE VALIDATION EVEN IF MAJORITY WAS NOT REACHED
+                // -> Maximize the data output
                 isCheckPassed = true;
             }
-
             if (AreStringsEqual(majorityNewFile, "")) {
                 //If majorityNewFile is null, find a submitted file to replace it
-                for (uint256 i = 0; i < allocated_workers.length; i++) {                    
+                for (uint256 i = 0; i < allocated_workers.length; i++) {
                     if (!UserVoteSubmission[_ModB(_DataBatchId)][allocated_workers[i]].revealed) {
                         continue; // if user has not even voted, skip.
                     }
@@ -1305,227 +1526,272 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
                 }
             }
         }
-
-        // Failing case: make majorityBatchCount SPOT_FILE_SIZE for that case, for a minimum rewards.
-        if (!isCheckPassed) {
-            majorityBatchCount = SPOT_FILE_SIZE;
-        } else {
-            // Cap the Batch Count to [Maximum Nb of files in batch * SPOT_FILE_SIZE)] (there can't be more item)
-            majorityBatchCount = uint32(
-                Math.min( 
-                    uint32(DataBatch[_ModB(_DataBatchId)].counter * SPOT_FILE_SIZE),
-                    majorityBatchCount));
-        }
-
-        for (uint256 i = 0; i < allocated_workers.length; i++) {
-            address worker_addr_ = allocated_workers[i];
-            uint256 worker_vote_ = UserVoteSubmission[_ModB(_DataBatchId)][worker_addr_].vote;
-            bool has_worker_voted_ = UserVoteSubmission[_ModB(_DataBatchId)][worker_addr_].revealed;
-
-            // Worker state update
-            WorkerState storage worker_state = WorkersState[worker_addr_];
-
-            // ------- if worker has indeed voted (commited & revealed)
-            if (has_worker_voted_) {
-                // mark that worker has completed job, no matter the reward
-
-                WorkersState[worker_addr_].succeeding_novote_count = 0; // reset the novote counter
-                // then assess if worker is in the majority to reward him
-                if ((isCheckPassed && worker_vote_ == 1) || (!isCheckPassed && worker_vote_ != 1)) {
-                    // vote 1 == OK, else = NOT OK, rejected
-                    // reward worker if he voted like the majority
-
-                    IAddressManager _AddressManager = IAddressManager(Parameters.getAddressManager());
-                    IRepManager _RepManager = IRepManager(Parameters.getRepManager());
-                    IRewardManager _RewardManager = IRewardManager(Parameters.getRewardManager());
-
-                    address worker_master_addr_ = _AddressManager.FetchHighestMaster(worker_addr_);
-                    if (majorityBatchCount > 0) {
-                        require(
-                            _RepManager.mintReputationForWork(
-                                Parameters.get_SPOT_MIN_REP_DataValidation() * majorityBatchCount,
-                                worker_master_addr_,
-                                ""
-                            ),
-                            "could not reward REP in Validate, 1.a"
-                        );
-                        require(
-                            _RewardManager.ProxyAddReward(
-                                Parameters.get_SPOT_MIN_REWARD_DataValidation() * majorityBatchCount,
-                                worker_master_addr_
-                            ),
-                            "could not reward token in Validate, 1.b"
-                        );
-                    }
-                    worker_state.majority_counter += 1;
-                } else {
-                    worker_state.minority_counter += 1;
-                }
-            }
-            // ------- if worker has not voted (never revealed)
-            else {
-                WorkersState[worker_addr_].succeeding_novote_count += 1;
-                /// --- FORCE LOG OFF USER IF HAS NOT VOTED MULTIPLE TIMES IN A ROW
-                if (WorkersState[worker_addr_].succeeding_novote_count >= Parameters.get_MAX_SUCCEEDING_NOVOTES()) {
-                    worker_state.registered = false;
-                    PopFromBusyWorkers(worker_addr_);
-                    PopFromAvailableWorkers(worker_addr_);
-                }
-                //  if worker has revealed, he is available again (revealing releases a given worker)
-                //  if worker has not revealed, then worker is still busy, pop him from Busy, back to Available
-                if (worker_state.registered) {
-                    // only if the worker is still registered
-                    PopFromBusyWorkers(worker_addr_);
-                    PushInAvailableWorkers(worker_addr_);
-                }
-                worker_state.allocated_work_batch = 0;
-            }
-        }
-        // -------------------------------------------------------------
-        // BATCH STATE UPDATE: mark it checked, final.
-        DataBatch[_ModB(_DataBatchId)].checked = true;
-        DataBatch[_ModB(_DataBatchId)].batchIPFSfile = majorityNewFile;
-        DataBatch[_ModB(_DataBatchId)].item_count = majorityBatchCount;
-
-        // -------------------------------------------------------------
-        // IF THE DATA BLOCK IS ACCEPTED
-        if (isCheckPassed) {
-            // Reward Spotters involved in the Batch
-            uint128 start_batch_idx = DataBatch[_ModB(_DataBatchId)].start_idx;
-            uint128 end_batch_idx = DataBatch[_ModB(_DataBatchId)].start_idx + DataBatch[_ModB(_DataBatchId)].counter;
-
-            // -------------------------------------------------------------
-            // Rewards Spot Authors, one by one, for the batch
-            for (uint128 l = start_batch_idx; l < end_batch_idx; l++) {
-                address spot_author_ = SpotsMapping[_ModS(l)].author;
-                IAddressManager _AddressManager = IAddressManager(Parameters.getAddressManager());
-                IRepManager _RepManager = IRepManager(Parameters.getRepManager());
-                IRewardManager _RewardManager = IRewardManager(Parameters.getRewardManager());
-                address spot_author_master_ = _AddressManager.FetchHighestMaster(spot_author_);
-                if (majorityBatchCount > 0) {
-                    require(
-                        _RepManager.mintReputationForWork(
-                            Parameters.get_SPOT_MIN_REP_SpotData() * majorityBatchCount,
-                            spot_author_master_,
-                            ""
-                        ),
-                        "could not reward REP in ValidateDataBatch, 2.a"
-                    );
-                    require(
-                        _RewardManager.ProxyAddReward(
-                            Parameters.get_SPOT_MIN_REWARD_SpotData() * majorityBatchCount,
-                            spot_author_master_
-                        ),
-                        "could not reward token in ValidateDataBatch, 2.b"
-                    );
-                }
-            }
-            // UPDATE BATCH STATE
-            DataBatch[_ModB(_DataBatchId)].status = DataStatus.APPROVED;
-            AcceptedBatchsCounter += 1;
-
-            // SEND THIS BATCH TO THIS FollowingSystem
-            require(Parameters.getComplianceSystem() != address(0), "ComplianceSystem null in Parameters Contract");
-            IFollowingSystem _ComplianceSystem = IFollowingSystem(Parameters.getComplianceSystem());
-
-            try _ComplianceSystem.Ping(_DataBatchId) {
-                AllTxsCounter += 1;
-            } catch (bytes memory err) {
-                emit BytesFailure(err);
-            }
-        }
-        // -------------------------------------------------------------
-        // IF THE DATA BLOCK IS REJECTED
-        else {
-            DataBatch[_ModB(_DataBatchId)].status = DataStatus.REJECTED;
-            RejectedBatchsCounter += 1;
-        }
-        // ---------------- GLOBAL STATE UPDATE ----------------
-        AllTxsCounter += 1;
-        AllItemCounter += DataBatch[_ModB(_DataBatchId)].item_count;
-        ItemFlowManager[ItemFlowManager.length - 1].counter +=  DataBatch[_ModB(_DataBatchId)].item_count;
-        updateItemCount();
-        NotCommitedCounter += DataBatch[_ModB(_DataBatchId)].uncommited_workers;
-        NotRevealedCounter += DataBatch[_ModB(_DataBatchId)].unrevealed_workers;
-
-
-        emit _BatchValidated(_DataBatchId, majorityNewFile, isCheckPassed);
+        return (majorityNewFile, majorityBatchCount, isCheckPassed);
     }
 
     /**
-  * @notice Allocate last data batch to be checked by K out N currently available workers.
-  */
+     * @notice Update the majority batch count.
+     * @param batch_ BatchMetadata storage reference for the data batch.
+     * @param majorityBatchCount The majority batch count.
+     * @param isCheckPassed True if the validation check passed, otherwise false.
+     * @return The majority batch count
+     */
+    function updateMajorityBatchCount(BatchMetadata storage batch_, uint32 majorityBatchCount, bool isCheckPassed)
+    internal view returns(uint32) {
+        if (!isCheckPassed) {
+            return SPOT_FILE_SIZE;
+        } else {
+            return uint32(
+                Math.min(
+                    uint32(batch_.counter * SPOT_FILE_SIZE),
+                    majorityBatchCount
+                )
+            );
+        }
+    }
+
+    /**
+     * @notice Reward a worker for their participation in the data batch validation.
+     * @param worker_addr_ The address of the worker to be rewarded.
+     * @param majorityBatchCount The majority batch count.
+     */
+    function rewardWorker(address worker_addr_, uint32 majorityBatchCount) internal {
+        IAddressManager _AddressManager = IAddressManager(Parameters.getAddressManager());
+        IRepManager _RepManager = IRepManager(Parameters.getRepManager());
+        IRewardManager _RewardManager = IRewardManager(Parameters.getRewardManager());
+
+        address worker_master_addr_ = _AddressManager.FetchHighestMaster(worker_addr_);
+        if (majorityBatchCount > 0) {
+            require(
+                _RepManager.mintReputationForWork(
+                    Parameters.get_SPOT_MIN_REP_DataValidation() * majorityBatchCount,
+                    worker_master_addr_,
+                    ""
+                ),
+                "could not reward REP in Validate, 1.a"
+            );
+            require(
+                _RewardManager.ProxyAddReward(
+                    Parameters.get_SPOT_MIN_REWARD_DataValidation() * majorityBatchCount,
+                    worker_master_addr_
+                ),
+                "could not reward token in Validate, 1.b"
+            );
+        }
+    }
+
+    /**
+     * @notice Handle worker vote during the data batch validation.
+     * @param worker_addr_ The address of the worker.
+     * @param majorityBatchCount The majority batch count.
+     * @param worker_vote_ The worker's vote value.
+     * @param has_worker_voted_ True if the worker has voted, otherwise false.
+     * @param isCheckPassed True if the validation check passed, otherwise false.
+     */
+    function handleWorkerVote(
+        address worker_addr_,
+        uint32 majorityBatchCount,
+        uint256 worker_vote_,
+        bool has_worker_voted_,
+        bool isCheckPassed
+    ) internal {
+        // Access worker state
+        WorkerState storage worker_state = WorkersState[worker_addr_];
+
+        // If the worker has indeed voted (committed & revealed)
+        if (has_worker_voted_) {
+            // Reset the no-vote counter for the worker
+            worker_state.succeeding_novote_count = 0;
+
+            // Check if the worker's vote matches the majority vote
+            bool isInMajority = (isCheckPassed && worker_vote_ == 1) || (!isCheckPassed && worker_vote_ != 1);
+
+            // Reward the worker if they voted with the majority
+            if (isInMajority) {
+                rewardWorker(worker_addr_, majorityBatchCount);
+                worker_state.majority_counter += 1;
+            } else {
+                worker_state.minority_counter += 1;
+            }
+        }
+        // If the worker has not voted (never revealed)
+        else {
+            // Increment the succeeding no-vote count for the worker
+            worker_state.succeeding_novote_count += 1;
+
+            // Force log off the worker if they have not voted multiple times in a row
+            if (worker_state.succeeding_novote_count >= Parameters.get_MAX_SUCCEEDING_NOVOTES()) {
+                worker_state.registered = false;
+                PopFromBusyWorkers(worker_addr_);
+                PopFromAvailableWorkers(worker_addr_);
+            }
+
+            // If the worker has revealed, they are available again (revealing releases a given worker)
+            // If the worker has not revealed, then the worker is still busy, move them from Busy to Available
+            if (worker_state.registered) {
+                // Only if the worker is still registered
+                PopFromBusyWorkers(worker_addr_);
+                PushInAvailableWorkers(worker_addr_);
+            }
+
+            worker_state.allocated_work_batch = 0;
+        }
+    }
+
+    /**
+     * @notice Update the state of a validated data batch.
+     * @param batch_ BatchMetadata storage reference for the data batch.
+     * @param majorityNewFile The majority new file string.
+     * @param majorityBatchCount The majority batch count.
+     * @param isCheckPassed True if the validation check passed, otherwise false.
+     */
+    function updateValidatedBatchState(BatchMetadata storage batch_,
+        string memory majorityNewFile, uint32 majorityBatchCount, bool isCheckPassed)
+    internal {
+        // Update DataBatch properties
+        batch_.checked = true;
+        batch_.batchIPFSfile = majorityNewFile;
+        batch_.item_count = majorityBatchCount;
+
+        // Update DataBatch status and counters based on isCheckPassed
+        if (isCheckPassed) {
+            batch_.status = DataStatus.APPROVED;
+            AcceptedBatchsCounter += 1;
+        } else {
+            batch_.status = DataStatus.REJECTED;
+            RejectedBatchsCounter += 1;
+        }
+
+        // Update global counters
+        AllTxsCounter += 1;
+        AllItemCounter += batch_.item_count;
+        ItemFlowManager[ItemFlowManager.length - 1].counter += batch_.item_count;
+        updateItemCount();
+        NotCommitedCounter += batch_.uncommited_workers;
+        NotRevealedCounter += batch_.unrevealed_workers;
+    }
+
+    // ================================================================================
+    // ================================================================================
+
+    /**
+     * @dev Allocates work to a set of selected workers from the available pool.
+     * This function selects workers, updates the allocated batch state, and assigns work to the selected workers.
+     */
     function AllocateWork() internal {
-        require(DataBatch[_ModB(AllocatedBatchCursor)].complete,
-         "Can't allocate work, the current batch is not complete");
+
+        BatchMetadata storage allocated_batch = DataBatch[_ModB(AllocatedBatchCursor)];
+        require(
+            DataBatch[_ModB(AllocatedBatchCursor)].complete,
+            "Can't allocate work, the current batch is not complete"
+        );
         require(
             !DataBatch[_ModB(AllocatedBatchCursor)].allocated_to_work,
             "Can't allocate work, the current batch is already allocated"
         );
-        uint16 selected_k = uint16(Math.max(
-            Math.min(availableWorkers.length, Parameters.get_SPOT_MAX_CONSENSUS_WORKER_COUNT()),
-            Parameters.get_SPOT_MIN_CONSENSUS_WORKER_COUNT()
-        ));
-        require(selected_k <= MAX_WORKER_ALLOCATED_PER_BATCH,  
-        // this require check force the allocatedWorkers array to be capped in size
-        "selected_k must be at most MAX_WORKER_ALLOCATED_PER_BATCH" );
-        uint256 n = availableWorkers.length;
 
         if ((uint64(block.timestamp) - LastAllocationTime) >= Parameters.get_SPOT_INTER_ALLOCATION_DURATION()) {
-            uint128 _allocated_batch_cursor = AllocatedBatchCursor;
-            ///////////////////////////// BATCH UPDATE STATE /////////////////////////////
-            DataBatch[_ModB(_allocated_batch_cursor)].unrevealed_workers = selected_k;
-            DataBatch[_ModB(_allocated_batch_cursor)].uncommited_workers = selected_k;
-            uint64 _commitEndDate = uint64(block.timestamp + Parameters.get_SPOT_COMMIT_ROUND_DURATION());
-            uint64 _revealEndDate = uint64(_commitEndDate + Parameters.get_SPOT_REVEAL_ROUND_DURATION());
-            DataBatch[_ModB(_allocated_batch_cursor)].commitEndDate = _commitEndDate;
-            DataBatch[_ModB(_allocated_batch_cursor)].revealEndDate = _revealEndDate;
-            DataBatch[_ModB(_allocated_batch_cursor)].allocated_to_work = true;
-            //////////////////////////////////////////////////////////////////////////////
-
-            require(selected_k >= 1 && n >= 1, "Fail during allocation: not enough workers");
-            uint256[] memory selected_workers_idx = random_selection(selected_k, n);
-            address[] memory selected_workers_addresses = new address[](selected_workers_idx.length);
-
-                // There is no loop break here, because the number of 
-                // allocated workers per batch is always low (< 50). 
-                // This loop can be considered O(1).
-
-            for (uint256 i = 0; i < selected_workers_idx.length; i++) {
-                selected_workers_addresses[i] = availableWorkers[selected_workers_idx[i]];
-            }
-
-            for (uint256 i = 0; i < selected_workers_idx.length; i++) {
-                address selected_worker_ = selected_workers_addresses[i];
-                WorkerState storage worker_state = WorkersState[selected_worker_];
-                // clear existing values
-                UserVoteSubmission[_ModB(_allocated_batch_cursor)][selected_worker_].commited = false;
-                UserVoteSubmission[_ModB(_allocated_batch_cursor)][selected_worker_].revealed = false;
-                ///// worker swapping from available to busy, not to be picked again while working.
-                PopFromAvailableWorkers(selected_worker_);
-                PushInBusyWorkers(selected_worker_); //set worker as busy
-                WorkersPerBatch[_ModB(_allocated_batch_cursor)].push(selected_worker_);
-                ///// allocation
-                worker_state.allocated_work_batch = _allocated_batch_cursor;
-                worker_state.allocated_batch_counter += 1;
-                    
-                emit _WorkAllocated(_allocated_batch_cursor, selected_worker_);
-            }
-
+            // select workers
+            uint16 selected_k_workers = getSelectedWorkersCount();
+            // update newly allocated batch state
+            updateAllocatedBatchState(allocated_batch, selected_k_workers);
+            // get selected worker addresses
+            address[] memory selected_workers_addresses = selectWorkers(selected_k_workers);
+            // update selected workers states
+            allocateWorkToWorkers(selected_workers_addresses);
+            // post checks
             LastAllocationTime = uint64(block.timestamp);
             AllocatedBatchCursor += 1;
-            require(AllocatedBatchCursor < LastBatchCounter, 
-            "AllocatedBatchCursor < LastBatchCounter assert invalidated");
+            require(AllocatedBatchCursor < LastBatchCounter,
+                "AllocatedBatchCursor < LastBatchCounter assert invalidated");
             LastRandomSeed = getRandom();
             AllTxsCounter += 1;
         }
     }
 
     /**
-  * @notice To know if new work is available for worker's address user_
-  * @param user_ user
-  */
-    function IsNewWorkAvailable(address user_) public view returns (bool) {
+     * @dev Calculates the number of workers to be selected for allocation.
+     * @return A uint16 representing the number of workers to be selected for work allocation.
+     */
+    function getSelectedWorkersCount() private view returns(uint16) {
+        uint16 selected_k = uint16(Math.max(
+            Math.min(availableWorkers.length, Parameters.get_SPOT_MAX_CONSENSUS_WORKER_COUNT()),
+            Parameters.get_SPOT_MIN_CONSENSUS_WORKER_COUNT()
+        ));
+        require(selected_k <= MAX_WORKER_ALLOCATED_PER_BATCH,
+            "selected_k must be at most MAX_WORKER_ALLOCATED_PER_BATCH");
+        return selected_k;
+    }
+
+    /**
+     * @dev Updates the allocated batch state with the selected workers' count.
+     * @param allocated_batch A storage reference to the BatchMetadata struct being updated.
+     * @param selected_k_workers A uint16 representing the number of selected workers for the current batch.
+     */
+    function updateAllocatedBatchState(BatchMetadata storage allocated_batch, uint16 selected_k_workers) internal {
+        uint128 _allocated_batch_cursor = AllocatedBatchCursor;
+        allocated_batch.uncommited_workers = selected_k_workers;
+        allocated_batch.unrevealed_workers = selected_k_workers;
+        DataBatch[_ModB(_allocated_batch_cursor)].uncommited_workers = selected_k_workers;
+        uint64 _commitEndDate = uint64(block.timestamp + Parameters.get_SPOT_COMMIT_ROUND_DURATION());
+        uint64 _revealEndDate = uint64(_commitEndDate + Parameters.get_SPOT_REVEAL_ROUND_DURATION());
+        allocated_batch.commitEndDate = _commitEndDate;
+        allocated_batch.revealEndDate = _revealEndDate;
+        allocated_batch.allocated_to_work = true;
+    }
+
+    /**
+     * @dev Selects a set of workers from the available pool based on a specified count.
+     * @param selected_k_workers A uint16 representing the number of workers to be selected for work allocation.
+     * @return An array of addresses representing the selected workers.
+     */
+    function selectWorkers(uint16 selected_k_workers) private view returns(address[] memory) {
+        uint256 n = availableWorkers.length;
+        require(selected_k_workers >= 1 && n >= 1, "Fail during allocation: not enough workers");
+        uint256[] memory selected_workers_idx = random_selection(selected_k_workers, n);
+        address[] memory selected_workers_addresses = new address[](selected_workers_idx.length);
+
+        for (uint256 i = 0; i < selected_workers_idx.length; i++) {
+            selected_workers_addresses[i] = availableWorkers[selected_workers_idx[i]];
+        }
+
+        return selected_workers_addresses;
+    }
+
+    /**
+     * @dev Allocates work to the specified set of workers and updates their state.
+     * @param selected_workers_addresses An array of addresses representing the selected workers to be assigned work.
+     */
+    function allocateWorkToWorkers(address[] memory selected_workers_addresses) internal {
+        uint128 _allocated_batch_cursor = AllocatedBatchCursor;
+        // allocated workers per batch is always low (< 30). This loop can be considered O(1).
+        for (uint256 i = 0; i < selected_workers_addresses.length; i++) {
+            address selected_worker_ = selected_workers_addresses[i];
+            WorkerState storage worker_state = WorkersState[selected_worker_];
+
+            // clear existing values
+            UserVoteSubmission[_ModB(_allocated_batch_cursor)][selected_worker_].commited = false;
+            UserVoteSubmission[_ModB(_allocated_batch_cursor)][selected_worker_].revealed = false;
+
+            // swap worker from available to busy, not to be picked again while working
+            PopFromAvailableWorkers(selected_worker_);
+            PushInBusyWorkers(selected_worker_); // set worker as busy
+            WorkersPerBatch[_ModB(_allocated_batch_cursor)].push(selected_worker_);
+
+            // allocation
+            worker_state.allocated_work_batch = _allocated_batch_cursor;
+            worker_state.allocated_batch_counter += 1;
+
+            emit _WorkAllocated(_allocated_batch_cursor, selected_worker_);
+        }
+    }
+
+
+    /**
+     * @notice To know if new work is available for worker's address user_
+     * @param user_ user
+     */
+    function IsNewWorkAvailable(address user_) public view returns(bool) {
         bool new_work_available = false;
         WorkerState memory user_state = WorkersState[user_];
         uint128 _currentUserBatch = user_state.allocated_work_batch;
@@ -1540,10 +1806,10 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
     }
 
     /**
-  * @notice Get newest work for user
-  * @param user_ user
-  */
-    function GetCurrentWork(address user_) public view returns (uint256) {
+     * @notice Get newest work for user
+     * @param user_ user
+     */
+    function GetCurrentWork(address user_) public view returns(uint256) {
         WorkerState memory user_state = WorkersState[user_];
         uint128 _currentUserBatch = user_state.allocated_work_batch;
         // if user has failed to commit and commitPeriod is Over, then currentWork is "missed".
@@ -1559,8 +1825,8 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
     // ================================================================================
 
     /**
-  * @notice Update the global sliding counter of spotted data, measuring the spots per TIMEFRAME (hour)
-  */
+     * @notice Update the global sliding counter of spotted data, measuring the spots per TIMEFRAME (hour)
+     */
     function updateGlobalSpotFlow() public {
         require(IParametersManager(address(0)) != Parameters, "Parameters Manager must be set.");
         uint256 last_timeframe_idx_ = GlobalSpotFlowManager.length - 1;
@@ -1577,9 +1843,9 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
     }
 
     /**
-  * @notice Count the total spots per TIMEFRAME (hour)
-  */
-    function getGlobalPeriodSpotCount() public view returns (uint256) {
+     * @notice Count the total spots per TIMEFRAME (hour)
+     */
+    function getGlobalPeriodSpotCount() public view returns(uint256) {
         uint256 total = 0;
         for (uint256 i = 0; i < GlobalSpotFlowManager.length; i++) {
             total += GlobalSpotFlowManager[i].counter;
@@ -1589,8 +1855,8 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
 
 
     /**
-  * @notice Update the global sliding counter of validated data, measuring the URL per TIMEFRAME (hour)
-  */
+     * @notice Update the global sliding counter of validated data, measuring the URL per TIMEFRAME (hour)
+     */
     function updateItemCount() public {
         require(IParametersManager(address(0)) != Parameters, "Parameters Manager must be set.");
         uint256 last_timeframe_idx_ = ItemFlowManager.length - 1;
@@ -1607,9 +1873,9 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
     }
 
     /**
-  * @notice Count the total spots per TIMEFRAME (hour)
-  */
-    function getPeriodItemCount() public view returns (uint256) {
+     * @notice Count the total spots per TIMEFRAME (hour)
+     */
+    function getPeriodItemCount() public view returns(uint256) {
         uint256 total = 0;
         for (uint256 i = 0; i < ItemFlowManager.length; i++) {
             total += ItemFlowManager[i].counter;
@@ -1618,9 +1884,9 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
     }
 
     /**
-  * @notice Update the total spots per TIMEFRAME (hour) per USER
-  * @param user_ user
-  */
+     * @notice Update the total spots per TIMEFRAME (hour) per USER
+     * @param user_ user
+     */
     function updateUserSpotFlow(address user_) public {
         require(IParametersManager(address(0)) != Parameters, "Parameters Manager must be set.");
         TimeframeCounter[NB_TIMEFRAMES] storage UserSpotFlowManager = WorkersSpotFlowManager[user_];
@@ -1639,10 +1905,10 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
     }
 
     /**
-  * @notice Count the total spots per TIMEFRAME (hour) per USER
-  * @param user_ user
-  */
-    function getUserPeriodSpotCount(address user_) public view returns (uint256) {
+     * @notice Count the total spots per TIMEFRAME (hour) per USER
+     * @param user_ user
+     */
+    function getUserPeriodSpotCount(address user_) public view returns(uint256) {
         TimeframeCounter[NB_TIMEFRAMES] storage UserSpotFlowManager = WorkersSpotFlowManager[user_];
         uint256 total = 0;
         for (uint256 i = 0; i < UserSpotFlowManager.length; i++) {
@@ -1670,7 +1936,7 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
         string memory extra_
     ) public
     whenNotPaused()
-    returns (uint256 Dataid_) {
+    returns(uint256 Dataid_) {
         require(IParametersManager(address(0)) != Parameters, "Parameters Manager must be set.");
         // ---- Spot Flow Management ---------------------------------------
         require(Parameters.get_SPOT_TOGGLE_ENABLED(), "Spotting is not currently enabled by Owner");
@@ -1734,13 +2000,14 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
                     LastBatchCounter += 1;
                     delete DataBatch[_ModB(LastBatchCounter)];
                     // we indicate that the first spot of the new batch, is the one we just built
-                    DataBatch[_ModB(_batch_counter)].start_idx = DataNonce; 
+                    DataBatch[_ModB(_batch_counter)].start_idx = DataNonce;
                 }
 
                 // Global state update - spot flow management: increase global sliding counter & user counter
                 DataNonce = DataNonce + 1;
                 GlobalSpotFlowManager[GlobalSpotFlowManager.length - 1].counter += 1;
-                TimeframeCounter[NB_TIMEFRAMES] storage UserSpotFlowManager = WorkersSpotFlowManager[_selectedAddress];
+                TimeframeCounter[NB_TIMEFRAMES] storage UserSpotFlowManager = WorkersSpotFlowManager[
+                    _selectedAddress];
                 UserSpotFlowManager[UserSpotFlowManager.length - 1].counter += 1;
 
                 if (InstantSpotRewards) {
@@ -1767,8 +2034,8 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
             }
             // -----------------------------------------------------------------
         }
-        WorkerState storage worker_state = WorkersState[msg.sender];        
-        if ( !worker_state.isWorkerSeen ){
+        WorkerState storage worker_state = WorkersState[msg.sender];
+        if (!worker_state.isWorkerSeen) {
             AllWorkersList.push(msg.sender);
             worker_state.isWorkerSeen = true;
         }
@@ -1780,26 +2047,25 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
     }
 
     /**
-  * @notice Commits spot-check-vote on a DataBatch
-  * @param _DataBatchId DataBatch ID
-  * @param _encryptedHash encrypted hash of the submitted IPFS file (json format)
-  * @param _encryptedVote encrypted hash of the submitted IPFS vote
-  * @param _BatchCount Batch Count in number of items (in the aggregated IPFS hash)
-  * @param _From extra information (for indexing / archival purpose)
-  */
-    function commitSpotCheck(
+     * @notice Commits spot-check-vote on a DataBatch
+     * @param _DataBatchId DataBatch ID
+     * @param _encryptedHash encrypted hash of the submitted IPFS file (json format)
+     * @param _encryptedVote encrypted hash of the submitted IPFS vote
+     * @param _BatchCount Batch Count in number of items (in the aggregated IPFS hash)
+     * @param _From extra information (for indexing / archival purpose)
+     */
+    function commitFileVote(
         uint128 _DataBatchId,
         bytes32 _encryptedHash,
         bytes32 _encryptedVote,
         uint32 _BatchCount,
         string memory _From
-    ) public 
-    whenNotPaused()
-    {
+    ) public
+    whenNotPaused() {
         require(IParametersManager(address(0)) != Parameters, "Parameters Manager must be set.");
         require(commitPeriodActive(_DataBatchId), "commit period needs to be open for this batchId");
-        require(!UserVoteSubmission[_ModB(_DataBatchId)][msg.sender].commited, 
-        "User has already commited to this batchId");
+        require(!UserVoteSubmission[_ModB(_DataBatchId)][msg.sender].commited,
+            "User has already commited to this batchId");
         require(
             isWorkerAllocatedToBatch(_DataBatchId, msg.sender),
             "User needs to be allocated to this batch to commit on it"
@@ -1852,33 +2118,32 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
         DataBatch[_ModB(_DataBatchId)].uncommited_workers = DataBatch[_ModB(_DataBatchId)].uncommited_workers - 1;
         worker_state.last_interaction_date = uint64(block.timestamp);
         UserVoteSubmission[_ModB(_DataBatchId)][msg.sender].commited = true;
-                
+
         AllTxsCounter += 1;
         _retrieveSFuel();
         emit _SpotCheckCommitted(_DataBatchId, _numTokens, msg.sender);
     }
 
     /**
-  * @notice Reveals spot-check-vote on a DataBatch
-  * @param _DataBatchId DataBatch ID
-  * @param _clearIPFSHash clear hash of the submitted IPFS file (json format)
-  * @param _clearVote clear hash of the submitted IPFS vote
-  * @param _salt arbitraty integer used to hash the previous commit & verify the reveal
-  */
-    function revealSpotCheck(
+     * @notice Reveals spot-check-vote on a DataBatch
+     * @param _DataBatchId DataBatch ID
+     * @param _clearIPFSHash clear hash of the submitted IPFS file (json format)
+     * @param _clearVote clear hash of the submitted IPFS vote
+     * @param _salt arbitraty integer used to hash the previous commit & verify the reveal
+     */
+    function revealFileVote(
         uint64 _DataBatchId,
         string memory _clearIPFSHash,
         uint8 _clearVote,
         uint256 _salt
     ) public
-    whenNotPaused()
-    {
+    whenNotPaused() {
         // Make sure the reveal period is active
         require(revealPeriodActive(_DataBatchId), "Reveal period not open for this DataID");
-        require(UserVoteSubmission[_ModB(_DataBatchId)][msg.sender].commited, 
-        "User has not commited before, thus can't reveal");
-        require(!UserVoteSubmission[_ModB(_DataBatchId)][msg.sender].revealed, 
-        "User has already revealed, thus can't reveal");
+        require(UserVoteSubmission[_ModB(_DataBatchId)][msg.sender].commited,
+            "User has not commited before, thus can't reveal");
+        require(!UserVoteSubmission[_ModB(_DataBatchId)][msg.sender].revealed,
+            "User has already revealed, thus can't reveal");
         require(
             getEncryptedStringHash(_clearIPFSHash, _salt) == getCommitIPFSHash(msg.sender, _DataBatchId),
             "Not the same hash than commited, impossible to match with given _salt & _clearIPFSHash"
@@ -1923,9 +2188,9 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
             IRewardManager _RewardManager = IRewardManager(Parameters.getRewardManager());
             address reveal_author_master_ = _AddressManager.FetchHighestMaster(reveal_author_);
             uint256 repAmount = Parameters.get_SPOT_MIN_REP_DataValidation() *
-                                    SPOT_FILE_SIZE/InstantRevealRewardsDivider;
-            uint256 rewardAmount = Parameters.get_SPOT_MIN_REWARD_DataValidation() * 
-                                    SPOT_FILE_SIZE/InstantRevealRewardsDivider;
+                SPOT_FILE_SIZE / InstantRevealRewardsDivider;
+            uint256 rewardAmount = Parameters.get_SPOT_MIN_REWARD_DataValidation() *
+                SPOT_FILE_SIZE / InstantRevealRewardsDivider;
             require(
                 _RepManager.mintReputationForWork(repAmount, reveal_author_master_, ""),
                 "could not reward REP in revealSpotCheck, 1.a"
@@ -1957,11 +2222,11 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
     // ================================================================================
 
     /**
-  * @notice Loads _numTokens ERC20 tokens into the voting contract for one-to-one voting rights
-  * @dev Assumes that msg.sender has approved voting contract to spend on their behalf
-  * @param _numTokens The number of votingTokens desired in exchange for ERC20 tokens
-  * @param user_ The user address
-  */
+     * @notice Loads _numTokens ERC20 tokens into the voting contract for one-to-one voting rights
+     * @dev Assumes that msg.sender has approved voting contract to spend on their behalf
+     * @param _numTokens The number of votingTokens desired in exchange for ERC20 tokens
+     * @param user_ The user address
+     */
     function requestAllocatedStake(uint256 _numTokens, address user_) internal {
         require(Parameters.getStakeManager() != address(0), "StakeManager is null in Parameters");
         IStakeManager _StakeManager = IStakeManager(Parameters.getStakeManager());
@@ -1969,7 +2234,7 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
             _StakeManager.ProxyStakeAllocate(_numTokens, user_),
             "Could not request enough allocated stake, requestAllocatedStake"
         );
-        if(SystemStakedTokenBalance[user_] == 0){
+        if (SystemStakedTokenBalance[user_] == 0) {
             //----- Track Storage usage -----
             BytesUsed += BYTES_256; //boolean + vote + hash
             //----- Track Storage usage -----
@@ -1980,13 +2245,13 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
     }
 
     /**
-  * @notice Withdraw _numTokens ERC20 tokens from the voting contract, revoking these voting rights
-  * @param _numTokens The number of ERC20 tokens desired in exchange for voting rights
-  */
+     * @notice Withdraw _numTokens ERC20 tokens from the voting contract, revoking these voting rights
+     * @param _numTokens The number of ERC20 tokens desired in exchange for voting rights
+     */
     function withdrawVotingRights(uint256 _numTokens) public {
-        require(IParametersManager(address(0)) != Parameters, "Parameters Manager must be set.");        
-        address _selectedAddress = SelectAddressForUser(msg.sender, _numTokens);        
-        require(_selectedAddress != address(0),"Error: _selectedAddress is null during withdrawVotingRights");
+        require(IParametersManager(address(0)) != Parameters, "Parameters Manager must be set.");
+        address _selectedAddress = SelectAddressForUser(msg.sender, _numTokens);
+        require(_selectedAddress != address(0), "Error: _selectedAddress is null during withdrawVotingRights");
         uint256 availableTokens = SystemStakedTokenBalance[_selectedAddress] - getLockedTokens(_selectedAddress);
         require(availableTokens >= _numTokens, "availableTokens should be >= _numTokens");
 
@@ -2001,38 +2266,38 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
     }
 
     /**
-  * @notice get BytesUsed (storage space), monitored by the contract
-  *         can be approximative
-  */
-    function getBytesUsed() public view returns (uint256 storage_size) {
+     * @notice get BytesUsed (storage space), monitored by the contract
+     *         can be approximative
+     */
+    function getBytesUsed() public view returns(uint256 storage_size) {
         return BytesUsed;
     }
     /**
-  * @notice get Locked Token for the current Contract (WorkSystem)
-  * @param user_ The user address
-  */
-    function getSystemTokenBalance(address user_) public view returns (uint256 tokens) {
+     * @notice get Locked Token for the current Contract (WorkSystem)
+     * @param user_ The user address
+     */
+    function getSystemTokenBalance(address user_) public view returns(uint256 tokens) {
         return (uint256(SystemStakedTokenBalance[user_]));
     }
 
     /**
-  * @notice Get Total Accepted Batches
-  */
-    function getAcceptedBatchesCount() public view returns (uint128 count) {
+     * @notice Get Total Accepted Batches
+     */
+    function getAcceptedBatchesCount() public view returns(uint128 count) {
         return AcceptedBatchsCounter;
     }
 
     /**
-  * @notice Get Total Rejected Batches
-  */
-    function getRejectedBatchesCount() public view returns (uint128 count) {
+     * @notice Get Total Rejected Batches
+     */
+    function getRejectedBatchesCount() public view returns(uint128 count) {
         return RejectedBatchsCounter;
     }
 
     /**
-  * @dev Unlocks tokens locked in unrevealed spot-check-vote where SpottedData has ended
-  * @param _DataBatchId Integer identifier associated with the target SpottedData
-  */
+     * @dev Unlocks tokens locked in unrevealed spot-check-vote where SpottedData has ended
+     * @param _DataBatchId Integer identifier associated with the target SpottedData
+     */
     function rescueTokens(uint128 _DataBatchId) public {
         require(
             DataBatch[_ModB(_DataBatchId)].status == DataStatus.APPROVED,
@@ -2041,12 +2306,12 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
         require(dllMap[msg.sender].contains(_DataBatchId), "dllMap: does not cointain _DataBatchId for the msg sender");
 
         dllMap[msg.sender].remove(_DataBatchId);
-        
+
         //----- Track Storage usage -----
-        uint256 BytesUsedReduction = BYTES_128;                
-        if( BytesUsed >= BytesUsedReduction ){
+        uint256 BytesUsedReduction = BYTES_128;
+        if (BytesUsed >= BytesUsedReduction) {
             BytesUsed -= BytesUsedReduction;
-        }else{
+        } else {
             BytesUsed = 0;
         }
         //----- Track Storage usage -----
@@ -2056,9 +2321,9 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
     }
 
     /**
-  * @dev Unlocks tokens locked in unrevealed spot-check-votes where Datas have ended
-  * @param _DataBatchIDs Array of integer identifiers associated with the target Datas
-  */
+     * @dev Unlocks tokens locked in unrevealed spot-check-votes where Datas have ended
+     * @param _DataBatchIDs Array of integer identifiers associated with the target Datas
+     */
     function rescueTokensInMultipleDatas(uint128[] memory _DataBatchIDs) public {
         // loop through arrays, rescuing tokens from all
         for (uint256 i = 0; i < _DataBatchIDs.length; i++) {
@@ -2071,10 +2336,10 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
     // ================================================================================
 
     /**
-  * @notice get all IPFS hashes, input of the batch 
-  * @param _DataBatchId ID of the batch
-  */
-    function getIPFShashesForBatch(uint128 _DataBatchId) public view returns (string[] memory) {
+     * @notice get all IPFS hashes, input of the batch 
+     * @param _DataBatchId ID of the batch
+     */
+    function getIPFShashesForBatch(uint128 _DataBatchId) public view returns(string[] memory) {
         require(DataExists(_DataBatchId), "_DataBatchId must exist");
         BatchMetadata memory batch_ = DataBatch[_ModB(_DataBatchId)];
         uint256 batch_size = batch_.counter;
@@ -2091,15 +2356,14 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
     }
 
     /**
-  * @notice get all IPFS hashes, input of batchs, between batch indices A and B (a < B)
-  * @param _DataBatchId_a ID of the starting batch
-  * @param _DataBatchId_b ID of the ending batch (included)
-  */
+     * @notice get all IPFS hashes, input of batchs, between batch indices A and B (a < B)
+     * @param _DataBatchId_a ID of the starting batch
+     * @param _DataBatchId_b ID of the ending batch (included)
+     */
     function getMultiBatchIPFShashes(uint128 _DataBatchId_a, uint128 _DataBatchId_b)
-        public
-        view
-        returns (string[] memory)
-    {
+    public
+    view
+    returns(string[] memory) {
         require(_DataBatchId_a > 0 && _DataBatchId_a < _DataBatchId_b, "Input boundaries are invalid");
         uint128 _ipfs_hash_count = 0;
 
@@ -2125,23 +2389,22 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
 
 
     /**
-  * @notice get all item counts for all batches between batch indices A and B (a < B)
-  * @param _DataBatchId_a ID of the starting batch
-  * @param _DataBatchId_b ID of the ending batch (included)
-  */
+     * @notice get all item counts for all batches between batch indices A and B (a < B)
+     * @param _DataBatchId_a ID of the starting batch
+     * @param _DataBatchId_b ID of the ending batch (included)
+     */
     function getBatchCountForBatch(uint128 _DataBatchId_a, uint128 _DataBatchId_b)
-        public
-        view
-        returns (uint128 AverageURLCount, uint128[] memory batchCounts)
-    {
+    public
+    view
+    returns(uint128 AverageURLCount, uint128[] memory batchCounts) {
         require(_DataBatchId_a > 0 && _DataBatchId_a < _DataBatchId_b, "Input boundaries are invalid");
         uint128 _total_batchs_count = 0;
         uint128 _batch_amount = _DataBatchId_b - _DataBatchId_a + 1;
 
         uint128[] memory _batch_counts_list = new uint128[](_batch_amount);
 
-        for (uint128 i = 0; i < _batch_amount ; i++) {
-            BatchMetadata memory batch_ = DataBatch[_ModB(i+_DataBatchId_a)];
+        for (uint128 i = 0; i < _batch_amount; i++) {
+            BatchMetadata memory batch_ = DataBatch[_ModB(i + _DataBatchId_a)];
             _total_batchs_count += batch_.item_count;
             _batch_counts_list[i] = batch_.item_count;
         }
@@ -2152,10 +2415,10 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
     }
 
     /**
-  * @notice get top domain URL for a given batch
-  * @param _DataBatchId ID of the batch
-  */
-    function getDomainsForBatch(uint128 _DataBatchId) public view returns (string[] memory) {
+     * @notice get top domain URL for a given batch
+     * @param _DataBatchId ID of the batch
+     */
+    function getDomainsForBatch(uint128 _DataBatchId) public view returns(string[] memory) {
         require(DataExists(_DataBatchId), "_DataBatchId must exist");
         BatchMetadata memory batch_ = DataBatch[_ModB(_DataBatchId)];
         uint128 batch_size = batch_.counter;
@@ -2172,10 +2435,10 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
     }
 
     /**
-  * @notice get the From information for a given batch
-  * @param _DataBatchId ID of the batch
-  */
-    function getFromsForBatch(uint128 _DataBatchId) public view returns (string[] memory) {
+     * @notice get the From information for a given batch
+     * @param _DataBatchId ID of the batch
+     */
+    function getFromsForBatch(uint128 _DataBatchId) public view returns(string[] memory) {
         require(DataExists(_DataBatchId), "_DataBatchId must exist");
 
         address[] memory allocated_workers = WorkersPerBatch[_ModB(_DataBatchId)];
@@ -2188,10 +2451,10 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
     }
 
     /**
-  * @notice get all Votes on a given batch
-  * @param _DataBatchId ID of the batch
-  */
-    function getVotesForBatch(uint128 _DataBatchId) public view returns (uint128[] memory) {
+     * @notice get all Votes on a given batch
+     * @param _DataBatchId ID of the batch
+     */
+    function getVotesForBatch(uint128 _DataBatchId) public view returns(uint128[] memory) {
         require(DataExists(_DataBatchId), "_DataBatchId must exist");
 
         address[] memory allocated_workers = WorkersPerBatch[_ModB(_DataBatchId)];
@@ -2204,10 +2467,10 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
     }
 
     /**
-  * @notice get all IPFS files submitted (during commit/reveal) on a given batch
-  * @param _DataBatchId ID of the batch
-  */
-    function getSubmittedFilesForBatch(uint128 _DataBatchId) public view returns (string[] memory) {
+     * @notice get all IPFS files submitted (during commit/reveal) on a given batch
+     * @param _DataBatchId ID of the batch
+     */
+    function getSubmittedFilesForBatch(uint128 _DataBatchId) public view returns(string[] memory) {
         require(DataExists(_DataBatchId), "_DataBatchId must exist");
 
         address[] memory allocated_workers = WorkersPerBatch[_ModB(_DataBatchId)];
@@ -2220,23 +2483,23 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
     }
 
     /**
-  * @notice Get all current workers
-  */
-    function getActiveWorkersCount() public view returns (uint256 numWorkers) {
+     * @notice Get all current workers
+     */
+    function getActiveWorkersCount() public view returns(uint256 numWorkers) {
         return (uint256(availableWorkers.length + busyWorkers.length));
     }
 
     /**
-  * @notice Get all available (idle) workers
-  */
-    function getAvailableWorkersCount() public view returns (uint256 numWorkers) {
+     * @notice Get all available (idle) workers
+     */
+    function getAvailableWorkersCount() public view returns(uint256 numWorkers) {
         return (uint256(availableWorkers.length));
     }
 
     /**
-  * @notice Get all busy workers
-  */
-    function getBusyWorkersCount() public view returns (uint256 numWorkers) {
+     * @notice Get all busy workers
+     */
+    function getBusyWorkersCount() public view returns(uint256 numWorkers) {
         return (uint256(busyWorkers.length));
     }
 
@@ -2248,19 +2511,19 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
     // ----------------------------------------------------
 
     /**
-  * @dev Compares previous and next SpottedData's committed tokens for sorting purposes
-  * @param _prevID Integer identifier associated with previous SpottedData in sorted order
-  * @param _nextID Integer identifier associated with next SpottedData in sorted order
-  * @param _voter Address of user to check DLL position for
-  * @param _numTokens The number of tokens to be committed towards the SpottedData (used for sorting)
-  * @return APPROVED Boolean indication of if the specified position maintains the sort
-  */
+     * @dev Compares previous and next SpottedData's committed tokens for sorting purposes
+     * @param _prevID Integer identifier associated with previous SpottedData in sorted order
+     * @param _nextID Integer identifier associated with next SpottedData in sorted order
+     * @param _voter Address of user to check DLL position for
+     * @param _numTokens The number of tokens to be committed towards the SpottedData (used for sorting)
+     * @return APPROVED Boolean indication of if the specified position maintains the sort
+     */
     function validPosition(
         uint128 _prevID,
         uint128 _nextID,
         address _voter,
         uint256 _numTokens
-    ) public view returns (bool APPROVED) {
+    ) public view returns(bool APPROVED) {
         bool prevValid = (_numTokens >= getNumTokens(_voter, _prevID));
         // if next is zero node, _numTokens does not need to be greater
         bool nextValid = (_numTokens <= getNumTokens(_voter, _nextID) || _nextID == 0);
@@ -2268,27 +2531,28 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
     }
 
     /**
-  * @notice Determines if proposal has passed
-  * @dev Check if votesFor out of totalSpotChecks exceeds votesQuorum (requires DataEnded)
-  * @param _DataBatchId Integer identifier associated with target SpottedData
-  */
-    function isPassed(uint128 _DataBatchId) public view returns (bool passed) {
+     * @notice Determines if proposal has passed
+     * @dev Check if votesFor out of totalSpotChecks exceeds votesQuorum (requires DataEnded)
+     * @param _DataBatchId Integer identifier associated with target SpottedData
+     */
+    function isPassed(uint128 _DataBatchId) public view returns(bool passed) {
         BatchMetadata memory batch_ = DataBatch[_ModB(_DataBatchId)];
         return (100 * batch_.votesFor) > (Parameters.getVoteQuorum() * (batch_.votesFor + batch_.votesAgainst));
     }
 
     /**
-  * @param _DataBatchId Integer identifier associated with target SpottedData
-  * @param _salt Arbitrarily chosen integer used to generate secretHash
-  * @return numTokens Number of tokens voted for winning option
-  */
+     * @param _DataBatchId Integer identifier associated with target SpottedData
+     * @param _salt Arbitrarily chosen integer used to generate secretHash
+     * @return numTokens Number of tokens voted for winning option
+     */
     function getNumPassingTokens(
         address _voter,
         uint128 _DataBatchId,
         uint256 _salt
-    ) public view returns (uint256 numTokens) {
+    ) public view returns(uint256 numTokens) {
         require(DataEnded(_DataBatchId), "_DataBatchId checking vote must have ended");
-        require(UserVoteSubmission[_ModB(_DataBatchId)][_voter].revealed, "user must have revealed in this given Batch");
+        require(UserVoteSubmission[_ModB(_DataBatchId)][_voter].revealed,
+            "user must have revealed in this given Batch");
 
         uint16 winningChoice = isPassed(_DataBatchId) ? 1 : 0;
         bytes32 winnerHash = keccak256(abi.encodePacked(winningChoice, _salt));
@@ -2300,81 +2564,80 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
     }
 
     /**
-  * @notice Determines if SpottedData is over
-  * @dev Checks isExpired for specified SpottedData's revealEndDate
-  * @return ended Boolean indication of whether Dataing period is over
-  */
-    function DataEnded(uint128 _DataBatchId) public view returns (bool ended) {
+     * @notice Determines if SpottedData is over
+     * @dev Checks isExpired for specified SpottedData's revealEndDate
+     * @return ended Boolean indication of whether Dataing period is over
+     */
+    function DataEnded(uint128 _DataBatchId) public view returns(bool ended) {
         require(DataExists(_DataBatchId), "Data must exist");
 
-        return isExpired(DataBatch[_ModB(_DataBatchId)].revealEndDate)
-                || (commitPeriodOver(_DataBatchId) && BatchCommitedVoteCount[_ModB(_DataBatchId)] == 0);
+        return isExpired(DataBatch[_ModB(_DataBatchId)].revealEndDate) ||
+            (commitPeriodOver(_DataBatchId) && BatchCommitedVoteCount[_ModB(_DataBatchId)] == 0);
     }
 
     /**
-  * @notice get Last Data Id
-  * @return DataId
-  */
-    function getLastDataId() public view returns (uint256 DataId) {
+     * @notice get Last Data Id
+     * @return DataId
+     */
+    function getLastDataId() public view returns(uint256 DataId) {
         return DataNonce;
     }
 
     /**
-  * @notice get Last Batch Id
-  * @return LastBatchId
-  */
-    function getLastBatchId() public view returns (uint256 LastBatchId) {
+     * @notice get Last Batch Id
+     * @return LastBatchId
+     */
+    function getLastBatchId() public view returns(uint256 LastBatchId) {
         return LastBatchCounter;
     }
 
     /**
-  * @notice get Last Checked Batch Id
-  * @return LastCheckedBatchId
-  */
-    function getLastCheckedBatchId() public view returns (uint256 LastCheckedBatchId) {
+     * @notice get Last Checked Batch Id
+     * @return LastCheckedBatchId
+     */
+    function getLastCheckedBatchId() public view returns(uint256 LastCheckedBatchId) {
         return BatchCheckingCursor;
     }
 
     /**
-  * @notice getLastAllocatedBatchId
-  * @return LastAllocatedBatchId
-  */
-    function getLastAllocatedBatchId() public view returns (uint256 LastAllocatedBatchId) {
+     * @notice getLastAllocatedBatchId
+     * @return LastAllocatedBatchId
+     */
+    function getLastAllocatedBatchId() public view returns(uint256 LastAllocatedBatchId) {
         return AllocatedBatchCursor;
     }
 
     /**
-  * @notice get DataBatch By ID
-  * @return batch as BatchMetadata struct
-  */
-    function getBatchByID(uint128 _DataBatchId) public view returns (BatchMetadata memory batch) {
+     * @notice get DataBatch By ID
+     * @return batch as BatchMetadata struct
+     */
+    function getBatchByID(uint128 _DataBatchId) public view returns(BatchMetadata memory batch) {
         require(DataExists(_DataBatchId));
         return DataBatch[_ModB(_DataBatchId)];
     }
 
     /**
-  * @notice get Output Batch IPFS File By ID
-  * @return batch IPFS File
-  */
-    function getBatchIPFSFileByID(uint128 _DataBatchId) public view returns (string memory batch) {
+     * @notice get Output Batch IPFS File By ID
+     * @return batch IPFS File
+     */
+    function getBatchIPFSFileByID(uint128 _DataBatchId) public view returns(string memory batch) {
         require(DataExists(_DataBatchId));
         return DataBatch[_ModB(_DataBatchId)].batchIPFSfile;
     }
-    
+
     /**
-  * @notice get all Output Batch IPFS Files (hashes),between batch indices A and B (a < B)
-  * @param _DataBatchId_a ID of the starting batch
-  * @param _DataBatchId_b ID of the ending batch (included)
-  * @return array of Batch File ID between index A and B included
-  */
-  
+     * @notice get all Output Batch IPFS Files (hashes),between batch indices A and B (a < B)
+     * @param _DataBatchId_a ID of the starting batch
+     * @param _DataBatchId_b ID of the ending batch (included)
+     * @return array of Batch File ID between index A and B included
+     */
+
     function getBatchsFilesByID(uint128 _DataBatchId_a, uint128 _DataBatchId_b)
-        public
-        view
-        returns (string[] memory)
-    {
+    public
+    view
+    returns(string[] memory) {
         require(_DataBatchId_a > 0 && _DataBatchId_a < _DataBatchId_b, "Input boundaries are invalid");
-        uint128 _array_size = _DataBatchId_b - _DataBatchId_a+1;
+        uint128 _array_size = _DataBatchId_b - _DataBatchId_a + 1;
         string[] memory ipfs_hash_list = new string[](_array_size);
         for (uint128 i = 0; i < _array_size; i++) {
             ipfs_hash_list[i] = DataBatch[_ModB(_DataBatchId_a + i)].batchIPFSfile;
@@ -2383,93 +2646,94 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
     }
 
     /**
-  * @dev Returns all worker addresses between index A_ and index B
-  * @param A_ Address of user to check against
-  * @param B_ Integer identifier associated with target SpottedData
-  * @return workers array of workers of size (B_-A_+1)
-  */
-    function getAllWorkersBetweenIndex(uint256 A_, uint256 B_) public view returns (address[] memory workers) {
-        require(B_>= A_, " _B must be >= _A");
-        require(B_<= (AllWorkersList.length -1), " B_ is out of bounds");
-        uint256 _array_size = B_ - A_+1;
+     * @dev Returns all worker addresses between index A_ and index B
+     * @param A_ Address of user to check against
+     * @param B_ Integer identifier associated with target SpottedData
+     * @return workers array of workers of size (B_-A_+1)
+     */
+    function getAllWorkersBetweenIndex(uint256 A_, uint256 B_) public view returns(address[] memory workers) {
+        require(B_ >= A_, " _B must be >= _A");
+        require(B_ <= (AllWorkersList.length - 1), " B_ is out of bounds");
+        uint256 _array_size = B_ - A_ + 1;
         address[] memory address_list = new address[](_array_size);
         for (uint256 i = 0; i < _array_size; i++) {
-            address_list[i] = AllWorkersList[i+A_];
+            address_list[i] = AllWorkersList[i + A_];
         }
         return address_list;
     }
 
     /**
-  * @notice get AllWorkersList length
-  * @return length of the array
-  */
-    function getAllWorkersLength() public view returns (uint256 length) {
+     * @notice get AllWorkersList length
+     * @return length of the array
+     */
+    function getAllWorkersLength() public view returns(uint256 length) {
         return AllWorkersList.length;
     }
 
     /**
-  * @notice get Data By ID
-  * @return data as SpottedData struct
-  */
-    function getDataByID(uint128 _DataId) public view returns (SpottedData memory data) {
+     * @notice get Data By ID
+     * @return data as SpottedData struct
+     */
+    function getDataByID(uint128 _DataId) public view returns(SpottedData memory data) {
         return SpotsMapping[_ModS(_DataId)];
     }
 
     /**
-  * @notice getCounter
-  * @return Counter of all "accepted transactions"
-  */
-    function getTxCounter() public view returns (uint256 Counter) {
+     * @notice getCounter
+     * @return Counter of all "accepted transactions"
+     */
+    function getTxCounter() public view returns(uint256 Counter) {
         return AllTxsCounter;
     }
 
     /**
-  * @notice getCounter
-  * @return Counter of the last Dataed a user started
-  */
-    function getItemCounter() public view returns (uint256 Counter) {
+     * @notice getCounter
+     * @return Counter of the last Dataed a user started
+     */
+    function getItemCounter() public view returns(uint256 Counter) {
         return AllItemCounter;
     }
 
     /**
-  * @notice Determines DataCommitEndDate
-  * @return commitEndDate indication of whether Dataing period is over
-  */
-    function DataCommitEndDate(uint128 _DataBatchId) public view returns (uint256 commitEndDate) {
+     * @notice Determines DataCommitEndDate
+     * @return commitEndDate indication of whether Dataing period is over
+     */
+    function DataCommitEndDate(uint128 _DataBatchId) public view returns(uint256 commitEndDate) {
         require(DataExists(_DataBatchId), "_DataBatchId must exist");
 
         return DataBatch[_ModB(_DataBatchId)].commitEndDate;
     }
 
     /**
-  * @notice Determines DataRevealEndDate
-  * @return revealEndDate indication of whether Dataing period is over
-  */
-    function DataRevealEndDate(uint128 _DataBatchId) public view returns (uint256 revealEndDate) {
+     * @notice Determines DataRevealEndDate
+     * @return revealEndDate indication of whether Dataing period is over
+     */
+    function DataRevealEndDate(uint128 _DataBatchId) public view returns(uint256 revealEndDate) {
         require(DataExists(_DataBatchId), "_DataBatchId must exist");
 
         return DataBatch[_ModB(_DataBatchId)].revealEndDate;
     }
 
     /**
-  * @notice Checks if the commit period is still active for the specified SpottedData
-  * @dev Checks isExpired for the specified SpottedData's commitEndDate
-  * @param _DataBatchId Integer identifier associated with target SpottedData
-  * @return active Boolean indication of isCommitPeriodActive for target SpottedData
-  */
-    function commitPeriodActive(uint128 _DataBatchId) public view returns (bool active) {
+     * @notice Checks if the commit period is still active for the specified SpottedData
+     * @dev Checks isExpired for the specified SpottedData's commitEndDate
+     * @param _DataBatchId Integer identifier associated with target SpottedData
+     * @return active Boolean indication of isCommitPeriodActive for target SpottedData
+     */
+    function commitPeriodActive(uint128 _DataBatchId) public view returns(bool active) {
         require(DataExists(_DataBatchId), "_DataBatchId must exist");
 
-        return !isExpired(DataBatch[_ModB(_DataBatchId)].commitEndDate) && (DataBatch[_ModB(_DataBatchId)].uncommited_workers > 0);
+        return !isExpired(DataBatch[_ModB(_DataBatchId)].commitEndDate) && (DataBatch[_ModB(_DataBatchId)]
+            .uncommited_workers > 0);
     }
 
     /**
-  * @notice Checks if the commit period is over
-  * @dev Checks isExpired for the specified SpottedData's commitEndDate
-  * @param _DataBatchId Integer identifier associated with target SpottedData
-  * @return active Boolean indication of isCommitPeriodActive for target SpottedData
-  */
-    function commitPeriodOver(uint128 _DataBatchId) public view returns (bool active) {
+     * @notice Checks if the commit period is over
+     * @dev Checks isExpired for the specified SpottedData's commitEndDate
+     * @param _DataBatchId Integer identifier associated with target SpottedData
+     * @return active Boolean indication of isCommitPeriodActive for target SpottedData
+     */
+    function commitPeriodOver(uint128 _DataBatchId) public view returns(bool active) {
         if (!DataExists(_DataBatchId)) {
             return false;
         } else {
@@ -2479,29 +2743,29 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
     }
 
     /**
-  * @notice commitPeriodStatus
-  * @param _DataBatchId Integer identifier associated with target SpottedData
-  * @return status 0 = don't exist, 1 = active, 2 = expired/closed
-  */
-    function commitPeriodStatus(uint128 _DataBatchId) public view returns (uint8 status) {
+     * @notice commitPeriodStatus
+     * @param _DataBatchId Integer identifier associated with target SpottedData
+     * @return status 0 = don't exist, 1 = active, 2 = expired/closed
+     */
+    function commitPeriodStatus(uint128 _DataBatchId) public view returns(uint8 status) {
         if (!DataExists(_DataBatchId)) {
             return 0;
         } else {
-            if( commitPeriodOver(_DataBatchId) ){
+            if (commitPeriodOver(_DataBatchId)) {
                 return 2;
-            }else if( commitPeriodActive(_DataBatchId) ){
+            } else if (commitPeriodActive(_DataBatchId)) {
                 return 1;
             }
         }
     }
 
     /**
-  * @notice Checks if the commit period is still active for the specified SpottedData
-  * @dev Checks isExpired for the specified SpottedData's commitEndDate
-  * @param _DataBatchId Integer identifier associated with target SpottedData
-  * @return remainingTime Integer
-  */
-    function remainingCommitDuration(uint128 _DataBatchId) public view returns (uint256 remainingTime) {
+     * @notice Checks if the commit period is still active for the specified SpottedData
+     * @dev Checks isExpired for the specified SpottedData's commitEndDate
+     * @param _DataBatchId Integer identifier associated with target SpottedData
+     * @return remainingTime Integer
+     */
+    function remainingCommitDuration(uint128 _DataBatchId) public view returns(uint256 remainingTime) {
         require(DataExists(_DataBatchId), "_DataBatchId must exist");
         uint64 _remainingTime = 0;
         if (commitPeriodActive(_DataBatchId)) {
@@ -2511,54 +2775,54 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
     }
 
     /**
-  * @notice Checks if the reveal period is still active for the specified SpottedData
-  * @dev Checks isExpired for the specified SpottedData's revealEndDate
-  * @param _DataBatchId Integer identifier associated with target SpottedData
-  */
-    function revealPeriodActive(uint128 _DataBatchId) public view returns (bool active) {
+     * @notice Checks if the reveal period is still active for the specified SpottedData
+     * @dev Checks isExpired for the specified SpottedData's revealEndDate
+     * @param _DataBatchId Integer identifier associated with target SpottedData
+     */
+    function revealPeriodActive(uint128 _DataBatchId) public view returns(bool active) {
         require(DataExists(_DataBatchId), "_DataBatchId must exist");
 
         return !isExpired(DataBatch[_ModB(_DataBatchId)].revealEndDate) && !commitPeriodActive(_DataBatchId);
     }
 
     /**
-  * @notice Checks if the reveal period is over
-  * @dev Checks isExpired for the specified SpottedData's revealEndDate
-  * @param _DataBatchId Integer identifier associated with target SpottedData
-  */
-    function revealPeriodOver(uint128 _DataBatchId) public view returns (bool active) {
+     * @notice Checks if the reveal period is over
+     * @dev Checks isExpired for the specified SpottedData's revealEndDate
+     * @param _DataBatchId Integer identifier associated with target SpottedData
+     */
+    function revealPeriodOver(uint128 _DataBatchId) public view returns(bool active) {
         if (!DataExists(_DataBatchId)) {
             return false;
         } else {
             // a commitPeriod is Over if : time has expired OR if revealPeriod for the same _DataBatchId is true
-            return isExpired(DataBatch[_ModB(_DataBatchId)].revealEndDate) 
-            || DataBatch[_ModB(_DataBatchId)].unrevealed_workers == 0;
+            return isExpired(DataBatch[_ModB(_DataBatchId)].revealEndDate) ||
+                DataBatch[_ModB(_DataBatchId)].unrevealed_workers == 0;
         }
     }
 
     /**
-  * @notice revealPeriodStatus
-  * @param _DataBatchId Integer identifier associated with target SpottedData
-  * @return status 0 = don't exist, 1 = active, 2 = expired/closed
-  */
-    function revealPeriodStatus(uint128 _DataBatchId) public view returns (uint8 status) {
+     * @notice revealPeriodStatus
+     * @param _DataBatchId Integer identifier associated with target SpottedData
+     * @return status 0 = don't exist, 1 = active, 2 = expired/closed
+     */
+    function revealPeriodStatus(uint128 _DataBatchId) public view returns(uint8 status) {
         if (!DataExists(_DataBatchId)) {
             return 0;
         } else {
-            if( revealPeriodOver(_DataBatchId) ){
+            if (revealPeriodOver(_DataBatchId)) {
                 return 2;
-            }else if( revealPeriodActive(_DataBatchId) ){
+            } else if (revealPeriodActive(_DataBatchId)) {
                 return 1;
             }
         }
     }
     /**
-  * @notice Checks if the commit period is still active for the specified SpottedData
-  * @dev Checks isExpired for the specified SpottedData's commitEndDate
-  * @param _DataBatchId Integer identifier associated with target SpottedData
-  * @return remainingTime Integer indication of isCommitPeriodActive for target SpottedData
-  */
-    function remainingRevealDuration(uint128 _DataBatchId) public view returns (uint256 remainingTime) {
+     * @notice Checks if the commit period is still active for the specified SpottedData
+     * @dev Checks isExpired for the specified SpottedData's commitEndDate
+     * @param _DataBatchId Integer identifier associated with target SpottedData
+     * @return remainingTime Integer indication of isCommitPeriodActive for target SpottedData
+     */
+    function remainingRevealDuration(uint128 _DataBatchId) public view returns(uint256 remainingTime) {
         require(DataExists(_DataBatchId), "_DataBatchId must exist");
         uint256 _remainingTime = 0;
         if (revealPeriodActive(_DataBatchId)) {
@@ -2568,12 +2832,12 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
     }
 
     /**
-  * @dev Checks if user has committed for specified SpottedData
-  * @param _voter Address of user to check against
-  * @param _DataBatchId Integer identifier associated with target SpottedData
-  * @return committed Boolean indication of whether user has committed
-  */
-    function didCommit(address _voter, uint128 _DataBatchId) public view returns (bool committed) {
+     * @dev Checks if user has committed for specified SpottedData
+     * @param _voter Address of user to check against
+     * @param _DataBatchId Integer identifier associated with target SpottedData
+     * @return committed Boolean indication of whether user has committed
+     */
+    function didCommit(address _voter, uint128 _DataBatchId) public view returns(bool committed) {
         require(DataExists(_DataBatchId), "_DataBatchId must exist");
 
         // return SpotsMapping[_ModS(_DataBatchId)].didCommit[_voter];
@@ -2581,35 +2845,31 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
     }
 
     /**
-  * @dev Checks if user has revealed for specified SpottedData
-  * @param _voter Address of user to check against
-  * @param _DataBatchId Integer identifier associated with target SpottedData
-  * @return revealed Boolean indication of whether user has revealed
-  */
-    function didReveal(address _voter, uint128 _DataBatchId) public view returns (bool revealed) {
+     * @dev Checks if user has revealed for specified SpottedData
+     * @param _voter Address of user to check against
+     * @param _DataBatchId Integer identifier associated with target SpottedData
+     * @return revealed Boolean indication of whether user has revealed
+     */
+    function didReveal(address _voter, uint128 _DataBatchId) public view returns(bool revealed) {
         require(DataExists(_DataBatchId), "_DataBatchId must exist");
 
         // return SpotsMapping[_ModS(_DataBatchId)].didReveal[_voter];
         return UserVoteSubmission[_ModB(_DataBatchId)][_voter].revealed;
     }
 
-    
+
 
     /**
-  * @dev Checks if a SpottedData exists
-  * @param _DataBatchId The DataID whose existance is to be evaluated.
-  * @return exists Boolean Indicates whether a SpottedData exists for the provided DataID
-  */
-    function DataExists(uint128 _DataBatchId) public view returns (bool exists) {
+     * @dev Checks if a SpottedData exists
+     * @param _DataBatchId The DataID whose existance is to be evaluated.
+     * @return exists Boolean Indicates whether a SpottedData exists for the provided DataID
+     */
+    function DataExists(uint128 _DataBatchId) public view returns(bool exists) {
         return (DataBatch[_ModB(_DataBatchId)].complete);
     }
 
-    function AmIRegistered() public view returns (bool passed) {
+    function AmIRegistered() public view returns(bool passed) {
         return WorkersState[msg.sender].registered;
-    }
-
-    function isWorkerRegistered(address _worker) public view returns (bool passed) {
-        return WorkersState[_worker].registered;
     }
 
     // ------------------------------------------------------------------------------------------------------------
@@ -2617,70 +2877,70 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
     // ------------------------------------------------------------------------------------------------------------
 
     /**
-  * @dev Gets the bytes32 commitHash property of target SpottedData
-  * @param _voter Address of user to check against
-  * @param _DataBatchId Integer identifier associated with target SpottedData
-  * @return commitHash Bytes32 hash property attached to target SpottedData
-  */
-    function getCommitVoteHash(address _voter, uint128 _DataBatchId) public view returns (bytes32 commitHash) {
+     * @dev Gets the bytes32 commitHash property of target SpottedData
+     * @param _voter Address of user to check against
+     * @param _DataBatchId Integer identifier associated with target SpottedData
+     * @return commitHash Bytes32 hash property attached to target SpottedData
+     */
+    function getCommitVoteHash(address _voter, uint128 _DataBatchId) public view returns(bytes32 commitHash) {
         return bytes32(getAttribute(attrUUID(_voter, _DataBatchId), "commitVote"));
     }
 
     /**
-  * @dev Gets the bytes32 commitHash property of target SpottedData
-  * @param _voter Address of user to check against
-  * @param _DataBatchId Integer identifier associated with target SpottedData
-  * @return commitHash Bytes32 hash property attached to target SpottedData
-  */
-    function getCommitIPFSHash(address _voter, uint128 _DataBatchId) public view returns (bytes32 commitHash) {
+     * @dev Gets the bytes32 commitHash property of target SpottedData
+     * @param _voter Address of user to check against
+     * @param _DataBatchId Integer identifier associated with target SpottedData
+     * @return commitHash Bytes32 hash property attached to target SpottedData
+     */
+    function getCommitIPFSHash(address _voter, uint128 _DataBatchId) public view returns(bytes32 commitHash) {
         return bytes32(getAttribute(attrUUID(_voter, _DataBatchId), "commitHash"));
     }
 
     /**
-  * @dev Gets the bytes32 commitHash property of target SpottedData
-  * @param _clearVote vote Option
-  * @param _salt is the salt
-  * @return keccak256hash Bytes32 hash property attached to target SpottedData
-  */
-    function getEncryptedHash(uint256 _clearVote, uint256 _salt) public pure returns (bytes32 keccak256hash) {
+     * @dev Gets the bytes32 commitHash property of target SpottedData
+     * @param _clearVote vote Option
+     * @param _salt is the salt
+     * @return keccak256hash Bytes32 hash property attached to target SpottedData
+     */
+    function getEncryptedHash(uint256 _clearVote, uint256 _salt) public pure returns(bytes32 keccak256hash) {
         return keccak256(abi.encodePacked(_clearVote, _salt));
     }
 
     /**
-  * @dev Gets the bytes32 commitHash property of target FormattedData
-  * @param _hash ipfs hash of aggregated data in a string
-  * @param _salt is the salt
-  * @return keccak256hash Bytes32 hash property attached to target FormattedData
-  */
-    function getEncryptedStringHash(string memory _hash, uint256 _salt) public pure returns (bytes32 keccak256hash) {
+     * @dev Gets the bytes32 commitHash property of target FormattedData
+     * @param _hash ipfs hash of aggregated data in a string
+     * @param _salt is the salt
+     * @return keccak256hash Bytes32 hash property attached to target FormattedData
+     */
+    function getEncryptedStringHash(string memory _hash, uint256 _salt) public pure returns(bytes32 keccak256hash) {
         return keccak256(abi.encode(_hash, _salt));
     }
 
     /**
-  * @dev Wrapper for getAttribute with attrName="numTokens"
-  * @param _voter Address of user to check against
-  * @param _DataBatchId Integer identifier associated with target SpottedData
-  * @return numTokens Number of tokens committed to SpottedData in sorted SpottedData-linked-list
-  */
-    function getNumTokens(address _voter, uint128 _DataBatchId) public view returns (uint256 numTokens) {
+     * @dev Wrapper for getAttribute with attrName="numTokens"
+     * @param _voter Address of user to check against
+     * @param _DataBatchId Integer identifier associated with target SpottedData
+     * @return numTokens Number of tokens committed to SpottedData in sorted SpottedData-linked-list
+     */
+    function getNumTokens(address _voter, uint128 _DataBatchId) public view returns(uint256 numTokens) {
         return getAttribute(attrUUID(_voter, _DataBatchId), "numTokens");
     }
 
     /**
-  * @dev Gets top element of sorted SpottedData-linked-list
-  * @param _voter Address of user to check against
-  * @return DataID Integer identifier to SpottedData with maximum number of tokens committed to it
-  */
-    function getLastNode(address _voter) public view returns (uint128 DataID) {
+     * @dev Gets top element of sorted SpottedData-linked-list
+     * @param _voter Address of user to check against
+     * @return DataID Integer identifier to SpottedData with maximum number of tokens committed to it
+     */
+    function getLastNode(address _voter) public view returns(uint128 DataID) {
         return dllMap[_voter].getPrev(0);
     }
 
     /**
-  * @dev Gets the numTokens property of getLastNode
-  * @param _voter Address of user to check against
-  * @return numTokens Maximum number of tokens committed in SpottedData specified
-  */
-    function getLockedTokens(address _voter) public view returns (uint256 numTokens) {
+     * @dev Gets the numTokens property of getLastNode
+     * @param _voter Address of user to check against
+     * @return numTokens Maximum number of tokens committed in SpottedData specified
+     */
+    function getLockedTokens(address _voter) public view returns(uint256 numTokens) {
         return getNumTokens(_voter, getLastNode(_voter));
     }
 
@@ -2698,7 +2958,7 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
         address _voter,
         uint256 _numTokens,
         uint128 _DataBatchId
-    ) public view returns (uint256 prevNode) {
+    ) public view returns(uint256 prevNode) {
         // Get the last node in the list and the number of tokens in that node
         uint128 nodeID = getLastNode(_voter);
         uint256 tokensInNode = getNumTokens(_voter, nodeID);
@@ -2729,20 +2989,20 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
     // ----------------
 
     /**
-  * @dev Checks if an expiration date has been reached
-  * @param _terminationDate Integer timestamp of date to compare current timestamp with
-  * @return expired Boolean indication of whether the terminationDate has passed
-  */
-    function isExpired(uint256 _terminationDate) public view returns (bool expired) {
+     * @dev Checks if an expiration date has been reached
+     * @param _terminationDate Integer timestamp of date to compare current timestamp with
+     * @return expired Boolean indication of whether the terminationDate has passed
+     */
+    function isExpired(uint256 _terminationDate) public view returns(bool expired) {
         return (block.timestamp > _terminationDate);
     }
 
     /**
-  * @dev Generates an identifier which associates a user and a SpottedData together
-  * @param _DataBatchId Integer identifier associated with target SpottedData
-  * @return UUID Hash which is deterministic from user_ and _DataBatchId
-  */
-    function attrUUID(address user_, uint128 _DataBatchId) public pure returns (bytes32 UUID) {
+     * @dev Generates an identifier which associates a user and a SpottedData together
+     * @param _DataBatchId Integer identifier associated with target SpottedData
+     * @return UUID Hash which is deterministic from user_ and _DataBatchId
+     */
+    function attrUUID(address user_, uint128 _DataBatchId) public pure returns(bytes32 UUID) {
         return keccak256(abi.encodePacked(user_, _DataBatchId));
     }
 }
