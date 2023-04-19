@@ -2,11 +2,33 @@
 pragma solidity 0.8.8;
 
 /**
-* @notice RandomAllocator seeds it randomness from getSeed() a native SKALE RNG Endpoint
-*         It is sufficient that it rotates every block
-*         The work allocation must be as random as possible, over time, statistically
-*         We could use Oracles to improve randomness, but it is not relevant.
-*/
+ * @title RandomAllocator
+ * @dev The RandomAllocator contract is a robust, precise, and comprehensive
+ * random number generator, designed for use with downstream contracts that
+ * require reliable random number generation over extended periods of time.
+ * This contract utilizes the SKALE RNG (Random Number Generator) for its
+ * randomness source, which is refreshed every few seconds due to BLS signature
+ * rotation by SKALE validators. However, this contract is intended for use
+ * with downstream contracts operating at a lower frequency, thus ensuring
+ * robust randomness over the course of hours.
+ *
+ * The contract provides the following functionality:
+ * 1. Get Native RNG Seed: This function retrieves the native RNG seed from
+ *    the SKALE chain, allowing the contract to access a reliable source of
+ *    randomness.
+ * 2. Generate Random Integer: This function uses the native seed to generate
+ *    a single random integer.
+ * 3. Generate Unique Integers: This function generates a specified number (_k)
+ *    of unique integers within a specified range (N_range), ensuring that each
+ *    integer is unique within the given range.
+ * 4. Random Selection: This function selects a specified number (k) of unique
+ *    integers from a given range (N), returning an array containing the
+ *    selected random integers.
+ *
+ * Note: As the SKALE RNG Randomness source is only refreshed every few seconds,
+ * it is crucial that downstream contracts work at a lower frequency to ensure
+ * statistically robust randomness over time.
+ */
 contract RandomAllocator {
 
     /**
