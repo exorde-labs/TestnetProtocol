@@ -57,6 +57,35 @@ interface IParametersManager {
     function get_MAX_UPDATE_ITERATIONS() external view returns (uint256);
 }
 
+/**
+ * @title AddressManager
+ * @author Mathias Dail - Exorde Labs
+ * @notice This contract manages the relationship between master and sub-worker addresses,
+ * allowing master addresses to claim, remove, and transfer reputation and rewards
+ * from their linked sub-worker addresses. The contract provides functionality
+ * for linking and unlinking addresses, as well as querying and modifying the
+ * relationships between them.
+ *
+ * The AddressManager contract contains the following main features:
+ *  1. Linking a sub-worker address to a master address, allowing the master
+ *     address to control the reputation and rewards of its sub-workers.
+ *  2. Unlinking a sub-worker address from its master address, freeing it from
+ *     the control of the master address.
+ *  3. Transferring reputation and rewards from a sub-worker address to its
+ *     master address, consolidating the reputation and rewards of the master
+ *     address and its sub-workers.
+ *  4. Querying the relationships between master and sub-worker addresses,
+ *     including whether a master address is linked to a particular sub-worker
+ *     address, the master address of a given sub-worker address, and the
+ *     sub-worker addresses linked to a particular master address.
+ *  5. Modifying the relationships between master and sub-worker addresses with
+ *     optional iteration limits and starting indices, providing flexibility
+ *     in how the relationships are managed.
+ *
+ * @dev This contract uses the OpenZeppelin Ownable library to provide
+ * ownership functionality, ensuring that certain functions can only be
+ * called by the contract owner.
+ */
 contract AddressManager is Ownable {
     mapping(address => mapping(address => bool)) public MasterClaimingWorker; // master -> worker -> true/false
 
