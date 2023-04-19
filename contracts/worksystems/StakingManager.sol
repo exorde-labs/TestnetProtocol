@@ -5,7 +5,29 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
-
+/**
+ * @title StakeManager
+ * @author Mathias Dail - Exorde Labs
+ * @notice The StakeManager is a smart contract designed to manage staking, deposit, withdrawal, 
+ *   and allocation of EXD tokens for users and whitelisted sub-systems. 
+ *   This contract serves as the central staking manager and interacts with the sub-system contracts for locking or slashing stakes.
+ * 
+ * Key features and aspects of the contract logic:
+ * - Centralized staking manager: Manages and oversees all staking activities within the ecosystem.
+ * - Deposits and withdrawals: Allows users to deposit and withdraw EXD tokens from their free balance.
+ * - Stakeholder management: Tracks the status of stakeholders and their stakes.
+ * - Staking allocations: Allows the administrator (DAO/owner) to whitelist and remove contracts (sub-systems) that can allocate (lock) or slash stakes.
+ * - Security and recovery: The administrator has the ability to remove faulty sub-systems, ensuring that user stakes are not lost and the staking system remains secure.
+ * - Detailed information: Provides comprehensive information about stake allocations, total stakes, and stakeholder status for auditors and developers.
+ * - Event logging: Emits relevant events for all major actions within the contract (e.g. deposits, withdrawals, stake allocations, slashing, etc.).
+ * 
+ * The StakeManager ensures that user stakes are not lost, even in the event of a faulty sub-system, 
+ * by allowing the administrator to remove such sub-systems and recover the affected stakes.
+ * 
+ * @dev This contract uses the OpenZeppelin Ownable library to provide
+ * ownership functionality, ensuring that certain functions can only be
+ * called by the contract owner. SafeERC20 is used for IERC20 token transfers.
+ */
 contract StakingManager is
     Ownable {
     using SafeERC20 for IERC20;
