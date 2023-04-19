@@ -1,6 +1,8 @@
 {
   "gas_cap_min":1300000,
+  "gas_cap_min_testnet":17000000,
+  "gas_cap_min_mainnet":6000000,
   "wait_time":5,
-  "default_gas_amount":15000000,
+  "default_gas_amount":16000000,
   "default_gas_price ":100000
 }
