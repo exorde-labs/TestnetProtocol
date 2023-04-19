@@ -6,6 +6,35 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
+/**
+ * @title Rewards Manager
+ * @author  Mathias Dail - Exorde Labs
+ * @notice This smart contract is designed to manage rewards distribution within the Exorde ecosystem. 
+ *  The contract provides functionality for depositing and withdrawing rewards, 
+ *  as well as managing the distribution of rewards through whitelisted proxies. 
+ *  It also implements a sliding counter mechanism to limit the total rewards distributed per hour and per day, 
+ *  in order to mitigate potential exploitation and limit token inflation.
+ * @dev The RewardsManager contract utilizes OpenZeppelin's Ownable, IERC20, and SafeERC20 libraries. 
+ *  It maintains a mapping of rewards balances per user address, along with an overall balance
+ *  for the contract itself (ManagerBalance). 
+ *  The contract also keeps track of the total rewards distributed (TotalRewards) 
+ *  and implements a sliding counter mechanism to limit rewards distribution 
+ *  using TimeframeCounter structs for hourly and daily counters. 
+ *  The contract allows for de/whitelisting of addresses.
+ * Main functionalities include:
+ * Whitelisting: Adding or removing addresses to interact with rewards functions.
+ * Proxy actions: Allocating and transferring rewards through verified whitelisted contracts.
+ * Sliding counter management: Updating and retrieving the total rewards distributed in the last hour and day.
+ * Deposit and Withdrawal: Depositing ERC20 tokens to fill the contract's balance, and withdrawing rewards for users.
+ * Owner management actions: Withdrawing tokens from the contract and recovering stuck ERC20 tokens.
+ * The contract enforces certain restrictions on rewards distribution:
+ * A maximum of 1,250 EXD tokens can be distributed per hour.
+ * A maximum of 30,000 EXD tokens can be distributed per day.
+ * The number of timeframes for the sliding counters (hourly and daily) 
+ * must be less than 50 to prevent excessive gas consumption during iterations.
+ * It is important to note that the ManagerBalance must be sufficiently funded for rewards distribution to take place,
+ * and rewards can only be distributed by whitelisted addresses.
+*/
 
 contract RewardsManager is Ownable {
     using SafeERC20 for IERC20;    
