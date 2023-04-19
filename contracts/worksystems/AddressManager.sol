@@ -3,59 +3,10 @@
 pragma solidity 0.8.8;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
-
-interface IReputation {
-    function balanceOf(address _owner) external view returns (uint256 balance);
-}
-
-interface IRepManager {
-    function mintReputationForWork(
-        uint256 _amount,
-        address _beneficiary,
-        bytes32
-    ) external returns (bool);
-
-    function burnReputationForWork(
-        uint256 _amount,
-        address _beneficiary,
-        bytes32
-    ) external returns (bool);
-}
-
-interface IRewardManager {
-    function ProxyAddReward(uint256 _RewardsAllocation, address _user) external returns (bool);
-
-    function ProxyTransferRewards(address _user, address _recipient) external returns (bool);
-
-    function RewardsBalanceOf(address _address) external returns (uint256);
-}
-
-interface IParametersManager {
-    // -------------- GETTERS : ADDRESSES --------------------
-    function getStakeManager() external view returns (address);
-
-    function getRepManager() external view returns (address);
-
-    function getReputationSystem() external view returns (address);
-
-    function getAddressManager() external view returns (address);
-
-    function getRewardManager() external view returns (address);
-
-    function getArchivingSystem() external view returns (address);
-
-    function getSpottingSystem() external view returns (address);
-
-    function getComplianceSystem() external view returns (address);
-
-    function getIndexingSystem() external view returns (address);
-
-    function getsFuelSystem() external view returns (address);
-
-    function getExordeToken() external view returns (address);
-
-    function get_MAX_UPDATE_ITERATIONS() external view returns (uint256);
-}
+import "./interfaces/IReputation.sol";
+import "./interfaces/IRepManager.sol";
+import "./interfaces/IRewardManager.sol";
+import "./interfaces/IParametersManager.sol";
 
 /**
  * @title AddressManager
@@ -86,6 +37,7 @@ interface IParametersManager {
  * ownership functionality, ensuring that certain functions can only be
  * called by the contract owner.
  */
+
 contract AddressManager is Ownable {
     mapping(address => mapping(address => bool)) public MasterClaimingWorker; // master -> worker -> true/false
 
@@ -94,7 +46,7 @@ contract AddressManager is Ownable {
     // worker -> master, only 1 master per worker address, 1->1 relation
     // ALWAYS [MASTER, WORKER] order in the arguments of all functions
 
-    uint256 MAX_MASTER_LOOKUP = 5;
+    uint256 MAX_MASTER_LOOKUP = 3;
 
     IParametersManager public Parameters;
     // ------------------------------------------------------------------------------------------
@@ -172,7 +124,7 @@ contract AddressManager is Ownable {
      * @param starting_index starting index of the loop
      * @return bool true if _address is in the MasterToSubsMap mapping of _master
      */
-    function isSubInMasterArray(address _worker, address _master, uint256 iterations_max, uint256 starting_index) 
+    function isSubInMasterArrayWithLimit(address _worker, address _master, uint256 iterations_max, uint256 starting_index) 
     public view returns (bool) {
         bool found = false;
         uint256 k = 0;
