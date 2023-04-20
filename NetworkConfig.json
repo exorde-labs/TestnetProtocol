@@ -3,7 +3,7 @@
    ],
    "testnet":[      
        {
-         "_networkId":"mainnet-A",
+         "_networkId":"mainnet",
          "_urlSkale1":"http://44.241.236.162:10067",
          "_urlSkale2":"http://57.128.84.254:10067",
          "_urlSkale3":"http://57.128.85.245:10067",
