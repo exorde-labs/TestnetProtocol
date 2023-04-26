@@ -1,4 +1,4 @@
 {
-    "run_forever": True,
-    "remote_kill": False
+    "run_forever": true,
+    "remote_kill": false
 }
