@@ -1,7 +1,7 @@
 {
   "collect_amount":100,
-  "inter_collect_delay_min":50,
-  "inter_collect_delay_max":300,
+  "inter_collect_delay_min":15,
+  "inter_collect_delay_max":60,
   "max_stored_spot_data_pending":5,
   "freshness_threshold_seconds":1800
 }
