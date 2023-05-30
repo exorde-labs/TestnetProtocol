@@ -1,11 +1,12 @@
 {
-   "mainnet":[      
+   "mainnet":[
+      
    ],
-   "testnet":[      
-       {
+   "testnet":[
+      {
          "_networkId":"mainnet",
          "_urlSkale1":"http://44.241.236.162:10067",
-         "_urlSkale2":"http://57.128.80.82:10067",          
+         "_urlSkale2":"http://57.128.80.82:10067",
          "SyncNodeCount":"2",
          "_urlTxSkale":"https://mainnet.skalenodes.com/v1/light-vast-diphda",
          "_chainID":"2139927552",
