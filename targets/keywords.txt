@@ -1,6 +1,7 @@
 election, elections, fire, drought, attack, event, president, dictator, strike, tour, poll, leader, trend, fashion,
 product, artefact, commodity, concoction, creation, goods, invention, merchandise, produce, production, work,
 consequence, effect, end result, fruit, issue, legacy, offshoot, outcome, result, returns, spin-off, upshot, yield,
+GPT, GPT3, GPT4, AutoGPT, OpenAI, AI, NLP, Language, Analytics,
 aachen,
 aalen,
 aardenburg,
