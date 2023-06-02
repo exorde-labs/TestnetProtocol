@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0
-pragma solidity 0.8 .8;
+pragma solidity 0.8.8;
 
 /**
  * @title WorkSystem Spot v1.3.4a
@@ -95,128 +95,24 @@ library DLL {
     }
 }
 
-interface IParametersManager {
-    // -------------- GETTERS : GENERAL --------------------
-    function getMaxTotalWorkers() external view returns(uint256);
 
-    function getVoteQuorum() external view returns(uint256);
-
-    function get_MAX_UPDATE_ITERATIONS() external view returns(uint256);
-
-    function get_MAX_CONTRACT_STORED_BATCHES() external view returns(uint256);
-
-    function get_MAX_SUCCEEDING_NOVOTES() external view returns(uint256);
-
-    function get_NOVOTE_REGISTRATION_WAIT_DURATION() external view returns(uint256);
-
-    // -------------- GETTERS : ADDRESSES --------------------
-    function getStakeManager() external view returns(address);
-
-    function getRepManager() external view returns(address);
-
-    function getAddressManager() external view returns(address);
-
-    function getRewardManager() external view returns(address);
-
-    function getArchivingSystem() external view returns(address);
-
-    function getSpottingSystem() external view returns(address);
-
-    function getComplianceSystem() external view returns(address);
-
-    function getIndexingSystem() external view returns(address);
-
-    function getsFuelSystem() external view returns(address);
-
-    function getExordeToken() external view returns(address);
-
-    // -------------- GETTERS : SPOTTING --------------------
-    function get_SPOT_DATA_BATCH_SIZE() external view returns(uint256);
-
-    function get_SPOT_MIN_STAKE() external view returns(uint256);
-
-    function get_SPOT_MIN_CONSENSUS_WORKER_COUNT() external view returns(uint256);
-
-    function get_SPOT_MAX_CONSENSUS_WORKER_COUNT() external view returns(uint256);
-
-    function get_SPOT_COMMIT_ROUND_DURATION() external view returns(uint256);
-
-    function get_SPOT_REVEAL_ROUND_DURATION() external view returns(uint256);
-
-    function get_SPOT_MIN_REP_SpotData() external view returns(uint256);
-
-    function get_SPOT_MIN_REWARD_SpotData() external view returns(uint256);
-
-    function get_SPOT_MIN_REP_DataValidation() external view returns(uint256);
-
-    function get_SPOT_MIN_REWARD_DataValidation() external view returns(uint256);
-
-    function get_SPOT_INTER_ALLOCATION_DURATION() external view returns(uint256);
-
-    function get_SPOT_TOGGLE_ENABLED() external view returns(bool);
-
-    function get_SPOT_TIMEFRAME_DURATION() external view returns(uint256);
-
-    function get_SPOT_GLOBAL_MAX_SPOT_PER_PERIOD() external view returns(uint256);
-
-    function get_SPOT_MAX_SPOT_PER_USER_PER_PERIOD() external view returns(uint256);
-
-    function get_SPOT_NB_TIMEFRAMES() external view returns(uint256);
-}
-
-interface IStakeManager {
-    function ProxyStakeAllocate(uint256 _StakeAllocation, address _stakeholder) external returns(bool);
-
-    function ProxyStakeDeallocate(uint256 _StakeToDeallocate, address _stakeholder) external returns(bool);
-
-    function AvailableStakedAmountOf(address _stakeholder) external view returns(uint256);
-
-    function AllocatedStakedAmountOf(address _stakeholder) external view returns(uint256);
-}
-
-interface IRepManager {
-    function mintReputationForWork(
-        uint256 _amount,
-        address _beneficiary,
-        bytes32
-    ) external returns(bool);
-
-    function burnReputationForWork(
-        uint256 _amount,
-        address _beneficiary,
-        bytes32
-    ) external returns(bool);
-}
-
-interface IRewardManager {
-    function ProxyAddReward(uint256 _RewardsAllocation, address user_) external returns(bool);
-}
-
-interface IAddressManager {
-    function isMasterOf(address _master, address _address) external returns(bool);
-
-    function isSubWorkerOf(address _master, address _address) external returns(bool);
-
-    function AreMasterSubLinked(address _master, address _address) external returns(bool);
-
-    function getMasterSubs(address _master) external view returns(address);
-
-    function getMaster(address _worker) external view returns(address);
-
-    function FetchHighestMaster(address _worker) external view returns(address);
-}
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/utils/math/Math.sol";
+import "@openzeppelin/contracts/security/Pausable.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+import "./interfaces/IReputation.sol";
+import "./interfaces/IRepManager.sol";
+import "./interfaces/IRewardManager.sol";
+import "./interfaces/IStakeManager.sol";
+import "./interfaces/IAddressManager.sol";
+import "./interfaces/IParametersManager.sol";
+import "./RandomAllocator.sol";
 
 interface IFollowingSystem {
     function Ping(uint256 CheckedBatchId) external;
 
     function TriggerUpdate(uint256 iter) external;
 }
-
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "@openzeppelin/contracts/utils/math/Math.sol";
-import "@openzeppelin/contracts/security/Pausable.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
-import "./RandomAllocator.sol";
 
 /**
  * @title WorkSystem Spot v1.3.4a
@@ -829,95 +725,6 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
         return IsAddressKicked(msg.sender);
     }
 
-    /* Register worker (online) */
-    function _RegisterWorker() public {
-        WorkerState storage worker_state = WorkersState[msg.sender];
-        if (!worker_state.isWorkerSeen) {
-            AllWorkersList.push(msg.sender);
-            worker_state.isWorkerSeen = true;
-            //----- Track Storage usage -----
-            BytesUsed += BYTES_256 + BYTES_8 + BYTES_256 * NB_TIMEFRAMES;
-            //----- Track Storage usage -----
-        }
-        require(IParametersManager(address(0)) != Parameters, "Parameters Manager must be set.");
-        require(
-            (availableWorkers.length + busyWorkers.length) < Parameters.getMaxTotalWorkers(),
-            "Maximum registered workers already"
-        );
-        require(!worker_state.registered, "Worker is already registered (1)");
-        require(!isInAvailableWorkers(msg.sender) && !isInBusyWorkers(msg.sender), "Worker is already registered (2)");
-        // require worker to NOT have NOT VOTED MAX_SUCCEEDING_NOVOTES times in a row.
-        require(
-            !(worker_state.succeeding_novote_count >= Parameters.get_MAX_SUCCEEDING_NOVOTES() &&
-                (block.timestamp - worker_state.registration_date) <
-                Parameters.get_NOVOTE_REGISTRATION_WAIT_DURATION()),
-            "Address kicked temporarily from participation"
-        );
-
-        // ---  Master/SubWorker Stake Management
-        //_numTokens The number of tokens to be committed towards the target SpottedData
-        if (STAKING_REQUIREMENT_TOGGLE_ENABLED) {
-            uint256 _numTokens = Parameters.get_SPOT_MIN_STAKE();
-            address _selectedAddress = SelectAddressForUser(msg.sender, _numTokens);
-            // if tx sender has a master, then interact with his master's stake, or himself
-            if (SystemStakedTokenBalance[_selectedAddress] < _numTokens) {
-                uint256 remainder = _numTokens - SystemStakedTokenBalance[_selectedAddress];
-                requestAllocatedStake(remainder, _selectedAddress);
-            }
-        }
-        //////////////////////////////////
-        PushInAvailableWorkers(msg.sender);
-        worker_state.registered = true;
-        worker_state.unregistration_request = false;
-        worker_state.registration_date = uint64(block.timestamp);
-        worker_state.succeeding_novote_count = 0; // reset the novote counter
-
-        //----- Track Storage usage -----
-        BytesUsed += BYTES_256 * 2; // WorkerState is packed in 2 slots
-        //----- Track Storage usage -----
-
-        AllTxsCounter += 1;
-        _retrieveSFuel();
-        emit _WorkerRegistered(msg.sender, block.timestamp);
-    }
-
-    /* Unregister worker (offline) */
-    function _UnregisterWorker() public {
-        WorkerState storage worker_state = WorkersState[msg.sender];
-        require(worker_state.registered, "Worker is not registered so can't unregister");
-        require(worker_state.registration_date < block.timestamp + MIN_REGISTRATION_DURATION,
-            "Worker must wait some time to unregister");
-
-        if (
-            worker_state.allocated_work_batch != 0 &&
-            !worker_state.unregistration_request &&
-            !IsInLogoffList(msg.sender)
-        ) {
-            //////////////////////////////////
-            worker_state.unregistration_request = true;
-            toUnregisterWorkers.push(msg.sender);
-            //----- Track Storage usage -----
-            // toUnregisterWorkers push
-            BytesUsed += BYTES_256 * 1;
-            //----- Track Storage usage -----
-            WorkersStatus[msg.sender].isToUnregisterWorker = true;
-        }
-        if (worker_state.allocated_work_batch == 0) {
-            // only unregister a worker if he is not working
-            //////////////////////////////////
-            PopFromAvailableWorkers(msg.sender);
-            PopFromBusyWorkers(msg.sender);
-            PopFromLogoffList(msg.sender);
-            worker_state.last_interaction_date = uint64(block.timestamp);
-            WorkersStatus[msg.sender].isToUnregisterWorker = false;
-            worker_state.registered = false;
-            emit _WorkerUnregistered(msg.sender, block.timestamp);
-        }
-
-        AllTxsCounter += 1;
-        _retrieveSFuel();
-    }
-
     function processLogoffRequests(uint256 n_iteration) internal {
         uint256 iteration_count = Math.min(n_iteration, toUnregisterWorkers.length);
         for (uint256 i = 0; i < iteration_count; i++) {
@@ -1130,8 +937,8 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
                 emit _DataBatchDeleted(_deletion_index);
                 // Update Global Variable	
                 BatchDeletionCursor = BatchDeletionCursor + 1;
-                require(BatchDeletionCursor < BatchCheckingCursor,
-                    "BatchDeletionCursor < BatchCheckingCursor assert invalidated");
+                require(BatchDeletionCursor <= BatchCheckingCursor,
+                    "BatchDeletionCursor <= BatchCheckingCursor assert invalidated");
             }
         }
     }
@@ -1299,8 +1106,8 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
                 // increment BatchCheckingCursor if possible	
                 if (CurrentCursor == BatchCheckingCursor + 1) {
                     BatchCheckingCursor = BatchCheckingCursor + 1;
-                    require(BatchCheckingCursor < AllocatedBatchCursor,
-                        "BatchCheckingCursor < AllocatedBatchCursor assert invalidated");
+                    require(BatchCheckingCursor <= AllocatedBatchCursor,
+                        "BatchCheckingCursor <= AllocatedBatchCursor assert invalidated");
                 }
             }
             // Garbage collect if the offset [Deletion - Checking Cursor] > NB_BATCH_TO_TRIGGER_GARBAGE_COLLECTION
@@ -1702,8 +1509,6 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
             // post checks
             LastAllocationTime = uint64(block.timestamp);
             AllocatedBatchCursor += 1;
-            require(AllocatedBatchCursor < LastBatchCounter,
-                "AllocatedBatchCursor < LastBatchCounter assert invalidated");
             LastRandomSeed = getRandom();
             AllTxsCounter += 1;
         }
@@ -1795,9 +1600,11 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
         bool new_work_available = false;
         WorkerState memory user_state = WorkersState[user_];
         uint128 _currentUserBatch = user_state.allocated_work_batch;
+        if ( _currentUserBatch == 0 ){
+            return false;
+        }
         if (
             !didReveal(user_, _currentUserBatch) &&
-            !DataEnded(_currentUserBatch) &&
             !commitPeriodOver(_currentUserBatch)
         ) {
             new_work_available = true;
@@ -1812,6 +1619,9 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
     function GetCurrentWork(address user_) public view returns(uint256) {
         WorkerState memory user_state = WorkersState[user_];
         uint128 _currentUserBatch = user_state.allocated_work_batch;
+        if ( _currentUserBatch == 0 ){
+            return _currentUserBatch;
+        }
         // if user has failed to commit and commitPeriod is Over, then currentWork is "missed".
         if (!didCommit(user_, _currentUserBatch) && commitPeriodOver(_currentUserBatch)) {
             _currentUserBatch = 0;
@@ -2054,7 +1864,7 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
      * @param _BatchCount Batch Count in number of items (in the aggregated IPFS hash)
      * @param _From extra information (for indexing / archival purpose)
      */
-    function commitFileVote(
+    function commitSpotCheck(
         uint128 _DataBatchId,
         bytes32 _encryptedHash,
         bytes32 _encryptedVote,
@@ -2131,7 +1941,7 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
      * @param _clearVote clear hash of the submitted IPFS vote
      * @param _salt arbitraty integer used to hash the previous commit & verify the reveal
      */
-    function revealFileVote(
+    function revealSpotCheck(
         uint64 _DataBatchId,
         string memory _clearIPFSHash,
         uint8 _clearVote,
@@ -2562,15 +2372,13 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
 
         return getNumTokens(_voter, _DataBatchId);
     }
-
+    
     /**
      * @notice Determines if SpottedData is over
      * @dev Checks isExpired for specified SpottedData's revealEndDate
      * @return ended Boolean indication of whether Dataing period is over
      */
     function DataEnded(uint128 _DataBatchId) public view returns(bool ended) {
-        require(DataExists(_DataBatchId), "Data must exist");
-
         return isExpired(DataBatch[_ModB(_DataBatchId)].revealEndDate) ||
             (commitPeriodOver(_DataBatchId) && BatchCommitedVoteCount[_ModB(_DataBatchId)] == 0);
     }
@@ -2662,7 +2470,7 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
         return address_list;
     }
 
-    /**
+    /**b
      * @notice get AllWorkersList length
      * @return length of the array
      */
@@ -2838,8 +2646,6 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
      * @return committed Boolean indication of whether user has committed
      */
     function didCommit(address _voter, uint128 _DataBatchId) public view returns(bool committed) {
-        require(DataExists(_DataBatchId), "_DataBatchId must exist");
-
         // return SpotsMapping[_ModS(_DataBatchId)].didCommit[_voter];
         return UserVoteSubmission[_ModB(_DataBatchId)][_voter].commited;
     }
@@ -2851,8 +2657,6 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable {
      * @return revealed Boolean indication of whether user has revealed
      */
     function didReveal(address _voter, uint128 _DataBatchId) public view returns(bool revealed) {
-        require(DataExists(_DataBatchId), "_DataBatchId must exist");
-
         // return SpotsMapping[_ModS(_DataBatchId)].didReveal[_voter];
         return UserVoteSubmission[_ModB(_DataBatchId)][_voter].revealed;
     }
