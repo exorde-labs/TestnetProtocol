@@ -2,7 +2,7 @@
    "mainnet":[
       
    ],
-   "testnet":[
+   "testnet-A":[
       {
          "_networkId":"mainnet",
          "_urlSkale1":"http://44.241.236.162:10067",
