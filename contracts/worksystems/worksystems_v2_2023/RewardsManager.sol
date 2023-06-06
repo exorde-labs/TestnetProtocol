@@ -1,0 +1,377 @@
+// SPDX-License-Identifier: MIT
+
+pragma solidity 0.8.8;
+
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+
+/**
+ * @title Rewards Manager
+ * @author  Mathias Dail - Exorde Labs
+ * @notice This smart contract is designed to manage rewards distribution within the Exorde ecosystem. 
+ *  The contract provides functionality for depositing and withdrawing rewards, 
+ *  as well as managing the distribution of rewards through whitelisted proxies. 
+ *  It also implements a sliding counter mechanism to limit the total rewards distributed per hour and per day, 
+ *  in order to mitigate potential exploitation and limit token inflation.
+ * @dev The RewardsManager contract utilizes OpenZeppelin's Ownable, IERC20, and SafeERC20 libraries. 
+ *  It maintains a mapping of rewards balances per user address, along with an overall balance
+ *  for the contract itself (ManagerBalance). 
+ *  The contract also keeps track of the total rewards distributed (TotalRewards) 
+ *  and implements a sliding counter mechanism to limit rewards distribution 
+ *  using TimeframeCounter structs for hourly and daily counters. 
+ *  The contract allows for de/whitelisting of addresses.
+ * Main functionalities include:
+ * Whitelisting: Adding or removing addresses to interact with rewards functions.
+ * Proxy actions: Allocating and transferring rewards through verified whitelisted contracts.
+ * Sliding counter management: Updating and retrieving the total rewards distributed in the last hour and day.
+ * Deposit and Withdrawal: Depositing ERC20 tokens to fill the contract's balance, and withdrawing rewards for users.
+ * Owner management actions: Withdrawing tokens from the contract and recovering stuck ERC20 tokens.
+ * The contract enforces certain restrictions on rewards distribution:
+ * A maximum of 1,250 EXD tokens can be distributed per hour.
+ * A maximum of 30,000 EXD tokens can be distributed per day.
+ * The number of timeframes for the sliding counters (hourly and daily) 
+ * must be less than 50 to prevent excessive gas consumption during iterations.
+ * It is important to note that the ManagerBalance must be sufficiently funded for rewards distribution to take place,
+ * and rewards can only be distributed by whitelisted addresses.
+*/
+
+contract RewardsManager is Ownable {
+    using SafeERC20 for IERC20;    
+
+    IERC20 public token;
+    mapping(address => uint256) public rewards;
+    uint256 public ManagerBalance = 0;
+    uint256 TotalRewards = 0;
+
+    struct TimeframeCounter {
+        uint256 timestamp;
+        uint256 counter;
+    }
+
+    // Cap rewards at 30k EXD per 24 hours, and 1.25k per hour
+    uint16 constant NB_TIMEFRAMES_HOURLY = 15;
+    uint16 constant FOUR_MINUTES_DURATION = 240; // 240*15 = 3600s = 1 hour
+    uint16 constant NB_TIMEFRAMES_DAILY = 24;
+    uint16 constant ONE_HOUR_DURATION = 3600; // 3600*24 = 1 day
+    TimeframeCounter[NB_TIMEFRAMES_HOURLY] public HourlyRewardsFlowManager;
+    TimeframeCounter[NB_TIMEFRAMES_DAILY] public DailyRewardsFlowManager;
+
+    // Hardcoded limit of rewards per hour & day, to limit protocol inflation & rewards exploits
+    uint256 public MAX_HOURLY_EXD_REWARDS = 1250*(10**18); // 10**18 because EXD has 18 decimals
+    uint256 public MAX_DAILY_EXD_REWARDS = 30000*(10**18); // -> 1250 EXD/hour and 30000 EXD/day, hardcoded theoretical protocol limit.    
+    // the actual rate can be lower, as set initially
+    uint256 public CURRENT_HOURLY_EXD_REWARDS = 210*(10**18);
+    uint256 public CURRENT_DAILY_EXD_REWARDS = 500*(10**18);
+
+    constructor(
+        address EXD_token
+    ) {
+        require(NB_TIMEFRAMES_DAILY < 50 && NB_TIMEFRAMES_HOURLY < 50, 
+        "NB_TIMEFRAMES must be <50 to prevent out of gas during iteration");
+        token = IERC20(EXD_token);
+    }
+
+    // ------------------------------------------------------------------------------------------
+
+    mapping(address => bool) private RewardsWhitelistMap;
+    // addresses of schemes/contracts allowed to interact with Rewardss
+
+    event HourlySlidingCounterUpdate(uint256 LastSubTimestamp);
+    event DailySlidingCounterUpdate(uint256 LastSubTimestamp);
+    event AddedRewards(address indexed account, uint256 amountAdded);
+    event TransferedRewards(address indexed accountA, address accountB, uint256 amountTransfered);
+    event RemovedRewards(address indexed account, uint256 amountRemoved);
+    event RewardsWhitelisted(address indexed account, bool isWhitelisted);
+    event RewardsUnWhitelisted(address indexed account, bool isWhitelisted);
+    event HourlyRewardsRateUpdated(uint256 _newDailyRate);
+    event DailyRewardsRateUpdated(uint256 _newDailyRate);
+
+    /**
+     * @notice Returns if a contract address (or user) is whitelisted to interact with rewards
+     * @param _address The address
+     */
+    function isRewardsWhitelisted(address _address) public view returns (bool) {
+        return RewardsWhitelistMap[_address];
+    }
+
+    /**
+     * @notice Adds an address as whitelisted to interact with rewards
+     * @param _address The address
+     */
+    function addAddress(address _address) public onlyOwner {
+        require(RewardsWhitelistMap[_address] != true, "RewardsManager: address must not be whitelisted already");
+        RewardsWhitelistMap[_address] = true;
+        emit RewardsWhitelisted(_address, true);
+    }
+
+    /**
+     * @notice Removes an address as whitelisted to interact with rewards
+     * @param _address The address
+     */
+    function removeAddress(address _address) public onlyOwner {
+        require(RewardsWhitelistMap[_address] != false, "RewardsManager: address must be whitelisted to remove");
+        RewardsWhitelistMap[_address] = false;
+        emit RewardsUnWhitelisted(_address, false);
+    }
+
+    // ---------- EXTERNAL Rewards ALLOCATIONS ----------
+
+        /**
+    * @notice Update the current hourly EXD rewards rate
+    * @dev Only callable by the contract owner, within the hardcoded max hourly rewards limit
+    * @param _newHourlyRate The new hourly EXD rewards rate to be set
+    */
+    function updateCurrentHourlyEXDRewards(uint256 _newHourlyRate) external onlyOwner {
+        // Ensure the new hourly rate is within the max hourly rewards limit
+        require(
+            _newHourlyRate <= MAX_HOURLY_EXD_REWARDS,
+            "RewardsManager: new hourly rate must be within the max hourly rewards limit"
+        );
+
+        // Set the new hourly rate
+        CURRENT_HOURLY_EXD_REWARDS = _newHourlyRate;
+
+        // Emit an event to log the change
+        emit HourlyRewardsRateUpdated(_newHourlyRate);
+    }
+
+    /**
+    * @notice Update the current daily EXD rewards rate
+    * @dev Only callable by the contract owner, within the hardcoded max daily rewards limit
+    * @param _newDailyRate The new daily EXD rewards rate to be set
+    */
+    function updateCurrentDailyEXDRewards(uint256 _newDailyRate) external onlyOwner {
+        // Ensure the new daily rate is within the max daily rewards limit
+        require(
+            _newDailyRate <= MAX_DAILY_EXD_REWARDS,
+            "RewardsManager: new daily rate must be within the max daily rewards limit"
+        );
+
+        // Set the new daily rate
+        CURRENT_DAILY_EXD_REWARDS = _newDailyRate;
+
+        // Emit an event to log the change
+        emit DailyRewardsRateUpdated(_newDailyRate);
+    }
+
+    function updateSlidingCounters(uint256 _amount) internal{        
+        HourlyRewardsFlowManager[HourlyRewardsFlowManager.length - 1].counter +=  _amount;
+        DailyRewardsFlowManager[DailyRewardsFlowManager.length - 1].counter +=  _amount;
+    }
+
+    /**
+     * @notice A method for a verified whitelisted contract to allocate some Rewards
+     * @param _RewardsAllocation The rewards to allocate (distribute)
+     * @param _user The address of the user to credit _RewardsAllocation
+     */
+    function ProxyAddReward(uint256 _RewardsAllocation, address _user) external returns (bool) {
+        require(isRewardsWhitelisted(msg.sender), "RewardsManager: sender must be whitelisted to Proxy act");
+        // require(ManagerBalance >=  _RewardsAllocation);
+        require(_RewardsAllocation > 0, "rewards to allocate must be positive..");
+        bool success = false;
+        // ---- Pre rewards distribution limitation check
+        // check if the contract calling this method has rights to allocate from user Rewards
+        if (ManagerBalance >= _RewardsAllocation) {
+            ManagerBalance -= _RewardsAllocation;
+            // ---- credit user rewards balance with _RewardsAllocation
+            rewards[_user] +=  _RewardsAllocation;
+            TotalRewards += _RewardsAllocation;
+            // ---- EVENT EMISSION        
+            emit AddedRewards(_user, _RewardsAllocation);
+            success = true;
+        }
+        // ---- update the sliding counters
+        updateSlidingCounters(_RewardsAllocation);
+        // ---- Post rewards distribution limitation check
+        updateHourlyRewardsCount();
+        updateDailyRewardsCount();
+        require(getDailyRewardsCount() < CURRENT_DAILY_EXD_REWARDS, "Daily Total Rewards exceed!");
+        require(getHourlyRewardsCount() < CURRENT_HOURLY_EXD_REWARDS, "Hourly Total Rewards exceed!");
+        return success;
+    }
+
+    /**
+     * @notice A method for a verified whitelisted contract to transfer rewards between two addresses
+     * @param _initial The address of the user to transfer from
+     * @param _receiving The address of the user to transfer to
+     */
+    function ProxyTransferRewards(address _initial, address _receiving) external returns (bool) {
+        require(isRewardsWhitelisted(msg.sender), "RewardsManager: sender must be whitelisted to Proxy act");
+        uint256 _amount_to_transfer = rewards[_initial];
+        if (_amount_to_transfer > 0){
+            // transfer Rewards
+            rewards[_initial] = 0;
+            rewards[_receiving] += _amount_to_transfer;
+            // ---- event emission   
+            emit TransferedRewards(_initial, _receiving, _amount_to_transfer);
+            return true;
+        }
+        return false;
+    }
+
+
+    // ---------- ----------
+
+    /**
+     * @notice Updates the hourly sliding rewards counter: an array counting distributed rewards per slots of 4 min
+     *         -> The goal is to get the total amount of distributed rewards per hour, by summing the array's elements
+     *         If >FOUR_MINUTES_DURATION (e.g. 4min) has elasped since latest timestamp in the sliding counter
+     *         THEN shift all sliding counters array elements to the left
+     *         -> Operates a left-cycling of array values, to implement the sliding aspect of the counter
+     *         -> Overwrite the most left-wise element of the array
+     */
+    function updateHourlyRewardsCount() public {
+        uint256 last_timeframe_idx_ = HourlyRewardsFlowManager.length - 1;
+        uint256 mostRecentTimestamp_ = HourlyRewardsFlowManager[last_timeframe_idx_].timestamp;
+        if ((uint64(block.timestamp) - mostRecentTimestamp_) > FOUR_MINUTES_DURATION) {
+            // cycle & move periods to the left
+            for (uint256 i = 0; i < (HourlyRewardsFlowManager.length - 1); i++) {
+                HourlyRewardsFlowManager[i] = HourlyRewardsFlowManager[i + 1];
+            }
+            //update last timeframe with new values & reset counter
+            HourlyRewardsFlowManager[last_timeframe_idx_].timestamp = uint64(block.timestamp);
+            HourlyRewardsFlowManager[last_timeframe_idx_].counter = 0;
+            emit HourlySlidingCounterUpdate(block.timestamp);
+        }
+    }
+
+    /**
+     * @notice Updates the daily sliding rewards counter: an array counting distributed rewards per slots of 1 hour
+     *         -> The goal is to get the total amount of distributed rewards per day, by summing the array's elements
+     *         If >ONE_HOUR_DURATION (e.g. 1hour) has elasped since latest timestamp in the sliding counter
+     *         THEN shift all sliding counters array elements to the left
+     *         -> Operates a left-cycling of array values, to implement the sliding aspect of the counter
+     *         -> Overwrite the most left-wise element of the array
+     */
+    function updateDailyRewardsCount() public {
+        uint256 last_timeframe_idx_ = DailyRewardsFlowManager.length - 1;
+        uint256 mostRecentTimestamp_ = DailyRewardsFlowManager[last_timeframe_idx_].timestamp;
+        if ((uint64(block.timestamp) - mostRecentTimestamp_) > ONE_HOUR_DURATION) {
+            // cycle & move periods to the left
+            for (uint256 i = 0; i < (DailyRewardsFlowManager.length - 1); i++) {
+                DailyRewardsFlowManager[i] = DailyRewardsFlowManager[i + 1];
+            }
+            //update last timeframe with new values & reset counter
+            DailyRewardsFlowManager[last_timeframe_idx_].timestamp = uint64(block.timestamp);
+            DailyRewardsFlowManager[last_timeframe_idx_].counter = 0;
+            emit DailySlidingCounterUpdate(block.timestamp);
+        }
+    }
+
+    /**
+    * @notice Count the total EXD rewards on last hour
+    */
+    function getHourlyRewardsCount() public view returns (uint256) {
+        uint256 total = 0;
+        for (uint256 i = 0; i < HourlyRewardsFlowManager.length; i++) {
+            total += HourlyRewardsFlowManager[i].counter;
+        }
+        return total;
+    }
+
+    /**
+    * @notice Count the total EXD rewards on last day
+    */
+    function getDailyRewardsCount() public view returns (uint256) {
+        uint256 total = 0;
+        for (uint256 i = 0; i < DailyRewardsFlowManager.length; i++) {
+            total += DailyRewardsFlowManager[i].counter;
+        }
+        return total;
+    }
+
+    /**
+    * @notice returns the total amount of rewards distributed, during the life of this RewardsManager
+    */
+    function GetTotalGivenRewards() public view returns (uint256) {
+        return TotalRewards;
+    }
+
+
+    /**
+     * @notice Returns the rewards balance (currently withdrawable and available) of a given user
+     * @param _address The address of the user
+     */
+    function RewardsBalanceOf(address _address) public view returns (uint256) {
+        return rewards[_address];
+    }
+
+    // ---------- DEPOSIT  MECHANISMS ----------
+
+    /**
+    * @notice Deposit _numTokens ERC20 EXD tokens to fill the RewardsManager balance
+    * This function will likely be called by the Exorde DAO and Exorde Labs
+    * @param _numTokens The number of ERC20 tokens to deposit
+    */
+    function deposit(uint256 _numTokens) public {
+        require(token.balanceOf(msg.sender) >= _numTokens, "RewardsManager: sender doesn't have enough tokens");
+        // add the deposited tokens into existing balance
+        ManagerBalance += _numTokens;
+
+        // transfer the tokens from the sender to this contract
+        token.safeTransferFrom(msg.sender, address(this), _numTokens);
+    }
+
+    // ---------- WITHDRAWAL  MECHANISMS ----------
+
+    /**
+    * @notice Withdraw EXD rewards tokens associated to the user calling this function (the msg.sender)
+    * @param _numTokens The number of ERC20 tokens to withdraw
+    */
+    function WithdrawRewards(uint256 _numTokens) external {
+        require(
+            ManagerBalance >= _numTokens,
+            "RewardsManager: WithdrawRewards- require ManagerBalance >= _numTokens to withdraw"
+        );
+        rewards[msg.sender] -= _numTokens;
+        ManagerBalance -= _numTokens;
+        token.safeTransfer(msg.sender, _numTokens);
+    }
+
+    /**
+    * @notice Withdraw all rewards tokens associated to the user calling this function (the msg.sender)
+    */
+    function WithdrawAllRewards() external {
+        require(
+            ManagerBalance >= rewards[msg.sender],
+            "RewardsManager: WithdrawAllRewards- require ManagerBalance >= _numTokens to withdraw"
+        );
+        uint256 all_rewards = rewards[msg.sender];
+        ManagerBalance -= all_rewards;
+        rewards[msg.sender] = 0;
+        token.safeTransfer(msg.sender, all_rewards);
+    }
+
+    // ---------- OWNER MECHANISMS ----------
+    /**
+    * @notice Withdraw _numTokens ERC20 tokens from this rewards contracts
+    *         Only callable by the owner
+    * @param _numTokens The number of ERC20 tokens to withdraw
+    */
+    function OwnerWithdraw(uint256 _numTokens) external onlyOwner {
+        require(ManagerBalance >= _numTokens, "ManagerBalance has to be >= _numTokens");
+        ManagerBalance -= _numTokens;
+        token.safeTransfer(msg.sender, _numTokens);
+    }
+
+    /**
+    * @notice Withdraw all rewards in the remaining pool from the Rewards Manager, to the contract owner
+    * Usable in case of emergency or contract migration
+    */
+    function OwnerWithdrawAllRewards() external onlyOwner {
+        require(ManagerBalance > 0, "ManagerBalance has to be > 0");
+        uint256 amount = ManagerBalance;
+        ManagerBalance = 0;
+        token.safeTransfer(msg.sender, amount);
+    }
+    
+    /**
+    * @notice Withdraw (admin/owner only) any ERC20 (e.g. stuck on the contract)
+    */
+    function adminWithdrawERC20(IERC20 token_, address beneficiary_, uint256 tokenAmount_) external
+    onlyOwner
+    {
+        token_.safeTransfer(beneficiary_, tokenAmount_);
+    }
+}
