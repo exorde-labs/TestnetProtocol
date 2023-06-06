@@ -183,14 +183,8 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable, IDataSpotting {
     uint128 public MAX_INDEX_RANGE_BATCHS = 10000;
     uint128 public MAX_INDEX_RANGE_SPOTS = 10000 * 30;
 
-    // ------ Vote related    
-    uint16 constant APPROVAL_VOTE_MAPPING_ = 1;
-    uint16 immutable MAX_WORKER_ALLOCATED_PER_BATCH = 30;
-
     // ------------ Rewards & Work allocation related
     bool public STAKING_REQUIREMENT_TOGGLE_ENABLED = false;
-    bool public VALIDATE_ON_LAST_REVEAL = false;
-    bool public FORCE_VALIDATE_BATCH_FILE = true;
     bool public InstantSpotRewards = true;
     uint16 public InstantSpotRewardsDivider = 30;
     uint256 public NB_BATCH_TO_TRIGGER_GARBAGE_COLLECTION = 1000;
