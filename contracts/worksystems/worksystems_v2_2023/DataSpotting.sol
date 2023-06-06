@@ -142,8 +142,7 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable, IDataSpotting {
     TimeframeCounter[NB_TIMEFRAMES] public GlobalSpotFlowManager; // NB_TIMEFRAMES*2 slots
     TimeframeCounter[NB_TIMEFRAMES] public ItemFlowManager; // NB_TIMEFRAMES*2 slots per user
 
-    // ------ User Submissions & Voting related structure
-    mapping(uint128 => mapping(address => VoteSubmission)) public UserVoteSubmission;
+    // ------ User Submissions
     address[] public AllWorkersList;
 
     // ------ Backend Data Stores
@@ -159,27 +158,14 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable, IDataSpotting {
 
     // ------ Worker management structures
     mapping(address => WorkerStatus) public WorkersStatus;
-    mapping(uint128 => address[]) public WorkersPerBatch;
-    mapping(uint128 => uint16) public BatchCommitedVoteCount;
-    mapping(uint128 => uint16) public BatchRevealedVoteCount;
-
-    uint16 constant MIN_REGISTRATION_DURATION = 120; // in seconds
-
-    uint32 private REMOVED_WORKER_INDEX_VALUE = 2 ** 32 - 1;
 
     // ------ Processes counters
     uint128 public DataNonce = 0;
     // -- Batches Counters
-    uint128 public BatchDeletionCursor = 1;
     uint128 public LastBatchCounter = 1;
-    uint128 public BatchCheckingCursor = 1;
-    uint128 public AllocatedBatchCursor = 1;
+    uint128 public BatchDeletionCursor = 1;
 
     // ------ Statistics related counters
-    uint128 public AcceptedBatchsCounter = 0;
-    uint128 public RejectedBatchsCounter = 0;
-    uint128 public NotCommitedCounter = 0;
-    uint128 public NotRevealedCounter = 0;
     uint256 public LastRandomSeed = 0;
     uint256 public AllTxsCounter = 0;
     uint256 public AllItemCounter = 0;
@@ -206,12 +192,7 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable, IDataSpotting {
     bool public VALIDATE_ON_LAST_REVEAL = false;
     bool public FORCE_VALIDATE_BATCH_FILE = true;
     bool public InstantSpotRewards = true;
-    bool public InstantRevealRewards = true;
     uint16 public InstantSpotRewardsDivider = 30;
-    uint16 public InstantRevealRewardsDivider = 1;
-    uint16 public MaxPendingDataBatchCount = 750;
-    uint16 public SPOT_FILE_SIZE = 100;
-    uint256 public MAX_ONGOING_JOBS = 750;
     uint256 public NB_BATCH_TO_TRIGGER_GARBAGE_COLLECTION = 1000;
     uint256 private MIN_OFFSET_DELETION_CURSOR = 50;
 
@@ -273,31 +254,6 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable, IDataSpotting {
         InstantSpotRewardsDivider = divider_;
     }
 
-    /**
-     * @notice Enable or disable instant rewards when Revealing (Testnet)
-     * @param state_ boolean
-     * @param divider_ base rewards divider
-     */
-    function updateInstantRevealRewards(bool state_, uint16 divider_) public onlyOwner {
-        InstantRevealRewards = state_;
-        InstantRevealRewardsDivider = divider_;
-    }
-
-    /**
-     * @notice update MaxPendingDataBatchCount, limiting the queue of data to validate
-     * @param MaxPendingDataBatchCount_ max queue size
-     */
-    function updateMaxPendingDataBatch(uint16 MaxPendingDataBatchCount_) public onlyOwner {
-        MaxPendingDataBatchCount = MaxPendingDataBatchCount_;
-    }
-
-    /**
-     * @notice update MAX_ONGOING_JOBS, limiting the number of parallel jobs in the system
-     * @param MAX_ONGOING_JOBS_ max jobs in processing at any time 
-     */
-    function updateMaxOngoingWorks(uint16 MAX_ONGOING_JOBS_) public onlyOwner {
-        MAX_ONGOING_JOBS = MAX_ONGOING_JOBS_;
-    }
     /**
      * @notice update MaxPendingDataBatchCount, limiting the queue of data to validate
      * @param NewGarbageCollectTreshold_ new threshold for deletion of batchs data
@@ -485,7 +441,7 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable, IDataSpotting {
         // Rolling delete of previous data	
         uint128 _deletion_index;
         // make the system store at least this many batchs (offset between DeletionCursor & CheckingCursor)
-        if ((BatchDeletionCursor < (BatchCheckingCursor - MIN_OFFSET_DELETION_CURSOR))) {
+        if ((BatchDeletionCursor < (LastBatchCounter - MIN_OFFSET_DELETION_CURSOR))) {
             // Here the amount of iterations is capped by get_MAX_UPDATE_ITERATIONS	
             for (uint128 i = 0; i < iteration_count; i++) {
                 _deletion_index = BatchDeletionCursor;
@@ -498,29 +454,9 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable, IDataSpotting {
                 }
                 // delete the batch	
                 delete DataBatch[_ModB(_deletion_index)];
-                // delete the BatchCommitedVoteCount && BatchRevealedVoteCount	
-                delete BatchCommitedVoteCount[_ModB(_deletion_index)];
-                delete BatchRevealedVoteCount[_ModB(_deletion_index)];
-                // DELETE FOR ALL WORKERS	
-                address[] memory allocated_workers = WorkersPerBatch[_ModB(_deletion_index)];
-                for (uint128 k = 0; k < allocated_workers.length; k++) {
-                    //////////////////// FOR EACH WORKER ALLOCATED TO EACH BATCH	
-                    address _worker = allocated_workers[k];
-                    // clear store	
-                    bytes32 worker_UUID = attrUUID(_worker, _deletion_index);
-                    resetAttribute(worker_UUID, "numTokens");
-                    resetAttribute(worker_UUID, "commitHash");
-                    resetAttribute(worker_UUID, "commitVote");
-                    // clear UserVoteSubmission	
-                    delete UserVoteSubmission[_ModB(_deletion_index)][_worker];
-                }
-                // clear WorkersPerBatch	
-                delete WorkersPerBatch[_ModB(_deletion_index)];
                 emit _DataBatchDeleted(_deletion_index);
                 // Update Global Variable	
                 BatchDeletionCursor = BatchDeletionCursor + 1;
-                require(BatchDeletionCursor <= BatchCheckingCursor,
-                    "BatchDeletionCursor <= BatchCheckingCursor assert invalidated");
             }
         }
     }
@@ -764,8 +700,7 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable, IDataSpotting {
 
         if (
             getUserPeriodSpotCount(_selectedAddress) < Parameters.get_SPOT_MAX_SPOT_PER_USER_PER_PERIOD() &&
-            getGlobalPeriodSpotCount() < Parameters.get_SPOT_GLOBAL_MAX_SPOT_PER_PERIOD() &&
-            (_batch_counter - AllocatedBatchCursor) <= MaxPendingDataBatchCount
+            getGlobalPeriodSpotCount() < Parameters.get_SPOT_GLOBAL_MAX_SPOT_PER_PERIOD()
         ) {
             if (STAKING_REQUIREMENT_TOGGLE_ENABLED) {
                 // ---  Master/SubWorker Stake Management
@@ -915,19 +850,6 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable, IDataSpotting {
         return (uint256(SystemStakedTokenBalance[user_]));
     }
 
-    /**
-     * @notice Get Total Accepted Batches
-     */
-    function getAcceptedBatchesCount() public view returns(uint128 count) {
-        return AcceptedBatchsCounter;
-    }
-
-    /**
-     * @notice Get Total Rejected Batches
-     */
-    function getRejectedBatchesCount() public view returns(uint128 count) {
-        return RejectedBatchsCounter;
-    }
 
     /**
      * @dev Unlocks tokens locked in unrevealed spot-check-vote where SpottedData has ended
@@ -969,7 +891,6 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable, IDataSpotting {
     // ================================================================================
     //                              GETTERS - DATA
     // ================================================================================
-
 
     /**
      * @notice get all item counts for all batches between batch indices A and B (a < B)
@@ -1017,53 +938,6 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable, IDataSpotting {
         return ipfs_hash_list;
     }
 
-    /**
-     * @notice get the From information for a given batch
-     * @param _DataBatchId ID of the batch
-     */
-    function getFromsForBatch(uint128 _DataBatchId) public view returns(string[] memory) {
-        require(DataExists(_DataBatchId), "_DataBatchId must exist");
-
-        address[] memory allocated_workers = WorkersPerBatch[_ModB(_DataBatchId)];
-        string[] memory from_list = new string[](allocated_workers.length);
-
-        for (uint128 i = 0; i < allocated_workers.length; i++) {
-            from_list[i] = UserVoteSubmission[_ModB(_DataBatchId)][allocated_workers[i]].batchFrom;
-        }
-        return from_list;
-    }
-
-    /**
-     * @notice get all Votes on a given batch
-     * @param _DataBatchId ID of the batch
-     */
-    function getVotesForBatch(uint128 _DataBatchId) public view returns(uint128[] memory) {
-        require(DataExists(_DataBatchId), "_DataBatchId must exist");
-
-        address[] memory allocated_workers = WorkersPerBatch[_ModB(_DataBatchId)];
-        uint128[] memory votes_list = new uint128[](allocated_workers.length);
-
-        for (uint128 i = 0; i < allocated_workers.length; i++) {
-            votes_list[i] = UserVoteSubmission[_ModB(_DataBatchId)][allocated_workers[i]].vote;
-        }
-        return votes_list;
-    }
-
-    /**
-     * @notice get all IPFS files submitted (during commit/reveal) on a given batch
-     * @param _DataBatchId ID of the batch
-     */
-    function getSubmittedFilesForBatch(uint128 _DataBatchId) public view returns(string[] memory) {
-        require(DataExists(_DataBatchId), "_DataBatchId must exist");
-
-        address[] memory allocated_workers = WorkersPerBatch[_ModB(_DataBatchId)];
-        string[] memory files_list = new string[](allocated_workers.length);
-
-        for (uint256 i = 0; i < allocated_workers.length; i++) {
-            files_list[i] = UserVoteSubmission[_ModB(_DataBatchId)][allocated_workers[i]].newFile;
-        }
-        return files_list;
-    }
 
 
 
@@ -1095,7 +969,7 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable, IDataSpotting {
 
     /**
      * @notice Determines if proposal has passed
-     * @dev Check if votesFor out of totalSpotChecks exceeds votesQuorum (requires DataEnded)
+     * @dev Check if votesFor out of totalSpotChecks exceeds votesQuorum
      * @param _DataBatchId Integer identifier associated with target SpottedData
      */
     function isPassed(uint128 _DataBatchId) public view returns(bool passed) {
@@ -1103,39 +977,7 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable, IDataSpotting {
         return (100 * batch_.votesFor) > (Parameters.getVoteQuorum() * (batch_.votesFor + batch_.votesAgainst));
     }
 
-    /**
-     * @param _DataBatchId Integer identifier associated with target SpottedData
-     * @param _salt Arbitrarily chosen integer used to generate secretHash
-     * @return numTokens Number of tokens voted for winning option
-     */
-    function getNumPassingTokens(
-        address _voter,
-        uint128 _DataBatchId,
-        uint256 _salt
-    ) public view returns(uint256 numTokens) {
-        require(DataEnded(_DataBatchId), "_DataBatchId checking vote must have ended");
-        require(UserVoteSubmission[_ModB(_DataBatchId)][_voter].revealed,
-            "user must have revealed in this given Batch");
-
-        uint16 winningChoice = isPassed(_DataBatchId) ? 1 : 0;
-        bytes32 winnerHash = keccak256(abi.encodePacked(winningChoice, _salt));
-        bytes32 commitHash = getCommitVoteHash(_voter, _DataBatchId);
-
-        require(winnerHash == commitHash, "getNumPassingTokens: hashes must be equal");
-
-        return getNumTokens(_voter, _DataBatchId);
-    }
     
-    /**
-     * @notice Determines if SpottedData is over
-     * @dev Checks isExpired for specified SpottedData's revealEndDate
-     * @return ended Boolean indication of whether Dataing period is over
-     */
-    function DataEnded(uint128 _DataBatchId) public view returns(bool ended) {
-        return isExpired(DataBatch[_ModB(_DataBatchId)].revealEndDate) ||
-            (commitPeriodOver(_DataBatchId) && BatchCommitedVoteCount[_ModB(_DataBatchId)] == 0);
-    }
-
     /**
      * @notice get Last Data Id
      * @return DataId
@@ -1150,22 +992,6 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable, IDataSpotting {
      */
     function getLastBatchId() public view returns(uint256 LastBatchId) {
         return LastBatchCounter;
-    }
-
-    /**
-     * @notice get Last Checked Batch Id
-     * @return LastCheckedBatchId
-     */
-    function getLastCheckedBatchId() public view returns(uint256 LastCheckedBatchId) {
-        return BatchCheckingCursor;
-    }
-
-    /**
-     * @notice getLastAllocatedBatchId
-     * @return LastAllocatedBatchId
-     */
-    function getLastAllocatedBatchId() public view returns(uint256 LastAllocatedBatchId) {
-        return AllocatedBatchCursor;
     }
 
     /**
@@ -1280,167 +1106,6 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable, IDataSpotting {
     }
 
     /**
-     * @notice Determines DataCommitEndDate
-     * @return commitEndDate indication of whether Dataing period is over
-     */
-    function DataCommitEndDate(uint128 _DataBatchId) public view returns(uint256 commitEndDate) {
-        require(DataExists(_DataBatchId), "_DataBatchId must exist");
-
-        return DataBatch[_ModB(_DataBatchId)].commitEndDate;
-    }
-
-    /**
-     * @notice Determines DataRevealEndDate
-     * @return revealEndDate indication of whether Dataing period is over
-     */
-    function DataRevealEndDate(uint128 _DataBatchId) public view returns(uint256 revealEndDate) {
-        require(DataExists(_DataBatchId), "_DataBatchId must exist");
-
-        return DataBatch[_ModB(_DataBatchId)].revealEndDate;
-    }
-
-    /**
-     * @notice Checks if the commit period is still active for the specified SpottedData
-     * @dev Checks isExpired for the specified SpottedData's commitEndDate
-     * @param _DataBatchId Integer identifier associated with target SpottedData
-     * @return active Boolean indication of isCommitPeriodActive for target SpottedData
-     */
-    function commitPeriodActive(uint128 _DataBatchId) public view returns(bool active) {
-        require(DataExists(_DataBatchId), "_DataBatchId must exist");
-
-        return !isExpired(DataBatch[_ModB(_DataBatchId)].commitEndDate) && (DataBatch[_ModB(_DataBatchId)]
-            .uncommited_workers > 0);
-    }
-
-    /**
-     * @notice Checks if the commit period is over
-     * @dev Checks isExpired for the specified SpottedData's commitEndDate
-     * @param _DataBatchId Integer identifier associated with target SpottedData
-     * @return active Boolean indication of isCommitPeriodActive for target SpottedData
-     */
-    function commitPeriodOver(uint128 _DataBatchId) public view returns(bool active) {
-        if (!DataExists(_DataBatchId)) {
-            return false;
-        } else {
-            // a commitPeriod is Over if : time has expired OR if revealPeriod for the same _DataBatchId is true
-            return isExpired(DataBatch[_ModB(_DataBatchId)].commitEndDate) || revealPeriodActive(_DataBatchId);
-        }
-    }
-
-    /**
-     * @notice commitPeriodStatus
-     * @param _DataBatchId Integer identifier associated with target SpottedData
-     * @return status 0 = don't exist, 1 = active, 2 = expired/closed
-     */
-    function commitPeriodStatus(uint128 _DataBatchId) public view returns(uint8 status) {
-        if (!DataExists(_DataBatchId)) {
-            return 0;
-        } else {
-            if (commitPeriodOver(_DataBatchId)) {
-                return 2;
-            } else if (commitPeriodActive(_DataBatchId)) {
-                return 1;
-            }
-        }
-    }
-
-    /**
-     * @notice Checks if the commit period is still active for the specified SpottedData
-     * @dev Checks isExpired for the specified SpottedData's commitEndDate
-     * @param _DataBatchId Integer identifier associated with target SpottedData
-     * @return remainingTime Integer
-     */
-    function remainingCommitDuration(uint128 _DataBatchId) public view returns(uint256 remainingTime) {
-        require(DataExists(_DataBatchId), "_DataBatchId must exist");
-        uint64 _remainingTime = 0;
-        if (commitPeriodActive(_DataBatchId)) {
-            _remainingTime = DataBatch[_ModB(_DataBatchId)].commitEndDate - uint64(block.timestamp);
-        }
-        return _remainingTime;
-    }
-
-    /**
-     * @notice Checks if the reveal period is still active for the specified SpottedData
-     * @dev Checks isExpired for the specified SpottedData's revealEndDate
-     * @param _DataBatchId Integer identifier associated with target SpottedData
-     */
-    function revealPeriodActive(uint128 _DataBatchId) public view returns(bool active) {
-        require(DataExists(_DataBatchId), "_DataBatchId must exist");
-
-        return !isExpired(DataBatch[_ModB(_DataBatchId)].revealEndDate) && !commitPeriodActive(_DataBatchId);
-    }
-
-    /**
-     * @notice Checks if the reveal period is over
-     * @dev Checks isExpired for the specified SpottedData's revealEndDate
-     * @param _DataBatchId Integer identifier associated with target SpottedData
-     */
-    function revealPeriodOver(uint128 _DataBatchId) public view returns(bool active) {
-        if (!DataExists(_DataBatchId)) {
-            return false;
-        } else {
-            // a commitPeriod is Over if : time has expired OR if revealPeriod for the same _DataBatchId is true
-            return isExpired(DataBatch[_ModB(_DataBatchId)].revealEndDate) ||
-                DataBatch[_ModB(_DataBatchId)].unrevealed_workers == 0;
-        }
-    }
-
-    /**
-     * @notice revealPeriodStatus
-     * @param _DataBatchId Integer identifier associated with target SpottedData
-     * @return status 0 = don't exist, 1 = active, 2 = expired/closed
-     */
-    function revealPeriodStatus(uint128 _DataBatchId) public view returns(uint8 status) {
-        if (!DataExists(_DataBatchId)) {
-            return 0;
-        } else {
-            if (revealPeriodOver(_DataBatchId)) {
-                return 2;
-            } else if (revealPeriodActive(_DataBatchId)) {
-                return 1;
-            }
-        }
-    }
-    /**
-     * @notice Checks if the commit period is still active for the specified SpottedData
-     * @dev Checks isExpired for the specified SpottedData's commitEndDate
-     * @param _DataBatchId Integer identifier associated with target SpottedData
-     * @return remainingTime Integer indication of isCommitPeriodActive for target SpottedData
-     */
-    function remainingRevealDuration(uint128 _DataBatchId) public view returns(uint256 remainingTime) {
-        require(DataExists(_DataBatchId), "_DataBatchId must exist");
-        uint256 _remainingTime = 0;
-        if (revealPeriodActive(_DataBatchId)) {
-            _remainingTime = DataBatch[_ModB(_DataBatchId)].revealEndDate - block.timestamp;
-        }
-        return _remainingTime;
-    }
-
-    /**
-     * @dev Checks if user has committed for specified SpottedData
-     * @param _voter Address of user to check against
-     * @param _DataBatchId Integer identifier associated with target SpottedData
-     * @return committed Boolean indication of whether user has committed
-     */
-    function didCommit(address _voter, uint128 _DataBatchId) public view returns(bool committed) {
-        // return SpotsMapping[_ModS(_DataBatchId)].didCommit[_voter];
-        return UserVoteSubmission[_ModB(_DataBatchId)][_voter].commited;
-    }
-
-    /**
-     * @dev Checks if user has revealed for specified SpottedData
-     * @param _voter Address of user to check against
-     * @param _DataBatchId Integer identifier associated with target SpottedData
-     * @return revealed Boolean indication of whether user has revealed
-     */
-    function didReveal(address _voter, uint128 _DataBatchId) public view returns(bool revealed) {
-        // return SpotsMapping[_ModS(_DataBatchId)].didReveal[_voter];
-        return UserVoteSubmission[_ModB(_DataBatchId)][_voter].revealed;
-    }
-
-
-
-    /**
      * @dev Checks if a SpottedData exists
      * @param _DataBatchId The DataID whose existance is to be evaluated.
      * @return exists Boolean Indicates whether a SpottedData exists for the provided DataID
@@ -1449,50 +1114,6 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable, IDataSpotting {
         return (DataBatch[_ModB(_DataBatchId)].complete);
     }
 
-
-    // ------------------------------------------------------------------------------------------------------------
-    // DOUBLE-LINKED-LIST HELPERS:
-    // ------------------------------------------------------------------------------------------------------------
-
-    /**
-     * @dev Gets the bytes32 commitHash property of target SpottedData
-     * @param _voter Address of user to check against
-     * @param _DataBatchId Integer identifier associated with target SpottedData
-     * @return commitHash Bytes32 hash property attached to target SpottedData
-     */
-    function getCommitVoteHash(address _voter, uint128 _DataBatchId) public view returns(bytes32 commitHash) {
-        return bytes32(getAttribute(attrUUID(_voter, _DataBatchId), "commitVote"));
-    }
-
-    /**
-     * @dev Gets the bytes32 commitHash property of target SpottedData
-     * @param _voter Address of user to check against
-     * @param _DataBatchId Integer identifier associated with target SpottedData
-     * @return commitHash Bytes32 hash property attached to target SpottedData
-     */
-    function getCommitIPFSHash(address _voter, uint128 _DataBatchId) public view returns(bytes32 commitHash) {
-        return bytes32(getAttribute(attrUUID(_voter, _DataBatchId), "commitHash"));
-    }
-
-    /**
-     * @dev Gets the bytes32 commitHash property of target SpottedData
-     * @param _clearVote vote Option
-     * @param _salt is the salt
-     * @return keccak256hash Bytes32 hash property attached to target SpottedData
-     */
-    function getEncryptedHash(uint256 _clearVote, uint256 _salt) public pure returns(bytes32 keccak256hash) {
-        return keccak256(abi.encodePacked(_clearVote, _salt));
-    }
-
-    /**
-     * @dev Gets the bytes32 commitHash property of target FormattedData
-     * @param _hash ipfs hash of aggregated data in a string
-     * @param _salt is the salt
-     * @return keccak256hash Bytes32 hash property attached to target FormattedData
-     */
-    function getEncryptedStringHash(string memory _hash, uint256 _salt) public pure returns(bytes32 keccak256hash) {
-        return keccak256(abi.encode(_hash, _salt));
-    }
 
     /**
      * @dev Wrapper for getAttribute with attrName="numTokens"
