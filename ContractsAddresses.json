@@ -32,7 +32,7 @@
       "DataSpotting":"0x97A99EA8C4D2412cc6Af169972347AD4339EA6Aa",
       "RegistrarWalletScheme":"0x9ddAD551b059fdAF5041B3Eb56423935D2c850f1",
       "MasterWalletScheme":"0x1Dc3f8A7749B6c405A3597292Ce7f2107186432a",
-      "QuickWalletScheme":"0xe3040B07fb459E3B0D6C0F9b9f5B837D7CcFCa59"
+      "QuickWalletScheme":"0xe3040B07fb459E3B0D6C0F9b9f5B837D7CcFCa59",
       "ReputationReader":"0x9c18f3c9933B4A9c110406eE8B4771C0daebC46F"
    }
 }
