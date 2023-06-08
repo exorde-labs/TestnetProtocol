@@ -4,7 +4,7 @@
    ],
    "testnet-A":[
       {
-         "_networkId":"mainnet",
+         "_networkId":"testnet-A",
          "_urlSkale1":"http://57.128.80.82:10067",
          "urlSkale":[
             "http://57.128.80.82:10067"
@@ -16,7 +16,7 @@
          "_webSocket":"wss://mainnet.skalenodes.com/v1/ws/light-vast-diphda"
       },
       {
-         "_networkId":"testnet-A",
+         "_networkId":"testnet-B",
          "_urlSkale1":"http://57.128.82.225:10451",
          "urlSkale":[
             "http://57.128.82.225:10451"
