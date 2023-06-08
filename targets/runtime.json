@@ -1,5 +1,5 @@
 {
-    "remote_kill": false,
+    "online": false,
     "last_info": "Welcome to the v2 of the Exorde Worker Node!",
     "worker_version": "2.0.0",
     "protocol_version": "1.3.5",
