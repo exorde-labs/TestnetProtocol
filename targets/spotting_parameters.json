@@ -1,8 +1,0 @@
-{
-  "collect_amount":25,
-  "inter_collect_delay_min":10,
-  "inter_collect_delay_max":50,
-  "max_stored_spot_data_pending":1,
-  "freshness_threshold_seconds":300,
-  "min_content_length":20
-}
