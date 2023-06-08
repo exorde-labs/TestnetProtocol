@@ -1,6 +1,0 @@
-{
-  "new_job_available_polling_second":10,
-  "commit_period_check_second":5,
-  "reveal_period_check_second":5,
-  "vote_approval_value":1
-}
