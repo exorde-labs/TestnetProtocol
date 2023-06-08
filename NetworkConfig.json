@@ -14,7 +14,9 @@
          "_chainID":"2139927552",
          "_blockExplorer":"https://light-vast-diphda.explorer.mainnet.skalenodes.com/",
          "_webSocket":"wss://mainnet.skalenodes.com/v1/ws/light-vast-diphda"
-      },
+      }
+   ],
+   "testnet-B":[
       {
          "_networkId":"testnet-B",
          "_urlSkale1":"http://57.128.82.225:10451",
