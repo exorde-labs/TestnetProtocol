@@ -1,8 +1,8 @@
 {
-  "collect_amount":100,
-  "inter_collect_delay_min":50,
-  "inter_collect_delay_max":200,
-  "max_stored_spot_data_pending":2,
-  "freshness_threshold_seconds":180,
-  "min_content_length":10
+  "collect_amount":25,
+  "inter_collect_delay_min":10,
+  "inter_collect_delay_max":50,
+  "max_stored_spot_data_pending":1,
+  "freshness_threshold_seconds":300,
+  "min_content_length":20
 }
