@@ -1,5 +1,5 @@
 {
-   "mainnet":{
+   "testnet-A":{
       "Reputation":"0x96A31ba8d38d01dA62D745b9DAf46d9a427c6ec8",
       "EXDT":"0x829E6027063C66f401974257CCF6A1522b22C5fA",
       "Avatar":"0xdA61CBFF9390D0802372655197d8f29d4FFA6971",
@@ -17,7 +17,7 @@
       "QuickWalletScheme":"0x626Ef88a240c546Fb4e79553D4C5005F791895b0",
       "ReputationReader":"0xe4aac005cc2BA0751EFEA5F8077A0942094ff002"
    },
-   "testnet-A":{
+   "testnet-B":{
       "Reputation":"0x30FB4a693dbFbF682f57e55d1f396DC0e734f616",
       "EXDT":"0x6d115193d5b699916106603B810EAEcC4D2fCA51",
       "Avatar":"0x029C73734b32394bfB32eFeC07c160c5d2583827",
