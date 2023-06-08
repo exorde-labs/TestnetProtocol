@@ -9,5 +9,5 @@
     "target": "testnet-A",
     "gas_cap_min":1000000,
     "default_gas_amount":5000000,
-    "default_gas_price ":100000
+    "default_gas_price":100000
 }
