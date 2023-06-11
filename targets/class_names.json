@@ -1,50 +1,72 @@
 {
    "Arts and Entertainment":{
-      },
+      
+   },
    "Lifestyle and Hobbies":{
-      },
+      
+   },
    "Science and Research":{
-      },
+      
+   },
    "Technology and Innovation":{
       "Data and Analytics":{
+         
       },
       "Computers and Electronics":{
+         
       },
       "Internet and Telecom":{
+         
       },
       "Blockchain and Crypto":{
+         
       }
    },
    "Economy and Finance":{
       "Banking":{
+         
       },
       "Currencies and Foreign Exchange":{
+         
       },
       "Insurance":{
+         
       },
       "Real Estate":{
+         
       },
       "Investing and Trading":{
+         
       },
       "Cryptocurrency":{
+         
       }
    },
    "Politics and Society":{
-      },
+      
+   },
    "Nature and Environment":{
-      },
+      
+   },
    "Business and Industry":{
-      },
+      
+   },
    "Education and Learning":{
-      },
+      
+   },
    "Health and Wellness":{
-      },
+      
+   },
    "Travel and Transportation":{
-      },
+      
+   },
    "Law and Justice":{
-      },
-   "Media and Communication"::{
-      },
-   "Sports and Recreation"::{
-      },
+      
+   },
+   "Media and Communication":{
+      
+   },
+   "Sports and Recreation":{
+      
+   }
 }
