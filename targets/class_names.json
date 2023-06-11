@@ -1,72 +1,152 @@
 {
    "Arts and Entertainment":{
-      
-   },
-   "Lifestyle and Hobbies":{
-      
+      "Celebrities and Entertainment News":{
+      },
+      "Entertainment Industry":{
+      },
+      "Events and Listings":{
+      },
+      "Humor":{
+      },
+      "Movies":{
+      },
+      "Music and Audio":{
+      },
+      "TV and Video":{
+      }
    },
    "Science and Research":{
-      
+      "Astronomy and Cosmos":{
+      },
+      "Biological Sciences":{
+      },
+      "Chemistry":{
+      },
+      "Computer Science":{
+      },
+      "Ecology and Environment":{
+      },
+      "Engineering and Technology":{
+      },
+      "Mathematics":{
+      },
+      "Physics":{
+      },
+      "Scientific Institutions":{
+      }
    },
    "Technology and Innovation":{
-      "Data and Analytics":{
-         
+      "Data Analytics and AI":{
       },
       "Computers and Electronics":{
-         
       },
       "Internet and Telecom":{
-         
       },
-      "Blockchain and Crypto":{
-         
+      "Digital assets and Blockchain":{
       }
    },
    "Economy and Finance":{
       "Banking":{
-         
       },
       "Currencies and Foreign Exchange":{
-         
       },
       "Insurance":{
-         
       },
       "Real Estate":{
-         
       },
       "Investing and Trading":{
-         
+      },
+      "Retirement and Pension":{
       },
       "Cryptocurrency":{
-         
       }
    },
    "Politics and Society":{
-      
+      "Politics":{
+      },
+      "Campaigns and Elections":{
+      },
+      "Politicians":{
+      },
+      "Country and State":{
+      }
    },
    "Nature and Environment":{
-      
+      "Earth Sciences":{
+      },
+      "Green technology":{
+      },
+      "Ecology and Environment":{
+      },
+      "Pets and Animals":{
+      }
    },
    "Business and Industry":{
-      
+      "Advertising and Marketing":{
+      },
+      "Aerospace and Defense":{
+      },
+      "Agriculture and Forestry":{
+      },
+      "Automotive Industry":{
+      },
+      "Business Finance":{
+      },
+      "Energy and Utilities":{
+      },
+      "Metals and Mining":{
+      },
+      "Pharmaceuticals and Biotech":{
+      }
    },
    "Education and Learning":{
-      
+      "Education":{
+      },
+      "Jobs":{
+      }
    },
    "Health and Wellness":{
-      
+      "Alternative and Natural Medicine":{
+      },
+      "Health News":{
+      },
+      "Mental Health":{
+      },
+      "Nutrition":{
+      },
+      "Pharmacy":{
+      },
+      "Public Health":{
+      },
    },
    "Travel and Transportation":{
-      
+      "Air Travel":{
+      },
+      "Bus and Rail":{
+      },
+      "Tourist Destinations":{
+      },
+      "Travel Agencies and Services":{
+      }
    },
    "Law and Justice":{
-      
-   },
-   "Media and Communication":{
-      
+      "Government":{
+      },
+      "Legal":{
+      },
+      "Military":{
+      },
+      "Public Safety":{
+      },
    },
    "Sports and Recreation":{
-      
+      "World Competitions":{
+      },
+      "Individual activity":{
+      },
+      "Team or collective activity":{
+      },
+      "Sports News":{
+      }
    }
 }
