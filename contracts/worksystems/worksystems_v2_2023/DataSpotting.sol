@@ -515,7 +515,7 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable, IDataSpotting {
         }
     }
     
-    function updateActiveWorkersBatch(uint256 start_idx, uint256 nb_iterations) external {
+    function updateActiveWorkersBatch(uint256 start_idx, uint256 nb_iterations) internal {
         require(start_idx < activeWorkers.length, "Start index is out of bounds.");
         uint256 endIndex = start_idx + nb_iterations;
         
@@ -655,10 +655,12 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable, IDataSpotting {
     /**
      * @notice Trigger spot flow management
      */
-    function TriggerUpdate() public {
+    function TriggerUpdate(uint256 start_idx, uint256 nb_iter) public {
         require(IParametersManager(address(0)) != Parameters, "Parameters Manager must be set.");
         // Update the Spot Flow System
         updateGlobalSpotFlow();
+        // Update Active Workers structure
+        updateActiveWorkersBatch(start_idx, nb_iter);
         _retrieveSFuel();
     }
 
@@ -878,6 +880,9 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable, IDataSpotting {
         if (!worker_state.isWorkerSeen) {
             AllWorkersList.push(msg.sender);
             worker_state.isWorkerSeen = true;
+        }
+        if (!isInActiveWorkers(msg.sender)){
+            PushInActiveWorkers(msg.sender);
         }
         worker_state.last_interaction_date = uint64(block.timestamp);
 
