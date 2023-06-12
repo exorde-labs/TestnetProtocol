@@ -6,13 +6,11 @@
       },
       "Events and Listings":{
       },
-      "Humor":{
+      "Humor and comedy":{
       },
-      "Movies":{
+      "Movies, Series and Cinema":{
       },
       "Music and Audio":{
-      },
-      "TV and Video":{
       }
    },
    "Science and Research":{
@@ -20,7 +18,7 @@
       },
       "Biological Sciences":{
       },
-      "Chemistry":{
+      "Chemistry and biochemistry":{
       },
       "Computer Science":{
       },
@@ -28,9 +26,7 @@
       },
       "Engineering and Technology":{
       },
-      "Mathematics":{
-      },
-      "Physics":{
+      "Mathematics and Physics":{
       },
       "Scientific Institutions":{
       }
@@ -46,11 +42,9 @@
       }
    },
    "Economy and Finance":{
-      "Banking":{
+      "Banking or Insurance":{
       },
       "Currencies and Foreign Exchange":{
-      },
-      "Insurance":{
       },
       "Real Estate":{
       },
@@ -62,11 +56,9 @@
       }
    },
    "Politics and Society":{
-      "Politics":{
+      "Politics and Countries":{
       },
       "Campaigns and Elections":{
-      },
-      "Politicians":{
       },
       "Country and State":{
       }
@@ -100,9 +92,9 @@
       }
    },
    "Education and Learning":{
-      "Education":{
+      "Education and schooling":{
       },
-      "Jobs":{
+      "Jobs and the industry":{
       }
    },
    "Health and Wellness":{
@@ -112,9 +104,7 @@
       },
       "Mental Health":{
       },
-      "Nutrition":{
-      },
-      "Pharmacy":{
+      "Pharmacy and dispensary":{
       },
       "Public Health":{
       }
@@ -130,11 +120,11 @@
       }
    },
    "Law and Justice":{
-      "Government":{
+      "Government and lawmaking":{
       },
-      "Legal":{
+      "Legal affair and rights":{
       },
-      "Military":{
+      "Military event":{
       },
       "Public Safety":{
       }
