@@ -2,7 +2,7 @@
 pragma solidity 0.8.8;
 
 /**
- * @title WorkSystem Spot v1.3.4a
+ * @title WorkSystem Spot v1.5
  * @author Mathias Dail - CTO @ Exorde Labs 2022
  */
 
@@ -144,6 +144,13 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable, IDataSpotting {
 
     // ------ User Submissions
     address[] public AllWorkersList;
+        
+    // Array of currently active users
+    address[] public activeWorkers;
+
+    // Counter for currently active users
+    uint256 public activeWorkersCount = 0;
+    uint256 activeWorkerWindow = 2 hours;
 
     // ------ Backend Data Stores
     mapping(bytes32 => uint256) store;
@@ -246,6 +253,15 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable, IDataSpotting {
     function updateInstantSpotRewards(bool state_, uint16 divider_) public onlyOwner {
         InstantSpotRewards = state_;
         InstantSpotRewardsDivider = divider_;
+    }
+
+    /**
+     * @notice Update the delay (window) for workers (spotters) to be considered active
+     * @param new_window_ new window to update
+     */
+    function updateActiveWorkerWindow(uint256 new_window_) public onlyOwner {
+        require(new_window_> 10 minutes , "new window must be > 1 minute");
+        activeWorkerWindow = new_window_;
     }
 
     /**
@@ -423,6 +439,95 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable, IDataSpotting {
         }
     }
 
+    // --------------------------------------------------------------------------------------------
+    // ---------------------------------- ACTIVE USER MONITORING ----------------------------------  
+    // --------------------------------------------------------------------------------------------
+    
+    /**
+     * @notice Checks if Worker is Active
+     * @param _worker worker address
+     */
+    function isInActiveWorkers(address _worker) public view returns(bool) {
+        return WorkersStatus[_worker].isActiveWorker;
+    }
+
+    /**
+     * @notice Push _worker in the Active workers
+     */
+    function PushInActiveWorkers(address _worker) internal {
+        require(_worker != address(0), "Error: Can't push the null address in active workers");
+        if (!isInActiveWorkers(_worker)) {
+            activeWorkers.push(_worker);
+
+            //----- Track Storage usage -----
+            BytesUsed += BYTES_256; //address added
+            //----- Track Storage usage -----
+
+            // Update Worker State
+            WorkersStatus[_worker].isActiveWorker = true;
+            WorkersStatus[_worker].activeWorkersIndex = uint32(activeWorkers.length - 1);
+            // we can cast safely because activeWorkers.length << 2**32
+        }
+    }
+
+    uint32 private REMOVED_WORKER_INDEX_VALUE = 2 ** 32 - 1;
+    /**
+     * @notice Pop _worker from the Active workers
+     */
+    function PopFromActiveWorkers(address _worker) internal {
+        WorkerStatus storage workerStatus = WorkersStatus[_worker];
+        if (workerStatus.isActiveWorker) {
+            uint32 PreviousIndex = workerStatus.activeWorkersIndex;
+            address SwappedWorkerAtIndex = activeWorkers[activeWorkers.length - 1];
+
+            // Update Worker State
+            workerStatus.isActiveWorker = false;
+            workerStatus.activeWorkersIndex = REMOVED_WORKER_INDEX_VALUE; // reset Active worker index
+
+            if (activeWorkers.length >= 2) {
+                activeWorkers[PreviousIndex] = SwappedWorkerAtIndex; // swap last worker to this new position
+                // Update moved item Index
+                WorkersStatus[SwappedWorkerAtIndex].activeWorkersIndex = PreviousIndex;
+            }
+
+            activeWorkers.pop(); // pop last worker          
+
+            //----- Track Storage usage -----
+            uint256 BytesUsedReduction = BYTES_256;
+            if (BytesUsed >= BytesUsedReduction) {
+                BytesUsed -= BytesUsedReduction;
+            } else {
+                BytesUsed = 0;
+            }
+            //----- Track Storage usage -----
+        }
+    }
+
+    function updateActiveWorkerStatus(address userAddress) internal {
+        WorkerState memory worker_state = WorkersState[userAddress];
+        
+        // Check if user has been inactive for more than an hour
+        if(block.timestamp > worker_state.last_interaction_date + activeWorkerWindow){
+            // Pop from the activeWorkers array
+            PopFromActiveWorkers(userAddress);            
+            // Update activeWorkersCount
+            activeWorkersCount--;
+        }
+    }
+    
+    function updateActiveWorkersBatch(uint256 start_idx, uint256 nb_iterations) external {
+        require(start_idx < activeWorkers.length, "Start index is out of bounds.");
+        uint256 endIndex = start_idx + nb_iterations;
+        
+        if(endIndex > activeWorkers.length) {
+            endIndex = activeWorkers.length;
+        }
+        
+        for (uint256 i = start_idx; i < endIndex; i++) {
+            address worker_ = activeWorkers[i];
+            updateActiveWorkerStatus(worker_);
+        }
+    }
 
     // ================================================================================	
     //                             Data Deletion Function	
@@ -744,15 +849,16 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable, IDataSpotting {
                     _selectedAddress];
                 UserSpotFlowManager[UserSpotFlowManager.length - 1].counter += 1;
 
-                if (InstantSpotRewards) {
+                if (InstantSpotRewards && item_count_>0 && item_count_ <= 1000) {
                     address spot_author_ = msg.sender;
                     IAddressManager _AddressManager = IAddressManager(Parameters.getAddressManager());
                     IRepManager _RepManager = IRepManager(Parameters.getRepManager());
                     IRewardManager _RewardManager = IRewardManager(Parameters.getRewardManager());
                     address spot_author_master_ = _AddressManager.FetchHighestMaster(spot_author_);
-                    uint256 rewardAmount = (Parameters.get_SPOT_MIN_REWARD_SpotData() * 100) /
+                    uint256 rewardAmount = (Parameters.get_SPOT_MIN_REWARD_SpotData() * item_count_) /
                         InstantSpotRewardsDivider;
-                    uint256 repAmount = (Parameters.get_SPOT_MIN_REP_SpotData() * 100) / InstantSpotRewardsDivider;
+                    uint256 repAmount = (Parameters.get_SPOT_MIN_REP_SpotData() * item_count_) /
+                        InstantSpotRewardsDivider;
                     require(
                         _RepManager.mintReputationForWork(repAmount, spot_author_master_, ""),
                         "could not reward REP in ValidateDataBatch, 2.a"
@@ -917,7 +1023,6 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable, IDataSpotting {
      * @param _DataBatchId ID of the batch
      */
     function getDomainsForBatch(uint128 _DataBatchId) public view returns(string[] memory) {
-        require(DataExists(_DataBatchId), "_DataBatchId must exist");
         BatchMetadata memory batch_ = DataBatch[_ModB(_DataBatchId)];
         uint128 batch_size = batch_.counter;
 
@@ -931,8 +1036,6 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable, IDataSpotting {
 
         return ipfs_hash_list;
     }
-
-
 
 
     // ----------------------------------------------------
@@ -993,9 +1096,9 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable, IDataSpotting {
      * @return batch as BatchMetadata struct
      */
     function getBatchByID(uint128 _DataBatchId) public view returns(BatchMetadata memory batch) {
-        require(DataExists(_DataBatchId));
         return DataBatch[_ModB(_DataBatchId)];
     }
+
 
 
     /**
@@ -1003,7 +1106,6 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable, IDataSpotting {
      * @param _DataBatchId ID of the batch
      */
     function getBatchIPFSFileByID(uint128 _DataBatchId) public view returns(string[] memory) {
-        require(DataExists(_DataBatchId), "_DataBatchId must exist");
         BatchMetadata memory batch_ = DataBatch[_ModB(_DataBatchId)];
         uint256 batch_size = batch_.counter;
 
@@ -1067,7 +1169,7 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable, IDataSpotting {
         return address_list;
     }
 
-    /**b
+    /**
      * @notice get AllWorkersList length
      * @return length of the array
      */
@@ -1076,11 +1178,35 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable, IDataSpotting {
     }
 
     /**
+     * @notice get Active Workers
+     * @return array ouput
+     */
+    function getActiveWorkersArray() public view returns(address[] memory array) {
+        return activeWorkers;
+    }
+
+    /**
+     * @notice get AllWorkersList length
+     * @return length of the array
+     */
+    function getActiveWorkersCount() public view returns(uint256 length) {
+        return activeWorkersCount;
+    }
+
+    /**
      * @notice get Data By ID
      * @return data as SpottedData struct
      */
     function getDataByID(uint128 _DataId) public view returns(SpottedData memory data) {
         return SpotsMapping[_ModS(_DataId)];
+    }
+
+    /**
+     * @notice get Last Checked Batch Id
+     * @return LastCheckedBatchId
+     */
+    function getLastCheckedBatchId() public view returns(uint256 LastCheckedBatchId) {
+        return LastBatchCounter;
     }
 
     /**
