@@ -38,9 +38,11 @@ interface IDataBase {
 
     // ------ Commit Reveal struct : 1 slot
     struct WorkerStatus {
+        bool isActiveWorker;
         bool isAvailableWorker;
         bool isBusyWorker;
         bool isToUnregisterWorker;
+        uint32 activeWorkersIndex;
         uint32 availableWorkersIndex;
         uint32 busyWorkersIndex;
         uint32 toUnregisterWorkersIndex;
