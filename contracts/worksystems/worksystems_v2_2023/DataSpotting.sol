@@ -511,7 +511,9 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable, IDataSpotting {
             // Pop from the activeWorkers array
             PopFromActiveWorkers(userAddress);            
             // Update activeWorkersCount
-            activeWorkersCount--;
+            if( activeWorkersCount >= 1 ){
+                activeWorkersCount -= 1 ;
+            }
         }
     }
     
@@ -519,8 +521,8 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable, IDataSpotting {
         require(start_idx < activeWorkers.length, "Start index is out of bounds.");
         uint256 endIndex = start_idx + nb_iterations;
         
-        if(endIndex > activeWorkers.length) {
-            endIndex = activeWorkers.length;
+        if(endIndex >= activeWorkers.length) {
+            endIndex = activeWorkers.length -1;
         }
         
         for (uint256 i = start_idx; i < endIndex; i++) {
@@ -883,6 +885,7 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable, IDataSpotting {
         }
         if (!isInActiveWorkers(msg.sender)){
             PushInActiveWorkers(msg.sender);
+            activeWorkersCount += 1;
         }
         worker_state.last_interaction_date = uint64(block.timestamp);
 
