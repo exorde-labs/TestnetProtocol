@@ -8,6 +8,7 @@
     "minimum_items_in_spotfile": 1,
     "batch_size": 15,
     "inter_spot_delay_seconds": 1,
+    "max_depth": 0,
     "target": "testnet-A",
     "gas_cap_min":1000000,
     "default_gas_amount":5000000,
