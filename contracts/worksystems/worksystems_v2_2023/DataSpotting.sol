@@ -727,6 +727,41 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable, IDataSpotting {
         return total;
     }
 
+
+    /**
+     * @notice Update the ItemFlowManager
+     * @param item_count_to_add to the counters
+     */
+    function addtoItemCounter(uint128 item_count_to_add)
+    internal {
+        // Update DataBatch properties
+        // Update global counters
+        AllTxsCounter += 1;
+        AllItemCounter += item_count_to_add;
+        ItemFlowManager[ItemFlowManager.length - 1].counter += item_count_to_add;
+        updateItemCount();
+    }
+
+
+    /**
+     * @notice Update the global sliding counter of validated data, measuring the URL per TIMEFRAME (hour)
+     */
+    function updateItemCount() public {
+        require(IParametersManager(address(0)) != Parameters, "Parameters Manager must be set.");
+        uint256 last_timeframe_idx_ = ItemFlowManager.length - 1;
+        uint256 mostRecentTimestamp_ = ItemFlowManager[last_timeframe_idx_].timestamp;
+        if ((uint64(block.timestamp) - mostRecentTimestamp_) > Parameters.get_SPOT_TIMEFRAME_DURATION()) {
+            // cycle & move periods to the left
+            for (uint256 i = 0; i < (ItemFlowManager.length - 1); i++) {
+                ItemFlowManager[i] = ItemFlowManager[i + 1];
+            }
+            //update last timeframe with new values & reset counter
+            ItemFlowManager[last_timeframe_idx_].timestamp = uint64(block.timestamp);
+            ItemFlowManager[last_timeframe_idx_].counter = 0;
+        }
+    }
+
+
     /**
      * @notice Update the total spots per TIMEFRAME (hour) per USER
      * @param user_ user
@@ -852,6 +887,7 @@ contract DataSpotting is Ownable, RandomAllocator, Pausable, IDataSpotting {
                 TimeframeCounter[NB_TIMEFRAMES] storage UserSpotFlowManager = WorkersSpotFlowManager[
                     _selectedAddress];
                 UserSpotFlowManager[UserSpotFlowManager.length - 1].counter += 1;
+                addtoItemCounter(item_count_);
 
                 if (InstantSpotRewards && item_count_>0 && item_count_ <= 1000) {
                     address spot_author_ = msg.sender;
