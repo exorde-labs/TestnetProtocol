@@ -16,18 +16,6 @@
          "_chainID":"2139927552",
          "_blockExplorer":"https://light-vast-diphda.explorer.mainnet.skalenodes.com/",
          "_webSocket":"wss://mainnet.skalenodes.com/v1/ws/light-vast-diphda"
-      },
-      {
-         "_networkId":"testnet-B",
-         "_urlSkale1":"http://57.128.82.225:10451",
-         "urlSkale":[
-            "http://57.128.82.225:10451"
-         ],
-         "SyncNodeCount":"1",
-         "_urlTxSkale":"https://staging-v3.skalenodes.com/v1/staging-untimely-yawning-algorab",
-         "_chainID":"1722394779",
-         "_blockExplorer":"https://staging-untimely-yawning-algorab.explorer.staging-v3.skalenodes.com/",
-         "_webSocket":"wss://staging-v3.skalenodes.com/v1/ws/staging-untimely-yawning-algorab"
       }
    ]
 }
