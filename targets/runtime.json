@@ -6,7 +6,7 @@
     "protocol_version": "1.3.5",
     "expiration_delta": 180,
     "minimum_items_in_spotfile": 1,
-    "batch_size": 70,
+    "batch_size": 50,
     "inter_spot_delay_seconds": 1,
     "max_depth": 0,
     "target": "testnet-A",
