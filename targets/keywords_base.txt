@@ -178,4 +178,4 @@ Bonfida, FIDA,
 API3, API3,
 Marlin, POND,
 Paris Saint-Germain Fan Token, PSG,
-Parsiq, PRQ, market, plummet, surges, pumps, dumps
+Parsiq, PRQ,
