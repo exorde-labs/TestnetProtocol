@@ -1,12 +1,35 @@
 {
-  "enabled_modules": [
-    "ap98j3envoubi3fco1kc",
-    "a7df32de3a60dfdb7a0b",
-    "ch4875eda56be56000ac"
-  ],
-  "ap98j3envoubi3fco1kc": 25,
-  "a7df32de3a60dfdb7a0b": 30,
-  "ch4875eda56be56000ac": 10,
-  "hackbc9419ab11eebe56": 5,
-  "wei223be19ab11e891bo": 30
+   "enabled_modules":[
+      "ap98j3envoubi3fco1kc",
+      "a7df32de3a60dfdb7a0b",
+      "ch4875eda56be56000ac"
+   ],
+   "routing":{
+      "ch4875eda56be56000ac":[
+         "4chan",
+         "4channel",
+         "4cdn.org"
+      ],
+      "ap98j3envoubi3fco1kc":[
+         "reddit.com"
+      ],
+      "hackbc9419ab11eebe56":[
+         "https://news.ycombinator.com/"
+      ],
+      "a7df32de3a60dfdb7a0b":[
+         "twitter.com",
+         "t.co"
+      ],
+      "wei223be19ab11e891bo":[
+         "weibo.com",
+         "t.co"
+      ]
+   },
+   "weights":{
+      "ap98j3envoubi3fco1kc":25,
+      "a7df32de3a60dfdb7a0b":30,
+      "ch4875eda56be56000ac":10,
+      "hackbc9419ab11eebe56":5,
+      "wei223be19ab11e891bo":30
+   }
 }
