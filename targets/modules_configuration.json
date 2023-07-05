@@ -4,26 +4,23 @@
       "a7df32de3a60dfdb7a0b",
       "ch4875eda56be56000ac"
    ],
-   "routing":{
-      "ch4875eda56be56000ac":[
-         "4chan",
-         "4channel",
-         "4cdn.org"
-      ],
-      "ap98j3envoubi3fco1kc":[
-         "reddit.com"
-      ],
-      "hackbc9419ab11eebe56":[
-         "https://news.ycombinator.com/"
-      ],
-      "a7df32de3a60dfdb7a0b":[
-         "twitter.com",
-         "t.co"
-      ],
-      "wei223be19ab11e891bo":[
-         "weibo.com",
-         "t.co"
-      ]
+   "parameters":{
+      "common_parameters":{
+         "max_oldness_seconds":180,
+         "maximum_items_to_collect":25,
+         "min_post_length":25
+      },
+      "specific_parameters":{
+         "ap98j3envoubi3fco1kc":{
+            "max_oldness_seconds":180
+         },
+         "a7df32de3a60dfdb7a0b":{
+            "max_oldness_seconds":60
+         },
+         "ch4875eda56be56000ac":{
+            "max_oldness_seconds":60
+         }
+      }
    },
    "weights":{
       "ap98j3envoubi3fco1kc":25,
