@@ -2,6 +2,7 @@
    "enabled_modules":[
       "ap98j3envoubi3fco1kc",
       "a7df32de3a60dfdb7a0b",
+      "hackbc9419ab11eebe56",
       "ch4875eda56be56000ac"
    ],
    "parameters":{
@@ -21,6 +22,9 @@
             }
          },
          "ch4875eda56be56000ac":{
+            "max_oldness_seconds":60
+         },
+         "hackbc9419ab11eebe56":{
             "max_oldness_seconds":60
          }
       }
