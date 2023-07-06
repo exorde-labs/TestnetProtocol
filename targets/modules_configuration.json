@@ -3,7 +3,8 @@
       "ap98j3envoubi3fco1kc",
       "a7df32de3a60dfdb7a0b",
       "hackbc9419ab11eebe56",
-      "ch4875eda56be56000ac"
+      "ch4875eda56be56000ac",
+      "wei223be19ab11e891bo"
    ],
    "parameters":{
       "common_parameters":{
@@ -26,6 +27,10 @@
          },
          "hackbc9419ab11eebe56":{
             "max_oldness_seconds":60
+         },
+         "wei223be19ab11e891bo":{
+            "max_oldness_seconds":300,
+            "maximum_items_to_collect":30
          }
       }
    },
