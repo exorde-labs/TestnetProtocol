@@ -1,10 +1,8 @@
 {
    "enabled_modules":[
-      "ap98j3envoubi3fco1kc",
-      "a7df32de3a60dfdb7a0b",
-      "hackbc9419ab11eebe56",
-      "ch4875eda56be56000ac",
-      "wei223be19ab11e891bo"
+      "https://github.com/exorde-labs/a7df32de3a60dfdb7a0b",
+      "https://github.com/exorde-labs/ap98j3envoubi3fco1kc",
+      "https://github.com/exorde-labs/ch4875eda56be56000ac"
    ],
    "parameters":{
       "common_parameters":{
@@ -13,32 +11,23 @@
          "min_post_length":25
       },
       "specific_parameters":{
-         "ap98j3envoubi3fco1kc":{
+         "https://github.com/exorde-labs/ap98j3envoubi3fco1kc":{
             "max_oldness_seconds":180
          },
-         "a7df32de3a60dfdb7a0b":{
+         "https://github.com/exorde-labs/a7df32de3a60dfdb7a0b":{
             "max_oldness_seconds":60,
             "url_parameters":{
                "live":true
             }
          },
-         "ch4875eda56be56000ac":{
+         "https://github.com/exorde-labs/ch4875eda56be56000ac":{
             "max_oldness_seconds":60
-         },
-         "hackbc9419ab11eebe56":{
-            "max_oldness_seconds":60
-         },
-         "wei223be19ab11e891bo":{
-            "max_oldness_seconds":300,
-            "maximum_items_to_collect":30
          }
       }
    },
    "weights":{
-      "ap98j3envoubi3fco1kc":25,
-      "a7df32de3a60dfdb7a0b":30,
-      "ch4875eda56be56000ac":10,
-      "hackbc9419ab11eebe56":5,
-      "wei223be19ab11e891bo":30
+      "https://github.com/exorde-labs/a7df32de3a60dfdb7a0b":25,
+      "https://github.com/exorde-labs/ap98j3envoubi3fco1kc":50,
+      "https://github.com/exorde-labs/ch4875eda56be56000ac":25
    }
 }
