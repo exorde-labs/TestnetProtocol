@@ -14,7 +14,7 @@
       },
       "specific_parameters":{
          "https://github.com/exorde-labs/ap98j3envoubi3fco1kc":{
-            "max_oldness_seconds":30
+            "max_oldness_seconds":100
          },
          "https://github.com/exorde-labs/a7df32de3a60dfdb7a0b":{
             "max_oldness_seconds":100,
@@ -25,11 +25,11 @@
          },
          "https://github.com/exorde-labs/hackbc9419ab11eebe56":{
             "maximum_items_to_collect":5,
-            "max_oldness_seconds":30
+            "max_oldness_seconds":20
          },
          "https://github.com/exorde-labs/ch4875eda56be56000ac":{
             "maximum_items_to_collect":5,
-            "max_oldness_seconds":45
+            "max_oldness_seconds":25
          },
          "https://github.com/exorde-labs/wei223be19ab11e891bo":{
             "max_oldness_seconds":200,
@@ -38,9 +38,9 @@
       }
    },
    "weights":{
-      "https://github.com/exorde-labs/a7df32de3a60dfdb7a0b":35,
+      "https://github.com/exorde-labs/a7df32de3a60dfdb7a0b":33,
       "https://github.com/exorde-labs/ap98j3envoubi3fco1kc":30,
-      "https://github.com/exorde-labs/ch4875eda56be56000ac":25,
+      "https://github.com/exorde-labs/ch4875eda56be56000ac":27,
       "https://github.com/exorde-labs/hackbc9419ab11eebe56":2,
       "https://github.com/exorde-labs/wei223be19ab11e891bo":8
    }
