@@ -4,12 +4,13 @@
       "https://github.com/exorde-labs/ap98j3envoubi3fco1kc",
       "https://github.com/exorde-labs/ch4875eda56be56000ac",
       "https://github.com/exorde-labs/hackbc9419ab11eebe56",
-      "https://github.com/exorde-labs/wei223be19ab11e891bo"
+      "https://github.com/exorde-labs/wei223be19ab11e891bo",
+      "https://github.com/exorde-labs/rss007d0675444aa13fc",      
    ],
    "parameters":{
       "common_parameters":{
          "max_oldness_seconds":120,
-         "maximum_items_to_collect":25,
+         "maximum_items_to_collect":30,
          "min_post_length":10
       },
       "specific_parameters":{
@@ -23,15 +24,15 @@
             }
          },
          "https://github.com/exorde-labs/hackbc9419ab11eebe56":{
-            "maximum_items_to_collect":12,
+            "maximum_items_to_collect":20,
             "max_oldness_seconds":60
          },
          "https://github.com/exorde-labs/ch4875eda56be56000ac":{
-            "maximum_items_to_collect":17,
+            "maximum_items_to_collect":20,
             "max_oldness_seconds":90
          },
          "https://github.com/exorde-labs/wei223be19ab11e891bo":{
-            "maximum_items_to_collect":15,
+            "maximum_items_to_collect":20,
             "max_oldness_seconds":240
          },
          "https://github.com/exorde-labs/rss007d0675444aa13fc":{         
@@ -43,10 +44,10 @@
    },
    "weights":{
       "https://github.com/exorde-labs/a7df32de3a60dfdb7a0b":30,
-      "https://github.com/exorde-labs/ap98j3envoubi3fco1kc":34,
-      "https://github.com/exorde-labs/ch4875eda56be56000ac":24,
+      "https://github.com/exorde-labs/ap98j3envoubi3fco1kc":30,
+      "https://github.com/exorde-labs/ch4875eda56be56000ac":20,
       "https://github.com/exorde-labs/hackbc9419ab11eebe56":2,
-      "https://github.com/exorde-labs/wei223be19ab11e891bo":10,
-      "https://github.com/exorde-labs/rss007d0675444aa13fc":0
+      "https://github.com/exorde-labs/wei223be19ab11e891bo":8,
+      "https://github.com/exorde-labs/rss007d0675444aa13fc":10
    }
 }
