@@ -24,12 +24,12 @@
             }
          },
          "https://github.com/exorde-labs/hackbc9419ab11eebe56":{
-            "maximum_items_to_collect":20,
+            "maximum_items_to_collect":10,
             "max_oldness_seconds":60
          },
          "https://github.com/exorde-labs/ch4875eda56be56000ac":{
-            "maximum_items_to_collect":20,
-            "max_oldness_seconds":90
+            "maximum_items_to_collect":10,
+            "max_oldness_seconds":40
          },
          "https://github.com/exorde-labs/wei223be19ab11e891bo":{
             "maximum_items_to_collect":20,
