@@ -37,7 +37,7 @@
          },
          "https://github.com/exorde-labs/rss007d0675444aa13fc":{         
             "maximum_items_to_collect":1,
-            "max_oldness_seconds":360,
+            "max_oldness_seconds":3600,
             "max_extraction_trials":10
          }
       }
@@ -48,6 +48,6 @@
       "https://github.com/exorde-labs/ch4875eda56be56000ac":15,
       "https://github.com/exorde-labs/hackbc9419ab11eebe56":1,
       "https://github.com/exorde-labs/wei223be19ab11e891bo":4,
-      "https://github.com/exorde-labs/rss007d0675444aa13fc":15
+      "https://github.com/exorde-labs/rss007d0675444aa13fc":25
    }
 }
