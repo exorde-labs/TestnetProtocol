@@ -15,7 +15,7 @@
       },
       "specific_parameters":{
          "https://github.com/exorde-labs/ap98j3envoubi3fco1kc":{
-            "max_oldness_seconds":360000,
+            "max_oldness_seconds":240,
             "url_parameters":{
                "autonomous_subreddit_choice": 0.5
             }
@@ -40,7 +40,7 @@
          },
          "https://github.com/exorde-labs/rss007d0675444aa13fc":{         
             "maximum_items_to_collect":1,
-            "max_oldness_seconds":3600,
+            "max_oldness_seconds":360,
             "max_extraction_trials":10
          }
       }
