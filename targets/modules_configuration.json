@@ -43,7 +43,7 @@
          },
          "https://github.com/exorde-labs/masto65ezfd86424f69a":{         
             "maximum_items_to_collect":10,
-            "max_oldness_seconds":60,
+            "max_oldness_seconds":90,
             "special_keywords_checks":1
          }
       }
