@@ -34,16 +34,16 @@
          },
          "https://github.com/exorde-labs/wei223be19ab11e891bo":{
             "maximum_items_to_collect":15,
-            "max_oldness_seconds":240
+            "max_oldness_seconds":200
          },
          "https://github.com/exorde-labs/rss007d0675444aa13fc":{         
             "maximum_items_to_collect":1,
-            "max_oldness_seconds":600,
+            "max_oldness_seconds":360,
             "max_extraction_trials":10
          },
          "https://github.com/exorde-labs/masto65ezfd86424f69a":{         
             "maximum_items_to_collect":10,
-            "max_oldness_seconds":120,
+            "max_oldness_seconds":60,
             "special_keywords_checks":1
          }
       }
