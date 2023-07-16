@@ -42,15 +42,15 @@
             "max_extraction_trials":10
          },
          "https://github.com/exorde-labs/masto65ezfd86424f69a":{         
-            "maximum_items_to_collect":20,
-            "max_oldness_seconds":120,
+            "maximum_items_to_collect":15,
+            "max_oldness_seconds":360,
             "special_keywords_checks":1
          }
       }
    },
    "weights":{
-      "https://github.com/exorde-labs/a7df32de3a60dfdb7a0b":33,
-      "https://github.com/exorde-labs/ap98j3envoubi3fco1kc":35,
+      "https://github.com/exorde-labs/a7df32de3a60dfdb7a0b":25,
+      "https://github.com/exorde-labs/ap98j3envoubi3fco1kc":33,
       "https://github.com/exorde-labs/ch4875eda56be56000ac":20,
       "https://github.com/exorde-labs/hackbc9419ab11eebe56":2,
       "https://github.com/exorde-labs/wei223be19ab11e891bo":5,
