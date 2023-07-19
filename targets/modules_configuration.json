@@ -7,7 +7,9 @@
       "https://github.com/exorde-labs/wei223be19ab11e891bo",
       "https://github.com/exorde-labs/masto65ezfd86424f69a",
       "https://github.com/exorde-labs/tradview251ae30a11ee",
-      "https://github.com/exorde-labs/rss007d0675444aa13fc"
+      "https://github.com/exorde-labs/rss007d0675444aa13fc",
+      "https://github.com/exorde-labs/bitcointalk4de40ec26",
+      "https://github.com/exorde-labs/seekingalphad89ba32s"
    ],
    "parameters":{
       "common_parameters":{
@@ -49,7 +51,16 @@
          },
          "https://github.com/exorde-labs/tradview251ae30a11ee":{
             "maximum_items_to_collect":5,
-            "max_oldness_seconds":120
+            "max_oldness_seconds":120,
+            "nb_selections":2
+         },
+         "https://github.com/exorde-labs/bitcointalk4de40ec26":{
+            "maximum_items_to_collect":10,
+            "max_oldness_seconds":360
+         },
+         "https://github.com/exorde-labs/seekingalphad89ba32s":{
+            "maximum_items_to_collect":3,
+            "max_oldness_seconds":360
          }
       }
    },
@@ -58,9 +69,11 @@
       "https://github.com/exorde-labs/ap98j3envoubi3fco1kc":27,
       "https://github.com/exorde-labs/ch4875eda56be56000ac":15,
       "https://github.com/exorde-labs/hackbc9419ab11eebe56":1,
-      "https://github.com/exorde-labs/wei223be19ab11e891bo":10,
+      "https://github.com/exorde-labs/wei223be19ab11e891bo":8,
       "https://github.com/exorde-labs/masto65ezfd86424f69a":12,
       "https://github.com/exorde-labs/tradview251ae30a11ee":1,
-      "https://github.com/exorde-labs/rss007d0675444aa13fc":4
+      "https://github.com/exorde-labs/rss007d0675444aa13fc":2,
+      "https://github.com/exorde-labs/bitcointalk4de40ec26":3,
+      "https://github.com/exorde-labs/seekingalphad89ba32s":1
    }
 }
