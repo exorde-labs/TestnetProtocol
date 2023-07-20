@@ -60,11 +60,11 @@
             "nb_selections":2
          },
          "https://github.com/exorde-labs/seekingalphad89ba32s":{
-            "maximum_items_to_collect":3,
+            "maximum_items_to_collect":5,
             "max_oldness_seconds":360
          },
          "https://github.com/exorde-labs/followinc645fc950d7f":{
-            "maximum_items_to_collect":2,
+            "maximum_items_to_collect":4,
             "max_oldness_seconds":360
          }
       }
