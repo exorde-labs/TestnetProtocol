@@ -6,7 +6,7 @@
     "protocol_version": "1.3.6",
     "expiration_delta": 180,
     "minimum_items_in_spotfile": 1,
-    "max_token_count": 200,
+    "max_token_count": 50,
     "batch_size": 20,
     "inter_spot_delay_seconds": 1,
     "max_depth": 1,
