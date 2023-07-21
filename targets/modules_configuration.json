@@ -16,7 +16,7 @@
    "parameters":{
       "common_parameters":{
          "max_oldness_seconds":120,
-         "maximum_items_to_collect":30,
+         "maximum_items_to_collect":25,
          "min_post_length":10
       },
       "specific_parameters":{
@@ -34,11 +34,11 @@
             "max_oldness_seconds":80
          },
          "https://github.com/exorde-labs/ch4875eda56be56000ac":{
-            "maximum_items_to_collect":8,
+            "maximum_items_to_collect":10,
             "max_oldness_seconds":40
          },
          "https://github.com/exorde-labs/wei223be19ab11e891bo":{
-            "maximum_items_to_collect":15,
+            "maximum_items_to_collect":10,
             "max_oldness_seconds":200
          },
          "https://github.com/exorde-labs/rss007d0675444aa13fc":{
@@ -69,7 +69,7 @@
             "max_oldness_seconds":360
          },
          "https://github.com/exorde-labs/followinc645fc950d7f":{
-            "maximum_items_to_collect":4,
+            "maximum_items_to_collect":5,
             "max_oldness_seconds":360
          }
       }
