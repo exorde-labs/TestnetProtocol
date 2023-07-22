@@ -30,11 +30,11 @@
             "max_oldness_seconds":240
          },
          "https://github.com/exorde-labs/hackbc9419ab11eebe56":{
-            "maximum_items_to_collect":5,
+            "maximum_items_to_collect":10,
             "max_oldness_seconds":80
          },
          "https://github.com/exorde-labs/ch4875eda56be56000ac":{
-            "maximum_items_to_collect":10,
+            "maximum_items_to_collect":15,
             "max_oldness_seconds":40
          },
          "https://github.com/exorde-labs/wei223be19ab11e891bo":{
@@ -52,20 +52,20 @@
             "special_keywords_checks":1
          },
          "https://github.com/exorde-labs/tradview251ae30a11ee":{
-            "maximum_items_to_collect":5,
+            "maximum_items_to_collect":8,
             "max_oldness_seconds":120
          },
          "https://github.com/exorde-labs/bitcointalk4de40ec26":{
-            "maximum_items_to_collect":10,
+            "maximum_items_to_collect":15,
             "max_oldness_seconds":360,            
             "nb_selections":2
          },
          "https://github.com/exorde-labs/seekingalphad89ba32s":{
-            "maximum_items_to_collect":5,
+            "maximum_items_to_collect":7,
             "max_oldness_seconds":360
          },
          "https://github.com/exorde-labs/youtube00e1f862e5eff":{
-            "maximum_items_to_collect":20,
+            "maximum_items_to_collect":15,
             "max_oldness_seconds":360
          },
          "https://github.com/exorde-labs/followinc645fc950d7f":{
@@ -78,11 +78,11 @@
       "https://github.com/exorde-labs/a7df32de3a60dfdb7a0b":24,
       "https://github.com/exorde-labs/ap98j3envoubi3fco1kc":18,
       "https://github.com/exorde-labs/ch4875eda56be56000ac":15,
-      "https://github.com/exorde-labs/youtube00e1f862e5eff":15,
+      "https://github.com/exorde-labs/youtube00e1f862e5eff":12,
       "https://github.com/exorde-labs/masto65ezfd86424f69a":12,
-      "https://github.com/exorde-labs/hackbc9419ab11eebe56":2,
-      "https://github.com/exorde-labs/wei223be19ab11e891bo":6,
-      "https://github.com/exorde-labs/tradview251ae30a11ee":1,
+      "https://github.com/exorde-labs/hackbc9419ab11eebe56":3,
+      "https://github.com/exorde-labs/wei223be19ab11e891bo":7,
+      "https://github.com/exorde-labs/tradview251ae30a11ee":2,
       "https://github.com/exorde-labs/rss007d0675444aa13fc":3,
       "https://github.com/exorde-labs/bitcointalk4de40ec26":2,
       "https://github.com/exorde-labs/followinc645fc950d7f":1,
