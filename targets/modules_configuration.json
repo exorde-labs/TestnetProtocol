@@ -15,7 +15,7 @@
    ],
    "parameters":{
       "common_parameters":{
-         "max_oldness_seconds":120,
+         "max_oldness_seconds":300,
          "maximum_items_to_collect":25,
          "min_post_length":10
       },
@@ -34,8 +34,8 @@
             "max_oldness_seconds":80
          },
          "https://github.com/exorde-labs/ch4875eda56be56000ac":{
-            "maximum_items_to_collect":15,
-            "max_oldness_seconds":40
+            "maximum_items_to_collect":8,
+            "max_oldness_seconds":50
          },
          "https://github.com/exorde-labs/wei223be19ab11e891bo":{
             "maximum_items_to_collect":10,
@@ -61,11 +61,11 @@
             "nb_selections":2
          },
          "https://github.com/exorde-labs/seekingalphad89ba32s":{
-            "maximum_items_to_collect":7,
+            "maximum_items_to_collect":8,
             "max_oldness_seconds":360
          },
          "https://github.com/exorde-labs/youtube00e1f862e5eff":{
-            "maximum_items_to_collect":15,
+            "maximum_items_to_collect":20,
             "max_oldness_seconds":360,
             "max_total_comments_to_check":800
          },
