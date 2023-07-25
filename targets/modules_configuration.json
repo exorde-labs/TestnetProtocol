@@ -15,27 +15,26 @@
    ],
    "parameters":{
       "common_parameters":{
-         "max_oldness_seconds":120,
+         "max_oldness_seconds":1200,
          "maximum_items_to_collect":40,
          "min_post_length":10
       },
       "specific_parameters":{
          "https://github.com/exorde-labs/ap98j3envoubi3fco1kc":{
-            "max_oldness_seconds":300,
             "url_parameters":{
                "autonomous_subreddit_choice":0.8
             }
          },
          "https://github.com/exorde-labs/a7df32de3a60dfdb7a0b":{
-            "max_oldness_seconds":300
+            "max_oldness_seconds":600
          },
          "https://github.com/exorde-labs/hackbc9419ab11eebe56":{
             "maximum_items_to_collect":10,
-            "max_oldness_seconds":70
+            "max_oldness_seconds":120
          },
          "https://github.com/exorde-labs/ch4875eda56be56000ac":{
             "maximum_items_to_collect":8,
-            "max_oldness_seconds":60
+            "max_oldness_seconds":90
          },
          "https://github.com/exorde-labs/wei223be19ab11e891bo":{
             "maximum_items_to_collect":10,
@@ -43,12 +42,12 @@
          },
          "https://github.com/exorde-labs/rss007d0675444aa13fc":{
             "maximum_items_to_collect":1,
-            "max_oldness_seconds":300,
+            "max_oldness_seconds":1200,
             "max_extraction_trials":5
          },
          "https://github.com/exorde-labs/masto65ezfd86424f69a":{
             "maximum_items_to_collect":10,
-            "max_oldness_seconds":60,
+            "max_oldness_seconds":90,
             "special_keywords_checks":1
          },
          "https://github.com/exorde-labs/tradview251ae30a11ee":{
