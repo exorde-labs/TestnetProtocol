@@ -66,7 +66,7 @@
          "https://github.com/exorde-labs/youtube00e1f862e5eff":{
             "maximum_items_to_collect":30,
             "max_oldness_seconds":5000,
-            "max_total_comments_to_check":1000
+            "max_total_comments_to_check":350
          },
          "https://github.com/exorde-labs/followinc645fc950d7f":{
             "maximum_items_to_collect":5,
