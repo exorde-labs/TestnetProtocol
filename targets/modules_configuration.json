@@ -22,6 +22,7 @@
       },
       "specific_parameters":{
          "https://github.com/exorde-labs/ap98j3envoubi3fco1kc":{
+            "max_oldness_seconds":1200,
             "url_parameters":{
                "autonomous_subreddit_choice":0.8
             }
