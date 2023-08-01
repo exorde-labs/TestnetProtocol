@@ -17,7 +17,7 @@
    ],
    "parameters":{
       "common_parameters":{
-         "max_oldness_seconds":600,
+         "max_oldness_seconds":400,
          "maximum_items_to_collect":40,
          "min_post_length":10
       },
