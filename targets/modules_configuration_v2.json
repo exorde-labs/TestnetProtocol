@@ -49,19 +49,19 @@
     "generic_modules_parameters":{
        "max_oldness_seconds":1000,
        "maximum_items_to_collect":25,
-       "min_post_length":10
+       "min_post_length":5
     },
     "specific_modules_parameters":{
        "https://github.com/exorde-labs/ap98j3envoubi3fco1kc":{
-          "max_oldness_seconds":1200,
+          "max_oldness_seconds":6000,
           "url_parameters":{
              "autonomous_subreddit_choice":0.8
           }
        },
        "https://github.com/exorde-labs/a7df32de3a60dfdb7a0b":{
-          "max_oldness_seconds":600,
-          "pick_default_keyword_weight":0.4,
-          "maximum_items_to_collect":45
+          "max_oldness_seconds":400,
+          "pick_default_keyword_weight":0.25,
+          "maximum_items_to_collect":30
        },
        "https://github.com/exorde-labs/hackbc9419ab11eebe56":{
           "maximum_items_to_collect":15,
@@ -95,7 +95,7 @@
        },
        "https://github.com/exorde-labs/bitcointalk4de40ec26":{
           "maximum_items_to_collect":10,
-          "max_oldness_seconds":180,
+          "max_oldness_seconds":200,
           "nb_selections":2
        },
        "https://github.com/exorde-labs/seekingalphad89ba32s":{
