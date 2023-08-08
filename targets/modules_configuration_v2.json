@@ -61,7 +61,8 @@
        "https://github.com/exorde-labs/a7df32de3a60dfdb7a0b":{
           "max_oldness_seconds":600,
           "pick_default_keyword_weight":0.1,
-          "maximum_items_to_collect":30
+          "maximum_items_to_collect":30,
+          "check_top_tweets_weight":0.3
        },
        "https://github.com/exorde-labs/hackbc9419ab11eebe56":{
           "maximum_items_to_collect":15,
