@@ -124,18 +124,18 @@
    },
    "weights":{
       "youtube":20,
-      "reddit":20,
+      "reddit":17,
       "twitter":15,
       "4chan":10,
       "rss":6,
       "jvc":7,
       "nostr":0,
-      "mastodon":6,
+      "mastodon":7,
       "forocoches":6,
-      "weibo":3,
+      "weibo":4,
       "bitcointalk":2,
       "hackernews":2,
-      "tradingview":1,
+      "tradingview":2,
       "followin":1,
       "seekingalpha":1
    }
