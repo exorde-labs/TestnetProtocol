@@ -47,17 +47,13 @@
       ]
    },
    "generic_modules_parameters":{
-      "max_oldness_seconds":3600,
+      "max_oldness_seconds":360,
       "maximum_items_to_collect":25,
       "min_post_length":5
    },
    "specific_modules_parameters":{
       "https://github.com/exorde-labs/ap98j3envoubi3fco1kc":{
-         "max_oldness_seconds":40000,
-         "nb_subreddit_attempts":3
-      },
-      "reddit":{
-         "max_oldness_seconds":10000,
+         "max_oldness_seconds":21600,
          "nb_subreddit_attempts":3,
          "maximum_items_to_collect":40,
          "skip_post_probability":0.05,
