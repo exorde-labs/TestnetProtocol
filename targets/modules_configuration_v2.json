@@ -56,6 +56,13 @@
          "max_oldness_seconds":10000,
          "nb_subreddit_attempts":3
       },
+      "reddit":{
+         "max_oldness_seconds":10000,
+         "nb_subreddit_attempts":3,
+         "maximum_items_to_collect":25,
+         "skip_post_probability":0.05,
+         "new_layout_scraping_weight":0.1
+      },
       "https://github.com/exorde-labs/a7df32de3a60dfdb7a0b":{
          "max_oldness_seconds":600,
          "pick_default_keyword_weight":0.1,
