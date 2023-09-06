@@ -238,5 +238,22 @@
             "es"
          ]
       }
-   ]
+   ],
+   "source_type_map":{
+      "twitter":"social",
+      "reddit":"social",
+      "4chan":"social",
+      "hackernews":"social",
+      "weibo":"social",
+      "mastodon":"social",
+      "nostr":"social",
+      "tradingview":"social",
+      "rss":"news",
+      "bitcointalk":"social",
+      "followin":"social",
+      "youtube":"social",
+      "seekingalpha":"social",
+      "jvc":"social",
+      "forocoches":"social"
+   }
 }
