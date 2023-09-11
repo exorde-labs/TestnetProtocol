@@ -3,7 +3,7 @@
     "remote_kill": false,
     "last_info": "Welcome to the v2 of the Exorde Worker Node!",
     "last_notification": "3! This is a third notification!",
-    "docker_version": "2.4.0",
+    "docker_version": "2.4.9",
     "worker_version": "2.3.5",
     "protocol_version": "1.3.6",
     "expiration_delta": 180,
