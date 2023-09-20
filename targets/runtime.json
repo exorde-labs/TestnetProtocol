@@ -2,7 +2,7 @@
     "online": true,
     "remote_kill": false,
     "last_info": "Welcome to the v2 of the Exorde Worker Node!",
-    "last_notification": "3! This is a third notification!",
+    "last_notification": "Welcome to Exorde Client v2.5.0 with notifications! Thanks for supporting YOUR data network!",
     "docker_version": "2.4.9",
     "worker_version": "2.4.9",
     "protocol_version": "1.3.6",
