@@ -47,7 +47,7 @@
       ]
    },
    "generic_modules_parameters":{
-      "max_oldness_seconds":360,
+      "max_oldness_seconds":600,
       "maximum_items_to_collect":20,
       "min_post_length":5
    },
@@ -60,14 +60,14 @@
          "new_layout_scraping_weight":0.03
       },
       "https://github.com/exorde-labs/a7df32de3a60dfdb7a0b":{
-         "max_oldness_seconds":600,
+         "max_oldness_seconds":1200,
          "pick_default_keyword_weight":0.1,
          "maximum_items_to_collect":30,
          "check_top_tweets_weight":0.3
       },
       "https://github.com/exorde-labs/hackbc9419ab11eebe56":{
          "maximum_items_to_collect":15,
-         "max_oldness_seconds":200
+         "max_oldness_seconds":180
       },
       "https://github.com/exorde-labs/ch4875eda56be56000ac":{
          "maximum_items_to_collect":15,
@@ -75,11 +75,11 @@
       },
       "https://github.com/exorde-labs/wei223be19ab11e891bo":{
          "maximum_items_to_collect":15,
-         "max_oldness_seconds":400
+         "max_oldness_seconds":600
       },
       "https://github.com/exorde-labs/rss007d0675444aa13fc":{
          "maximum_items_to_collect":5,
-         "max_oldness_seconds":240,
+         "max_oldness_seconds":800,
          "max_extraction_trials":30
       },
       "https://github.com/exorde-labs/masto65ezfd86424f69a":{
@@ -93,7 +93,7 @@
       },
       "https://github.com/exorde-labs/tradview251ae30a11ee":{
          "maximum_items_to_collect":8,
-         "max_oldness_seconds":120
+         "max_oldness_seconds":180
       },
       "https://github.com/exorde-labs/bitcointalk4de40ec26":{
          "maximum_items_to_collect":10,
@@ -102,11 +102,11 @@
       },
       "https://github.com/exorde-labs/seekingalphad89ba32s":{
          "maximum_items_to_collect":10,
-         "max_oldness_seconds":200
+         "max_oldness_seconds":300
       },
       "https://github.com/exorde-labs/youtube00e1f862e5eff":{
          "maximum_items_to_collect":25,
-         "max_oldness_seconds":600,
+         "max_oldness_seconds":1000,
          "max_total_comments_to_check":800
       },
       "https://github.com/exorde-labs/followinc645fc950d7f":{
@@ -115,11 +115,11 @@
       },
       "https://github.com/exorde-labs/jvc8439846094ced03ff":{
          "maximum_items_to_collect":15,
-         "max_oldness_seconds":240
+         "max_oldness_seconds":360
       },
       "https://github.com/exorde-labs/forocoches86019fc2d4":{
          "maximum_items_to_collect":15,
-         "max_oldness_seconds":120
+         "max_oldness_seconds":240
       }
    },
    "weights":{
