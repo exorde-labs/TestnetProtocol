@@ -107,7 +107,8 @@
       "https://github.com/exorde-labs/youtube00e1f862e5eff":{
          "maximum_items_to_collect":25,
          "max_oldness_seconds":9000,
-         "max_total_comments_to_check":800
+         "max_total_comments_to_check":800,
+         "probability_to_select_default_kws":0.8
       },
       "https://github.com/exorde-labs/followinc645fc950d7f":{
          "maximum_items_to_collect":5,
