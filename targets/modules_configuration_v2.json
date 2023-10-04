@@ -140,15 +140,13 @@
       "followin":1,
       "seekingalpha":1
    },
-   "lang_map":[
-      {
-         "name":"twitter",
+   "lang_map":{
+      "twitter":{
          "languages":[
             "all"
          ]
       },
-      {
-         "name":"reddit",
+      "reddit":{
          "languages":[
             "en",
             "de",
@@ -161,85 +159,72 @@
             "ro"
          ]
       },
-      {
-         "name":"4chan",
+      "4chan":{
          "languages":[
             "en"
          ]
       },
-      {
-         "name":"hackernews",
+      "hackernews":{
          "languages":[
             "en"
          ]
       },
-      {
-         "name":"weibo",
+      "weibo":{
          "languages":[
             "cz"
          ]
       },
-      {
-         "name":"mastodon",
+      "mastodon":{
          "languages":[
             "all"
          ]
       },
-      {
-         "name":"nostr",
+      "nostr":{
          "languages":[
             "all"
          ]
       },
-      {
-         "name":"tradingview",
+      "tradingview":{
          "languages":[
             "all"
          ]
       },
-      {
-         "name":"rss",
+      "rss":{
          "languages":[
             "all"
          ]
       },
-      {
-         "name":"bitcointalk",
+      "bitcointalk":{
          "languages":[
             "all"
          ]
       },
-      {
-         "name":"followin",
+      "followin":{
          "languages":[
             "all"
          ]
       },
-      {
-         "name":"youtube",
+      "youtube":{
          "languages":[
             "all"
          ]
       },
-      {
-         "name":"seekingalpha",
+      "seekingalpha":{
          "languages":[
             "all"
          ]
       },
-      {
-         "name":"jvc",
+      "jvc":{
          "languages":[
             "all"
          ]
       },
-      {
-         "name":"forocoches",
+      "forocoches":{
          "languages":[
             "es"
          ]
       }
-   ],
+   },
    "source_type_map":{
       "twitter":"social",
       "reddit":"social",
