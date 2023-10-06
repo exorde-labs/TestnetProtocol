@@ -61,9 +61,9 @@
       },
       "https://github.com/exorde-labs/a7df32de3a60dfdb7a0b":{
          "max_oldness_seconds":1800,
-         "pick_default_keyword_weight":0.25,
+         "pick_default_keyword_weight":0.5,
          "maximum_items_to_collect":30,
-         "check_top_tweets_weight":0.3
+         "check_top_tweets_weight":0.25
       },
       "https://github.com/exorde-labs/hackbc9419ab11eebe56":{
          "maximum_items_to_collect":15,
@@ -108,7 +108,7 @@
          "maximum_items_to_collect":25,
          "max_oldness_seconds":9000,
          "max_total_comments_to_check":800,
-         "probability_to_select_default_kws":0.3
+         "probability_to_select_default_kws":0.5
       },
       "https://github.com/exorde-labs/followinc645fc950d7f":{
          "maximum_items_to_collect":5,
