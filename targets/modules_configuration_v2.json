@@ -124,21 +124,21 @@
       }
    },
    "weights":{
-      "youtube":20,
-      "reddit":17,
-      "twitter":15,
+      "reddit":20,
+      "youtube":17,
+      "twitter":12,
       "4chan":10,
-      "rss":6,
-      "jvc":7,
-      "nostr":0,
-      "mastodon":7,
+      "weibo":8,
+      "rss":8,
+      "jvc":6,
       "forocoches":6,
-      "weibo":4,
+      "mastodon":5,
       "bitcointalk":2,
       "hackernews":2,
       "tradingview":2,
       "followin":1,
-      "seekingalpha":1
+      "seekingalpha":1,
+      "nostr":0
    },
    "lang_map":{
       "a7df32de3a60dfdb7a0b":[
