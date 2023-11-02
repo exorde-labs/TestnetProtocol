@@ -79,7 +79,7 @@
       },
       "https://github.com/exorde-labs/rss007d0675444aa13fc":{
          "maximum_items_to_collect":5,
-         "max_oldness_seconds":360,
+         "max_oldness_seconds":600,
          "max_extraction_trials":30
       },
       "https://github.com/exorde-labs/masto65ezfd86424f69a":{
@@ -128,8 +128,8 @@
       "youtube":17,
       "twitter":12,
       "4chan":10,
-      "weibo":8,
-      "rss":8,
+      "rss":10,
+      "weibo":6,
       "jvc":6,
       "forocoches":6,
       "mastodon":5,
