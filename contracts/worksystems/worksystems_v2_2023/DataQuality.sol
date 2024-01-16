@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0
-pragma solidity 0.8.8;
+pragma solidity 0.8.20;
 
 /**
  * @title WorkSystem Quality v1.3.4a
@@ -8,7 +8,7 @@ pragma solidity 0.8.8;
 
 // File: dll/DLL.sol
 
-library DLL {
+library DLL2 {
     uint128 constant NULL_NODE_ID = 0;
 
     struct Node {
@@ -95,10 +95,12 @@ library DLL {
     }
 }
 
+import "@openzeppelin/contracts/utils/Context.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/utils/math/Math.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+
 import "./interfaces/IReputation.sol";
 import "./interfaces/IRepManager.sol";
 import "./interfaces/IDataSpotting.sol";
@@ -121,9 +123,7 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
     event _QualityCheckCommitted(uint256 indexed DataID, uint256 numTokens, address indexed voter);
     event _QualityCheckRevealed(
         uint256 indexed DataID,
-        uint256 votesFor,
-        uint256 votesAgainst,
-        uint256 indexed choice,
+        uint8[] quality_statuses,
         address indexed voter
     );
     event _BatchValidated(uint256 indexed DataID, string file_hash, bool isVotePassed);
@@ -138,16 +138,39 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
 
     event BytesFailure(bytes bytesFailure);
 
+
+    // ================================================================================
+    //                             Constructor
+    // ================================================================================
+    constructor(address token_, address Parameters_) 
+    Ownable(msg.sender)
+    {
+        require(token_ != address(0), "token_ must be non zero");
+        require(Parameters_ != address(0), "Parameters_ must be non zero");
+        token = IERC20(token_);
+        Parameters = IParametersManager(Parameters_);
+        emit ParametersUpdated(Parameters_);
+    }
     // ============ LIBRARIES ============
     // using AttributeStore for AttributeStore.QualityData;
-    using DLL
-    for DLL.QualityData;
+    using DLL2
+    for DLL2.QualityData;
 
 
     // ====================================
     //        GLOBAL STATE VARIABLES
     // ====================================
 
+    struct encrypted_quality_status {
+        bytes32 index;
+        bytes32 status;
+    }
+
+    struct quality_status {
+        uint index;
+        uint8 status;
+    }
+    
     // ------ Quality input flow management
     uint64 public LastAllocationTime = 0;
     uint16 constant NB_TIMEFRAMES = 15;
@@ -156,6 +179,9 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
 
     // ------ User Submissions & Voting related structure
     mapping(uint128 => mapping(address => VoteSubmission)) public UserVoteSubmission;
+    // now the structure to store encrypted votes, BatchID => (UserAddress => list of quality_status)
+    mapping(uint128 => mapping(address => encrypted_quality_status[])) public UserEncryptedStatuses;
+    mapping(uint128 => mapping(address => quality_status[])) public UserClearStatuses;
 
     // ------ Backend Data Stores
     mapping(bytes32 => uint256) store;
@@ -163,7 +189,7 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
     mapping(uint128 => BatchMetadata) public DataBatch; // refers to QualityData indices
 
     // ------ Worker & Stake related structure
-    mapping(address => DLL.QualityData) private dllMap;
+    mapping(address => DLL2.QualityData) private dllMap;
     mapping(address => WorkerState) public WorkersState;
     mapping(address => uint256) public SystemStakedTokenBalance; // maps user's address to voteToken balance
 
@@ -235,19 +261,7 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
     // ------ Addresses & Interfaces
     IERC20 public token;
     IParametersManager public Parameters;
-
-    // ================================================================================
-    //                             Constructor
-    // ================================================================================
-
-    /**
-     * @dev Initializer. Can only be called once.
-     */
-    constructor(address EXDT_token_) {
-        require(address(EXDT_token_) != address(0));
-        token = IERC20(EXDT_token_);
-    }
-
+    
     // ================================================================================
     //                             Management & Administration
     // ================================================================================
@@ -407,7 +421,7 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
      * @param _worker worker address
      */
     function isInAvailableWorkers(address _worker) public view returns(bool) {
-        return WorkersStatus[_worker].isAvailableWorker;
+        return WorkersStatus[_worker].isActiveWorker;
     }
 
     /**
@@ -430,12 +444,12 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
      */
     function PopFromAvailableWorkers(address _worker) internal {
         WorkerStatus storage workerStatus = WorkersStatus[_worker];
-        if (workerStatus.isAvailableWorker) {
+        if (workerStatus.isActiveWorker) {
             uint32 PreviousIndex = workerStatus.availableWorkersIndex;
             address SwappedWorkerAtIndex = availableWorkers[availableWorkers.length - 1];
 
             // Update Worker State
-            workerStatus.isAvailableWorker = false;
+            workerStatus.isActiveWorker = false;
             workerStatus.availableWorkersIndex = REMOVED_WORKER_INDEX_VALUE; // reset available worker index
 
             if (availableWorkers.length >= 2) {
@@ -528,7 +542,7 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
             //----- Track Storage usage -----
 
             // Update Worker State
-            WorkersStatus[_worker].isAvailableWorker = true;
+            WorkersStatus[_worker].isActiveWorker = true;
             WorkersStatus[_worker].availableWorkersIndex = uint32(availableWorkers.length - 1);
             // we can cast safely because availableWorkers.length << 2**32
         }
@@ -843,7 +857,6 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
                     // clear store	
                     bytes32 worker_UUID = attrUUID(_worker, _deletion_index);
                     resetAttribute(worker_UUID, "numTokens");
-                    resetAttribute(worker_UUID, "commitHash");
                     resetAttribute(worker_UUID, "commitVote");
                     // clear UserVoteSubmission	
                     delete UserVoteSubmission[_ModB(_deletion_index)][_worker];
@@ -948,7 +961,7 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
     }
 
     ///////////////  ---------------------------------------------------------------------
-    ///////////////              TRIGGER NEW EPOCH: DEPEND ON QUALITYTING SYSTEM
+    ///////////////              TRIGGER NEW EPOCH: DEPEND ON QUALITY SYSTEM
     ///////////////  ---------------------------------------------------------------------
 
 
@@ -1562,7 +1575,7 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
      * @dev Allocates work to the specified set of workers and updates their state.
      * @param selected_workers_addresses An array of addresses representing the selected workers to be assigned work.
      */
-    function allocateWorkToWorkers(address[] memory selected_workers_addresses) internal {
+    function (address[] memory selected_workers_addresses) internal {
         uint128 _allocated_batch_cursor = AllocatedBatchCursor;
         // allocated workers per batch is always low (< 30). This loop can be considered O(1).
         for (uint256 i = 0; i < selected_workers_addresses.length; i++) {
@@ -1627,22 +1640,27 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
 
 
     // ================================================================================
-    //                             INPUT DATA : QUALITYTING
+    //                             INPUT DATA : QUALITY
     // ================================================================================
-
+    struct Vote {
+        uint index;
+        uint8 status;
+        uint8 extra;
+    }
 
     /**
      * @notice Commits quality-check-vote on a DataBatch
      * @param _DataBatchId DataBatch ID
-     * @param _encryptedHash encrypted hash of the submitted IPFS file (json format)
-     * @param _encryptedVote encrypted hash of the submitted IPFS vote
+     * @param _encryptedSubmissions encrypted hash of the submitted status (list of integers), 
+                alternating index/value, in ascending order
+                example: [4,2,5,1,6,1,7,1] # index, value, index, value, ...
      * @param _BatchCount Batch Count in number of items (in the aggregated IPFS hash)
      * @param _From extra information (for indexing / archival purpose)
      */
     function commitQualityCheck(
         uint128 _DataBatchId,
-        bytes32 _encryptedHash,
-        bytes32 _encryptedVote,
+        bytes32[] memory _encryptedIndices, // Array of integers for encrypted votes
+        bytes32[] memory _encryptedSubmissions, // Array of integers for encrypted votes
         uint32 _BatchCount,
         string memory _From
     ) public
@@ -1655,14 +1673,15 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
             isWorkerAllocatedToBatch(_DataBatchId, msg.sender),
             "User needs to be allocated to this batch to commit on it"
         );
+        // check _encryptedIndices and _encryptedSubmissions are of same length
+        require(_encryptedIndices.length == _encryptedSubmissions.length, "_encryptedIndices length mismatch");
         require(Parameters.getAddressManager() != address(0), "AddressManager is null in Parameters");
 
         // ---  Master/SubWorker Stake Management
         //_numTokens The number of tokens to be committed towards the target QualityData
         uint256 _numTokens = Parameters.get_QUALITY_MIN_STAKE();
-        address _selectedAddress = SelectAddressForUser(msg.sender, _numTokens);
-
         if (STAKING_REQUIREMENT_TOGGLE_ENABLED) {
+            address _selectedAddress = SelectAddressForUser(msg.sender, _numTokens);
             // if tx sender has a master, then interact with his master's stake, or himself
             if (SystemStakedTokenBalance[_selectedAddress] < _numTokens) {
                 uint256 remainder = _numTokens - SystemStakedTokenBalance[_selectedAddress];
@@ -1671,28 +1690,23 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
         }
 
         uint128 _prevDataID = 0;
-
-        // Check if _prevDataID exists in the user's DLL or if _prevDataID is 0
-        require(
-            _prevDataID == 0 || dllMap[msg.sender].contains(_prevDataID),
-            "Error:  _prevDataID exists in the user's DLL or if _prevDataID is 0"
-        );
-
         uint128 nextDataID = dllMap[msg.sender].getNext(_prevDataID);
-
         // edge case: in-place update
         if (nextDataID == _DataBatchId) {
             nextDataID = dllMap[msg.sender].getNext(_DataBatchId);
         }
-
         require(validPosition(_prevDataID, nextDataID, msg.sender, _numTokens), "not a valid position");
         // dllMap[msg.sender].insert(_prevDataID, _DataBatchId, nextDataID);
 
         bytes32 UUID = attrUUID(msg.sender, _DataBatchId);
-
         setAttribute(UUID, "numTokens", _numTokens);
-        setAttribute(UUID, "commitHash", uint256(_encryptedHash));
-        setAttribute(UUID, "commitVote", uint256(_encryptedVote));
+        // for each vote, store the encrypted vote using UserEncryptedStatuses
+        for (uint256 i = 0; i < _encryptedSubmissions.length; i++) {
+            encrypted_quality_status memory encrypted_tuple = encrypted_quality_status(_encryptedIndices[i], _encryptedSubmissions[i]);
+            UserEncryptedStatuses[_ModB(_DataBatchId)][msg.sender].push(encrypted_tuple);
+        }
+        
+        // ----------------------- USER STATE UPDATE -----------------------        
 
         UserVoteSubmission[_ModB(_DataBatchId)][msg.sender].batchCount = _BatchCount; //1 slot
         UserVoteSubmission[_ModB(_DataBatchId)][msg.sender].batchFrom = _From; //1 slot
@@ -1709,17 +1723,17 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
         emit _QualityCheckCommitted(_DataBatchId, _numTokens, msg.sender);
     }
 
+
     /**
      * @notice Reveals quality-check-vote on a DataBatch
      * @param _DataBatchId DataBatch ID
-     * @param _clearIPFSHash clear hash of the submitted IPFS file (json format)
-     * @param _clearVote clear hash of the submitted IPFS vote
+     * @param _clearSubmissions clear hash of the submitted IPFS vote
      * @param _salt arbitraty integer used to hash the previous commit & verify the reveal
      */
     function revealQualityCheck(
-        uint64 _DataBatchId,
-        string memory _clearIPFSHash,
-        uint8 _clearVote,
+        uint64 _DataBatchId,    
+        uint8[] memory _clearIndicies,
+        uint8[] memory _clearSubmissions,
         uint256 _salt
     ) public
     whenNotPaused() {
@@ -1729,26 +1743,34 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
             "User has not commited before, thus can't reveal");
         require(!UserVoteSubmission[_ModB(_DataBatchId)][msg.sender].revealed,
             "User has already revealed, thus can't reveal");
-        require(
-            getEncryptedStringHash(_clearIPFSHash, _salt) == getCommitIPFSHash(msg.sender, _DataBatchId),
-            "Not the same hash than commited, impossible to match with given _salt & _clearIPFSHash"
-        ); // compare resultant hash from inputs to original commited IPFS hash
-        require(
-            getEncryptedHash(_clearVote, _salt) == getCommitVoteHash(msg.sender, _DataBatchId),
-            "Not the same vote than commited, impossible to match with given _salt & _clearVote"
-        ); // compare resultant hash from inputs to original commited vote hash
-
-        if (_clearVote == APPROVAL_VOTE_MAPPING_) {
-            // apply numTokens to appropriate QualityData choice
-            DataBatch[_ModB(_DataBatchId)].votesFor += 1;
-        } else {
-            DataBatch[_ModB(_DataBatchId)].votesAgainst += 1;
+        // check _encryptedIndices and _encryptedSubmissions are of same length
+        require(_clearIndicies.length == _clearSubmissions.length, "_clearIndicies and _clearSubmissions length mismatch");
+        for (uint i = 0; i < _clearSubmissions.length; i++) {
+            bytes32 computedIndexHash = keccak256(abi.encodePacked(_clearIndicies[i], _salt));
+            bytes32 computedSubmissionHash = keccak256(abi.encodePacked(_clearSubmissions[i], _salt));
+            encrypted_quality_status memory encrypted_tuple = UserEncryptedStatuses[_ModB(_DataBatchId)][msg.sender][i];
+            require(computedIndexHash == encrypted_tuple.index, "encryptedStatus mismatch");
+            require(computedSubmissionHash == encrypted_tuple.status, "encryptedSubmission mismatch");
         }
+        require(
+            isWorkerAllocatedToBatch(_DataBatchId, msg.sender),
+            "User needs to be allocated to this batch to reveal on it"
+        );
+        
 
         // ----------------------- USER STATE UPDATE -----------------------
         UserVoteSubmission[_ModB(_DataBatchId)][msg.sender].revealed = true;
-        UserVoteSubmission[_ModB(_DataBatchId)][msg.sender].vote = _clearVote;
-        UserVoteSubmission[_ModB(_DataBatchId)][msg.sender].newFile = _clearIPFSHash; //2 slots
+        if (_clearSubmissions.length == 0){
+            UserVoteSubmission[_ModB(_DataBatchId)][msg.sender].vote = 0;
+        }
+        else{
+            UserVoteSubmission[_ModB(_DataBatchId)][msg.sender].vote = 1;
+        }
+        // fill the UserClearStatuses array
+        for (uint256 i = 0; i < _clearSubmissions.length; i++) {
+            quality_status memory status_ = quality_status(_clearIndicies[i], _clearSubmissions[i]);
+            UserClearStatuses[_ModB(_DataBatchId)][msg.sender].push(status_);
+        }
         BatchRevealedVoteCount[_ModB(_DataBatchId)] += 1;
 
         // ----------------------- WORKER STATE UPDATE -----------------------
@@ -1795,9 +1817,7 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
         _retrieveSFuel();
         emit _QualityCheckRevealed(
             _DataBatchId,
-            DataBatch[_ModB(_DataBatchId)].votesFor,
-            DataBatch[_ModB(_DataBatchId)].votesAgainst,
-            _clearVote,
+            _clearSubmissions,
             msg.sender
         );
     }
@@ -2445,22 +2465,16 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
 
     /**
      * @dev Gets the bytes32 commitHash property of target QualityData
-     * @param _voter Address of user to check against
-     * @param _DataBatchId Integer identifier associated with target QualityData
-     * @return commitHash Bytes32 hash property attached to target QualityData
-     */
-    function getCommitIPFSHash(address _voter, uint128 _DataBatchId) public view returns(bytes32 commitHash) {
-        return bytes32(getAttribute(attrUUID(_voter, _DataBatchId), "commitHash"));
-    }
-
-    /**
-     * @dev Gets the bytes32 commitHash property of target QualityData
      * @param _clearVote vote Option
      * @param _salt is the salt
      * @return keccak256hash Bytes32 hash property attached to target QualityData
      */
     function getEncryptedHash(uint256 _clearVote, uint256 _salt) public pure returns(bytes32 keccak256hash) {
         return keccak256(abi.encodePacked(_clearVote, _salt));
+    }
+
+    function getEncryptedListHash(uint8[] memory values, uint256 _salt) public pure returns (bytes32) {
+        return keccak256(abi.encodePacked(values, _salt));
     }
 
     /**
