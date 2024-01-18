@@ -109,7 +109,6 @@ import "./interfaces/IRewardManager.sol";
 import "./interfaces/IStakeManager.sol";
 import "./interfaces/IAddressManager.sol";
 import "./interfaces/IParametersManager.sol";
-import "./RandomAllocator.sol";
 import "./RandomSubsets.sol";
 
 
@@ -187,6 +186,8 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
     mapping(bytes32 => uint256) store;
     mapping(uint128 => QualityData) public QualityMapping; // maps DataID to QualityData struct
     mapping(uint128 => BatchMetadata) public DataBatch; // refers to QualityData indices
+    // structure to store the subsets for each batch
+    mapping(uint128 => uint128[][]) public BatchSubsets;
 
     // ------ Worker & Stake related structure
     mapping(address => DLL2.QualityData) private dllMap;
@@ -251,10 +252,15 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
     uint16 public InstantSpotRewardsDivider = 30;
     uint16 public InstantRevealRewardsDivider = 1;
     uint16 public MaxPendingDataBatchCount = 750;
+    // Data random integrity check parameters
+    uint128 public _RIC_subset_count = 2;
+    uint128 public _RIC_coverage = 5;
     uint16 public QUALITY_FILE_SIZE_MIN = 1000;
     uint256 public MAX_ONGOING_JOBS = 750;
     uint256 public NB_BATCH_TO_TRIGGER_GARBAGE_COLLECTION = 1000;
     uint256 private MIN_OFFSET_DELETION_CURSOR = 50;
+
+
 
     // ---------------------
 
@@ -1141,6 +1147,11 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
     // ================================================================================
     // ================================================================================
 
+    function updateRICParameters(uint128 new_RIC_subset_count, uint128 new_RIC_coverage) public onlyOwner{ 
+        _RIC_subset_count = new_RIC_subset_count;
+        _RIC_coverage = new_RIC_coverage;
+    }
+
     /**
      * @dev Allocates work to a set of selected workers from the available pool.
      * This function selects workers, updates the allocated batch state, and assigns work to the selected workers.
@@ -1164,6 +1175,10 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
             updateAllocatedBatchState(allocated_batch, selected_k_workers);
             // get selected worker addresses
             address[] memory selected_workers_addresses = selectWorkers(selected_k_workers);
+            // get the random subsets to be allocated to the selected workers
+            // get the batch size
+            uint128 _RIC_N = allocated_batch.counter;
+            uint128[][] memory random_subsets = getRandomSubsets(_RIC_subset_count, _RIC_N, _RIC_coverage);
             // update selected workers states
             allocateWorkToWorkers(selected_workers_addresses);
             // post checks
@@ -1575,7 +1590,7 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
      * @dev Allocates work to the specified set of workers and updates their state.
      * @param selected_workers_addresses An array of addresses representing the selected workers to be assigned work.
      */
-    function (address[] memory selected_workers_addresses) internal {
+    function allocateWorkToWorkers(address[] memory selected_workers_addresses) internal {
         uint128 _allocated_batch_cursor = AllocatedBatchCursor;
         // allocated workers per batch is always low (< 30). This loop can be considered O(1).
         for (uint256 i = 0; i < selected_workers_addresses.length; i++) {
@@ -1624,18 +1639,22 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
      * @notice Get newest work for user
      * @param user_ user
      */
-    function GetCurrentWork(address user_) public view returns(uint256) {
+    function GetCurrentWork(address user_) public view returns(uint128,uint128[][] memory) {
         WorkerState memory user_state = WorkersState[user_];
         uint128 _currentUserBatch = user_state.allocated_work_batch;
+        uint128[][] memory _currentWork = new uint128[][](2);
         if ( _currentUserBatch == 0 ){
-            return _currentUserBatch;
+            return (_currentUserBatch, _currentWork);
+        }
+        else{
+            _currentWork = BatchSubsets[_ModB(_currentUserBatch)];
         }
         // if user has failed to commit and commitPeriod is Over, then currentWork is "missed".
         if (!didCommit(user_, _currentUserBatch) && commitPeriodOver(_currentUserBatch)) {
             _currentUserBatch = 0;
         }
 
-        return _currentUserBatch;
+        return (_currentUserBatch, _currentWork);
     }
 
 
@@ -1739,6 +1758,10 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
     whenNotPaused() {
         // Make sure the reveal period is active
         require(revealPeriodActive(_DataBatchId), "Reveal period not open for this DataID");
+        require(
+            isWorkerAllocatedToBatch(_DataBatchId, msg.sender),
+            "User needs to be allocated to this batch to reveal on it"
+        );
         require(UserVoteSubmission[_ModB(_DataBatchId)][msg.sender].commited,
             "User has not commited before, thus can't reveal");
         require(!UserVoteSubmission[_ModB(_DataBatchId)][msg.sender].revealed,
@@ -1752,10 +1775,6 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
             require(computedIndexHash == encrypted_tuple.index, "encryptedStatus mismatch");
             require(computedSubmissionHash == encrypted_tuple.status, "encryptedSubmission mismatch");
         }
-        require(
-            isWorkerAllocatedToBatch(_DataBatchId, msg.sender),
-            "User needs to be allocated to this batch to reveal on it"
-        );
         
 
         // ----------------------- USER STATE UPDATE -----------------------
