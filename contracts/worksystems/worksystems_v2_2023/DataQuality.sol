@@ -1178,7 +1178,9 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
             // get the random subsets to be allocated to the selected workers
             // get the batch size
             uint128 _RIC_N = allocated_batch.counter;
-            uint128[][] memory random_subsets = getRandomSubsets(_RIC_subset_count, _RIC_N, _RIC_coverage);
+            uint128[][] memory allocated_random_subsets = getRandomSubsets(_RIC_subset_count, _RIC_N, _RIC_coverage);
+            // fill BatchSubset
+            BatchSubsets[_ModB(AllocatedBatchCursor)] = allocated_random_subsets;
             // update selected workers states
             allocateWorkToWorkers(selected_workers_addresses);
             // post checks
