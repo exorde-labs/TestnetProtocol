@@ -22,7 +22,6 @@ import "./interfaces/IAddressManager.sol";
 import "./interfaces/IParametersManager.sol";
 import "./RandomSubsets.sol";
 
-
 /**
  * @title WorkSystem Quality v1.3.4a
  * @author Mathias Dail - CTO @ Exorde Labs
@@ -89,7 +88,6 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
     mapping(uint128 => mapping(address => QualityStatus[])) public UserClearStatuses;
 
     // ------ Backend Data Stores
-    mapping(bytes32 => uint256) store;
     mapping(uint128 => QualityData) public QualityMapping; // maps DataID to QualityData struct
     mapping(uint128 => BatchMetadata) public DataBatch; // refers to QualityData indices
     // structure to store the subsets for each batch
@@ -198,7 +196,6 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
         Parameters = IParametersManager(addr);
         emit ParametersUpdated(addr);
     }
-
 
     // ================================================================================
     //                             ADMIN Updaters
@@ -981,12 +978,12 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
     // ================================================================================
     
     
-    function triggerTotalQualityCheck(uint128 _DataBatchId) internal {
+    function triggerNewnessCheck(uint128 _DataBatchId) internal {
 
         
     }
 
-    function triggerSampledQualityCheck(uint128 _DataBatchId) internal {
+    function triggerRICCheck(uint128 _DataBatchId) internal {
 
         
     }
@@ -2170,7 +2167,6 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
     function getEncryptedStringHash(string memory _hash, uint256 _salt) public pure returns(bytes32 keccak256hash) {
         return keccak256(abi.encode(_hash, _salt));
     }
-
 
     // ----------------
     // GENERAL HELPERS:
