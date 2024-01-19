@@ -22,6 +22,7 @@ import "./interfaces/IAddressManager.sol";
 import "./interfaces/IParametersManager.sol";
 import "./RandomSubsets.sol";
 
+
 /**
  * @title WorkSystem Quality v1.3.4a
  * @author Mathias Dail - CTO @ Exorde Labs
@@ -46,7 +47,6 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
     event ParametersUpdated(address parameters);
 
     event BytesFailure(bytes bytesFailure);
-
 
     // ================================================================================
     //                             Constructor
@@ -151,9 +151,7 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
     bool public STAKING_REQUIREMENT_TOGGLE_ENABLED = false;
     bool public VALIDATE_ON_LAST_REVEAL = false;
     bool public FORCE_VALIDATE_BATCH_FILE = true;
-    bool public InstantSpotRewards = true;
     bool public InstantRevealRewards = true;
-    uint16 public InstantSpotRewardsDivider = 30;
     uint16 public InstantRevealRewardsDivider = 1;
     uint16 public MaxPendingDataBatchCount = 750;
     // Data random integrity check parameters
@@ -197,19 +195,10 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
         emit ParametersUpdated(addr);
     }
 
+
     // ================================================================================
     //                             ADMIN Updaters
     // ================================================================================
-
-    /**
-     * @notice Enable or disable instant rewards when SpottingData (Testnet)
-     * @param state_ boolean
-     * @param divider_ base rewards divider
-     */
-    function updateInstantSpotRewards(bool state_, uint16 divider_) public onlyOwner {
-        InstantSpotRewards = state_;
-        InstantSpotRewardsDivider = divider_;
-    }
 
     /**
      * @notice Enable or disable instant rewards when Revealing (Testnet)
@@ -2167,6 +2156,7 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
     function getEncryptedStringHash(string memory _hash, uint256 _salt) public pure returns(bytes32 keccak256hash) {
         return keccak256(abi.encode(_hash, _salt));
     }
+
 
     // ----------------
     // GENERAL HELPERS:
