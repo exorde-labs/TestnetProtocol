@@ -6,95 +6,6 @@ pragma solidity 0.8.20;
  * @author Mathias Dail - CTO @ Exorde Labs 2022
  */
 
-// File: dll/DLL.sol
-
-library DLL2 {
-    uint128 constant NULL_NODE_ID = 0;
-
-    struct Node {
-        uint128 next;
-        uint128 prev;
-    }
-
-    struct QualityData {
-        mapping(uint128 => Node) dll;
-    }
-
-    function isEmpty(QualityData storage self) public view returns(bool) {
-        return getStart(self) == NULL_NODE_ID;
-    }
-
-    function contains(QualityData storage self, uint128 _curr) public view returns(bool) {
-        if (isEmpty(self) || _curr == NULL_NODE_ID) {
-            return false;
-        }
-
-        bool isSingleNode = (getStart(self) == _curr) && (getEnd(self) == _curr);
-        bool isNullNode = (getNext(self, _curr) == NULL_NODE_ID) && (getPrev(self, _curr) == NULL_NODE_ID);
-        return isSingleNode || !isNullNode;
-    }
-
-    function getNext(QualityData storage self, uint128 _curr) public view returns(uint128) {
-        return self.dll[_curr].next;
-    }
-
-    function getPrev(QualityData storage self, uint128 _curr) public view returns(uint128) {
-        return self.dll[_curr].prev;
-    }
-
-    function getStart(QualityData storage self) public view returns(uint128) {
-        return getNext(self, NULL_NODE_ID);
-    }
-
-    function getEnd(QualityData storage self) public view returns(uint256) {
-        return getPrev(self, NULL_NODE_ID);
-    }
-
-    /**
-  * @dev Inserts a new node between _prev and _next. When inserting a node already existing in 
-  the list it will be automatically removed from the old position.
-  * @param _prev the node which _new will be inserted after
-  * @param _curr the id of the new node being inserted
-  * @param _next the node which _new will be inserted before
-  */
-    function insert(
-        QualityData storage self,
-        uint128 _prev,
-        uint128 _curr,
-        uint128 _next
-    ) public {
-        require(_curr != NULL_NODE_ID, "error: could not insert, 1");
-
-        remove(self, _curr);
-
-        require(_prev == NULL_NODE_ID || contains(self, _prev), "error: could not insert, 2");
-        require(_next == NULL_NODE_ID || contains(self, _next), "error: could not insert, 3");
-
-        require(getNext(self, _prev) == _next, "error: could not insert, 4");
-        require(getPrev(self, _next) == _prev, "error: could not insert, 5");
-
-        self.dll[_curr].prev = _prev;
-        self.dll[_curr].next = _next;
-
-        self.dll[_prev].next = _curr;
-        self.dll[_next].prev = _curr;
-    }
-
-    function remove(QualityData storage self, uint128 _curr) public {
-        if (!contains(self, _curr)) {
-            return;
-        }
-
-        uint128 next = getNext(self, _curr);
-        uint128 prev = getPrev(self, _curr);
-
-        self.dll[next].prev = prev;
-        self.dll[prev].next = next;
-
-        delete self.dll[_curr];
-    }
-}
-
 import "@openzeppelin/contracts/utils/Context.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/utils/math/Math.sol";
@@ -125,7 +36,7 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
         uint8[] quality_statuses,
         address indexed voter
     );
-    event _BatchValidated(uint256 indexed DataID, string file_hash, bool isVotePassed);
+    event _BatchRICValidated(uint256 indexed DataID, QualityStatus[] statuses);
     event _WorkAllocated(uint256 indexed batchID, address worker);
     event _WorkerRegistered(address indexed worker, uint256 timestamp);
     event _WorkerUnregistered(address indexed worker, uint256 timestamp);
@@ -150,23 +61,18 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
         Parameters = IParametersManager(Parameters_);
         emit ParametersUpdated(Parameters_);
     }
-    // ============ LIBRARIES ============
-    // using AttributeStore for AttributeStore.QualityData;
-    using DLL2
-    for DLL2.QualityData;
-
 
     // ====================================
     //        GLOBAL STATE VARIABLES
     // ====================================
 
-    struct encrypted_quality_status {
+    struct EncryptedQualityStatus {
         bytes32 index;
         bytes32 status;
     }
 
-    struct quality_status {
-        uint index;
+    struct QualityStatus {
+        uint8 index;
         uint8 status;
     }
     
@@ -178,9 +84,9 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
 
     // ------ User Submissions & Voting related structure
     mapping(uint128 => mapping(address => VoteSubmission)) public UserVoteSubmission;
-    // now the structure to store encrypted votes, BatchID => (UserAddress => list of quality_status)
-    mapping(uint128 => mapping(address => encrypted_quality_status[])) public UserEncryptedStatuses;
-    mapping(uint128 => mapping(address => quality_status[])) public UserClearStatuses;
+    // now the structure to store encrypted votes, BatchID => (UserAddress => list of QualityStatus)
+    mapping(uint128 => mapping(address => EncryptedQualityStatus[])) public UserEncryptedStatuses;
+    mapping(uint128 => mapping(address => QualityStatus[])) public UserClearStatuses;
 
     // ------ Backend Data Stores
     mapping(bytes32 => uint256) store;
@@ -188,9 +94,9 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
     mapping(uint128 => BatchMetadata) public DataBatch; // refers to QualityData indices
     // structure to store the subsets for each batch
     mapping(uint128 => uint128[][]) public BatchSubsets;
+    mapping(uint128 => QualityStatus[]) public ConfirmedBatchStatuses;
 
     // ------ Worker & Stake related structure
-    mapping(address => DLL2.QualityData) private dllMap;
     mapping(address => WorkerState) public WorkersState;
     mapping(address => uint256) public SystemStakedTokenBalance; // maps user's address to voteToken balance
 
@@ -260,7 +166,7 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
     uint256 public NB_BATCH_TO_TRIGGER_GARBAGE_COLLECTION = 1000;
     uint256 private MIN_OFFSET_DELETION_CURSOR = 50;
 
-
+    uint256 MAJORITY_THRESHOLD_PERCENT = 50;
 
     // ---------------------
 
@@ -342,50 +248,6 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
         NB_BATCH_TO_TRIGGER_GARBAGE_COLLECTION = NewGarbageCollectTreshold_;
     }
 
-
-
-    // ================================================================================
-    //                             Library Related
-    // ================================================================================
-
-    /**
-     * @notice getAttribute from UUID and attrName
-     * @param _UUID unique identifier
-     * @param _attrName name of the attribute
-     */
-    function getAttribute(bytes32 _UUID, string memory _attrName) public view returns(uint256) {
-        bytes32 key = keccak256(abi.encodePacked(_UUID, _attrName));
-        return store[key];
-    }
-
-    /**
-     * @notice setAttribute from UUID , attrName & attrVal
-     * @param _UUID unique identifier
-     * @param _attrName name of the attribute
-     * @param _attrVal value of the attribute
-     */
-    function setAttribute(
-        bytes32 _UUID,
-        string memory _attrName,
-        uint256 _attrVal
-    ) internal {
-        bytes32 key = keccak256(abi.encodePacked(_UUID, _attrName));
-        store[key] = _attrVal;
-
-    }
-
-    /**
-     * @notice resetAttribute
-     * @param _UUID unique identifier
-     * @param _attrName name of the attribute
-     */
-    function resetAttribute(
-        bytes32 _UUID,
-        string memory _attrName
-    ) internal {
-        bytes32 key = keccak256(abi.encodePacked(_UUID, _attrName));
-        delete store[key];
-    }
 
     // ================================================================================
     //                              sFuel (eth) Auto Top Up system
@@ -860,10 +722,6 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
                 for (uint128 k = 0; k < allocated_workers.length; k++) {
                     //////////////////// FOR EACH WORKER ALLOCATED TO EACH BATCH	
                     address _worker = allocated_workers[k];
-                    // clear store	
-                    bytes32 worker_UUID = attrUUID(_worker, _deletion_index);
-                    resetAttribute(worker_UUID, "numTokens");
-                    resetAttribute(worker_UUID, "commitVote");
                     // clear UserVoteSubmission	
                     delete UserVoteSubmission[_ModB(_deletion_index)][_worker];
                 }
@@ -944,7 +802,6 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
      */
     function deleteWorkersState(address user_) public onlyOwner {
         delete WorkersState[user_];
-        delete dllMap[user_];
         delete SystemStakedTokenBalance[user_];
         //----- Track Storage usage -----
         uint256 BytesUsedReduction = BYTES_256 * (2 + 1 + 15 * 2 + 1);
@@ -1072,7 +929,7 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
             ) {
                 // check if the batch is already validated	
                 if (!DataBatch[_ModB(CurrentCursor)].checked) {
-                    ValidateDataBatch(CurrentCursor);
+                    ValidateRICBatch(CurrentCursor);
                 }
                 // increment BatchCheckingCursor if possible	
                 if (CurrentCursor == BatchCheckingCursor + 1) {
@@ -1198,7 +1055,7 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
      * @notice Validate data for the specified data batch.
      * @param _DataBatchId The ID of the data batch to be validated.
      */
-    function ValidateDataBatch(uint128 _DataBatchId) internal {
+    function ValidateRICBatch(uint128 _DataBatchId) internal {
         BatchMetadata storage batch_ = DataBatch[_ModB(_DataBatchId)];
         // 0. Check if initial conditions are met before validation process
         requireInitialConditions(_DataBatchId, batch_);
@@ -1207,38 +1064,24 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
         address[] memory allocated_workers = WorkersPerBatch[_ModB(_DataBatchId)];
 
         // 2. Gather user submissions and vote inputs for the DataBatch
-        (string[] memory proposedNewFiles, uint32[] memory proposedBatchCounts) =
-        gatherUserSubmissionsAndVoteInputs(_DataBatchId, allocated_workers);
+        QualityStatus[][] memory proposed_RIC_statuses = getWorkersSubmissions(_DataBatchId, allocated_workers);
 
         // 3. Compute the majority submission & vote for the DataBatch
-        (string memory majorityNewFile, uint32 majorityBatchCount) =
-        computeMajorityQuorum(allocated_workers, proposedNewFiles, proposedBatchCounts);
-
-        // 4. Check if the validation process has passed the required conditions
-        bool isCheckPassed = isValidationCheckPassed(_DataBatchId, majorityNewFile, majorityBatchCount);
-
-        // 5. If FORCE_VALIDATE_BATCH_FILE is set to true, handle forced validation
-        (majorityNewFile, majorityBatchCount, isCheckPassed) = handleForcedValidation(_DataBatchId, batch_,
-            allocated_workers,
-            majorityNewFile, majorityBatchCount, proposedNewFiles, proposedBatchCounts, isCheckPassed);
-
-        // 6. Update the majorityBatchCount based on the validation result
-        majorityBatchCount = updateMajorityBatchCount(batch_, majorityBatchCount, isCheckPassed);
-
-        // 7. Iterate through the allocated workers and process their votes
+        (QualityStatus[] memory confirmed_statuses, bool[] memory workers_in_majority) = computeMajorityQuorum(allocated_workers, proposed_RIC_statuses);
+        assert(workers_in_majority.length == allocated_workers.length);
+        // 7. Iterate through the minority_workers first
         for (uint256 i = 0; i < allocated_workers.length; i++) {
             address worker_addr_ = allocated_workers[i];
-            uint256 worker_vote_ = UserVoteSubmission[_ModB(_DataBatchId)][worker_addr_].vote;
             bool has_worker_voted_ = UserVoteSubmission[_ModB(_DataBatchId)][worker_addr_].revealed;
-
-            // 9. Handle worker vote, update worker state and perform necessary actions
-            handleWorkerVote(worker_addr_, majorityBatchCount, worker_vote_, has_worker_voted_, isCheckPassed);
+            bool is_in_majority_ = workers_in_majority[i];
+            // 8. Handle worker vote, update worker state and perform necessary actions
+            handleWorkerRIC(worker_addr_, has_worker_voted_, is_in_majority_);
         }
 
         // 10. Update the DataBatch state and counters based on the validation results
-        updateValidatedBatchState(batch_, majorityNewFile, majorityBatchCount, isCheckPassed);
+        updateValidatedBatchState(_DataBatchId, confirmed_statuses);
 
-        emit _BatchValidated(_DataBatchId, majorityNewFile, isCheckPassed);
+        emit _BatchRICValidated(_DataBatchId, confirmed_statuses);
     }
 
     /**
@@ -1259,81 +1102,98 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
             "_DataBatchId is already validated"); // votes need to be closed
     }
 
+  
+    
     /**
      * @notice Gather user submissions and vote inputs for the data batch validation.
      * @param _DataBatchId The ID of the data batch.
      * @param allocated_workers Array of worker addresses allocated to the data batch.
      */
-    function gatherUserSubmissionsAndVoteInputs(uint128 _DataBatchId, address[] memory allocated_workers)
-    public view returns(string[] memory, uint32[] memory) {
-        string[] memory proposedNewFiles = new string[](allocated_workers.length);
-        uint32[] memory proposedBatchCounts = new uint32[](allocated_workers.length);
+    function getWorkersSubmissions(uint128 _DataBatchId, address[] memory allocated_workers)
+    public view returns(QualityStatus[][] memory) {
+        QualityStatus[][] memory proposed_RIC_statuses = new QualityStatus[][](allocated_workers.length);
 
-        // Iterate through all allocated workers
+        // Iterate through all allocated workers for their RIC submissions
         for (uint256 i = 0; i < allocated_workers.length; i++) {
             address worker_addr_ = allocated_workers[i];
-
-            // Retrieve worker's submitted new file and batch count
-            string memory worker_proposed_new_file_ = UserVoteSubmission[_ModB(_DataBatchId)][worker_addr_].newFile;
-            uint32 worker_proposed_new_count_ = UserVoteSubmission[_ModB(_DataBatchId)][worker_addr_].batchCount;
-
-            // Store the worker's submitted new file and batch count in the respective arrays
-            proposedNewFiles[i] = worker_proposed_new_file_;
-            proposedBatchCounts[i] = worker_proposed_new_count_;
+            // Store the worker's submitted data
+            proposed_RIC_statuses[i] = UserClearStatuses[_ModB(_DataBatchId)][worker_addr_];
         }
 
-        return (proposedNewFiles, proposedBatchCounts);
+        return (proposed_RIC_statuses);
     }
+
+    
 
     /**
      * @notice Compute the majority quorum for the data batch validation.
      * @param allocated_workers Array of worker addresses allocated to the data batch.
-     * @param proposedNewFiles Array of proposed new file strings.
-     * @param proposedBatchCounts Array of proposed batch count values.
-     * @return The majority new file and the majority batch count.
+     * @return confirmed_statuses the list of confirmed statuses
+     * @return workers_in_majority the boolean list indicating which worker has voted like the majority
      */
-    function computeMajorityQuorum(address[] memory allocated_workers, string[] memory proposedNewFiles,
-        uint32[] memory proposedBatchCounts) internal view returns(string memory, uint32) {
-        uint256 majority_min_count = Math.max((allocated_workers.length * Parameters.getVoteQuorum()) / 100, 1);
-
-        // Calculate the majority new IPFS file
-        string memory majorityNewFile = "";
-        for (uint256 k = 0; k < proposedNewFiles.length; k++) {
-            uint256 counter = 0;
-            for (uint256 l = 0; l < proposedNewFiles.length; l++) {
-                if (AreStringsEqual(proposedNewFiles[k], proposedNewFiles[l])) {
-                    counter += 1;
-                    if (counter >= majority_min_count) {
-                        break;
-                    }
+    function computeMajorityQuorum(
+        address[] memory allocated_workers, 
+        QualityStatus[][] memory workers_statuses
+    ) 
+    public view returns (QualityStatus[] memory confirmed_statuses, bool[] memory workers_in_majority) 
+    {
+        // Find the maximum index
+        uint maxIndex = 0;
+        for (uint i = 0; i < workers_statuses.length; i++) {
+            for (uint j = 0; j < workers_statuses[i].length; j++) {
+                if (workers_statuses[i][j].index > maxIndex) {
+                    maxIndex = workers_statuses[i][j].index;
                 }
-            }
-            if (counter >= majority_min_count) {
-                majorityNewFile = proposedNewFiles[k];
-                break;
             }
         }
 
-        // Calculate the majority batch count
-        uint32 majorityBatchCount = 0;
-        for (uint32 k = 0; k < proposedBatchCounts.length; k++) {
-            uint256 counter = 0;
-            for (uint256 l = 0; l < proposedBatchCounts.length; l++) {
-                if (proposedBatchCounts[k] == proposedBatchCounts[l]) {
-                    counter += 1;
-                    if (counter >= majority_min_count) {
-                        break;
-                    }
+        // Initialize variables
+        uint[] memory statusCounts = new uint[](maxIndex + 1);
+        uint[] memory indexCounts = new uint[](maxIndex + 1);
+        confirmed_statuses = new QualityStatus[](maxIndex + 1);
+        workers_in_majority = new bool[](allocated_workers.length);
+
+        // Count statuses for each index
+        for (uint i = 0; i < workers_statuses.length; i++) {
+            for (uint j = 0; j < workers_statuses[i].length; j++) {
+                uint index = workers_statuses[i][j].index;
+                uint8 status = workers_statuses[i][j].status;
+                
+                // Assuming status is 0 or 1
+                if (status == 1) {
+                    statusCounts[index]++;
                 }
-            }
-            if (counter >= majority_min_count) {
-                majorityBatchCount = proposedBatchCounts[k];
-                break;
+                indexCounts[index]++;
             }
         }
 
-        return (majorityNewFile, majorityBatchCount);
+        // Determine the majority status for each index
+        for (uint8 i = 0; i <= maxIndex; i++) {
+            if (statusCounts[i] * 100 / indexCounts[i] > MAJORITY_THRESHOLD_PERCENT) {
+                confirmed_statuses[i] = QualityStatus(i, 1);
+            } else {
+                confirmed_statuses[i] = QualityStatus(i, 0);
+            }
+        }
+
+        // Determine if each worker is in the majority
+        for (uint i = 0; i < allocated_workers.length; i++) {
+            uint majorityCount = 0;
+            uint totalCount = 0;
+            for (uint j = 0; j < workers_statuses[i].length; j++) {
+                uint index = workers_statuses[i][j].index;
+                if (workers_statuses[i][j].status == confirmed_statuses[index].status) {
+                    majorityCount++;
+                }
+                totalCount++;
+            }
+            workers_in_majority[i] = (majorityCount * 100 / totalCount > MAJORITY_THRESHOLD_PERCENT);
+        }
+
+        return (confirmed_statuses, workers_in_majority);
     }
+
+
 
     /**
      * @notice Check if the validation process has passed for a given data batch.
@@ -1347,54 +1207,6 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
         return isPassed(_DataBatchId) && !AreStringsEqual(majorityNewFile, "") && majorityBatchCount != 0;
     }
 
-    /**
-     * @notice Handle forced validation for the data batch.
-     * @param _DataBatchId The ID of the data batch.
-     * @param batch_ BatchMetadata storage reference for the data batch.
-     * @param allocated_workers Array of worker addresses allocated to the data batch.
-     * @param majorityNewFile The majority new file string.
-     * @param majorityBatchCount The majority batch count.
-     * @param proposedNewFiles Array of proposed new file strings.
-     * @param proposedBatchCounts Array of proposed batch count values.
-     * @param isCheckPassed True if the previous validation check passed, otherwise false.
-     * @return (majorityNewFile_replacement, majorityBatchCount_replacement)
-     */
-    function handleForcedValidation(uint128 _DataBatchId, BatchMetadata storage batch_,
-        address[] memory allocated_workers, string memory majorityNewFile, uint32 majorityBatchCount,
-        string[] memory proposedNewFiles, uint32[] memory proposedBatchCounts, bool isCheckPassed)
-    internal view returns(string memory, uint32, bool) {
-
-
-        if (FORCE_VALIDATE_BATCH_FILE) {
-            if (batch_.votesFor > 0) {
-                // FORCE VALIDATION EVEN IF MAJORITY WAS NOT REACHED
-                // -> Maximize the data output
-                isCheckPassed = true;
-            }
-            if (AreStringsEqual(majorityNewFile, "")) {
-                //If majorityNewFile is null, find a submitted file to replace it
-                for (uint256 i = 0; i < allocated_workers.length; i++) {
-                    if (!UserVoteSubmission[_ModB(_DataBatchId)][allocated_workers[i]].revealed) {
-                        continue; // if user has not even voted, skip.
-                    }
-                    // if majorityNewFile was null, find a replacement
-                    if (!AreStringsEqual(proposedNewFiles[i], "")) {
-                        // REPLACE MAJORITY BATCH FILE
-                        majorityNewFile = proposedNewFiles[i];
-                    }
-                    //if majorityBatchCount was zero, find a replacement
-                    if (majorityBatchCount == 0 && proposedBatchCounts[i] > 0) {
-                        // REPLACE MAJORITY BATCH COUNT
-                        majorityBatchCount = proposedBatchCounts[i];
-                    }
-                    if (!AreStringsEqual(majorityNewFile, "") && majorityBatchCount > 0) {
-                        break;
-                    }
-                }
-            }
-        }
-        return (majorityNewFile, majorityBatchCount, isCheckPassed);
-    }
 
     /**
      * @notice Update the majority batch count.
@@ -1420,47 +1232,33 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
     /**
      * @notice Reward a worker for their participation in the data batch validation.
      * @param worker_addr_ The address of the worker to be rewarded.
-     * @param majorityBatchCount The majority batch count.
      */
-    function rewardWorker(address worker_addr_, uint32 majorityBatchCount) internal {
+    function rewardWorker(address worker_addr_) internal {
         IAddressManager _AddressManager = IAddressManager(Parameters.getAddressManager());
         IRepManager _RepManager = IRepManager(Parameters.getRepManager());
-        IRewardManager _RewardManager = IRewardManager(Parameters.getRewardManager());
+        // IRewardManager _RewardManager = IRewardManager(Parameters.getRewardManager());
 
         address worker_master_addr_ = _AddressManager.FetchHighestMaster(worker_addr_);
-        if (majorityBatchCount > 0) {
-            require(
-                _RepManager.mintReputationForWork(
-                    Parameters.get_QUALITY_MIN_REP_DataValidation() * majorityBatchCount,
-                    worker_master_addr_,
-                    ""
-                ),
-                "could not reward REP in Validate, 1.a"
-            );
-            require(
-                _RewardManager.ProxyAddReward(
-                    Parameters.get_QUALITY_MIN_REWARD_DataValidation() * majorityBatchCount,
-                    worker_master_addr_
-                ),
-                "could not reward token in Validate, 1.b"
-            );
-        }
+        require(
+            _RepManager.mintReputationForWork(
+                Parameters.get_QUALITY_MIN_REP_DataValidation(),
+                worker_master_addr_,
+                ""
+            ),
+            "could not reward REP in Validate, 1.a"
+        );
     }
 
     /**
      * @notice Handle worker vote during the data batch validation.
      * @param worker_addr_ The address of the worker.
-     * @param majorityBatchCount The majority batch count.
-     * @param worker_vote_ The worker's vote value.
      * @param has_worker_voted_ True if the worker has voted, otherwise false.
-     * @param isCheckPassed True if the validation check passed, otherwise false.
+     * @param isInMajority True if worker in Majority
      */
-    function handleWorkerVote(
+    function handleWorkerRIC(
         address worker_addr_,
-        uint32 majorityBatchCount,
-        uint256 worker_vote_,
         bool has_worker_voted_,
-        bool isCheckPassed
+        bool isInMajority
     ) internal {
         // Access worker state
         WorkerState storage worker_state = WorkersState[worker_addr_];
@@ -1470,12 +1268,9 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
             // Reset the no-vote counter for the worker
             worker_state.succeeding_novote_count = 0;
 
-            // Check if the worker's vote matches the majority vote
-            bool isInMajority = (isCheckPassed && worker_vote_ == 1) || (!isCheckPassed && worker_vote_ != 1);
-
             // Reward the worker if they voted with the majority
             if (isInMajority) {
-                rewardWorker(worker_addr_, majorityBatchCount);
+                rewardWorker(worker_addr_);
                 worker_state.majority_counter += 1;
             } else {
                 worker_state.minority_counter += 1;
@@ -1507,36 +1302,28 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
 
     /**
      * @notice Update the state of a validated data batch.
-     * @param batch_ BatchMetadata storage reference for the data batch.
-     * @param majorityNewFile The majority new file string.
-     * @param majorityBatchCount The majority batch count.
-     * @param isCheckPassed True if the validation check passed, otherwise false.
+     * @param DataBatchId DataBatchId
+     * @param confirmed_statuses The confirmed list of statuses
      */
-    function updateValidatedBatchState(BatchMetadata storage batch_,
-        string memory majorityNewFile, uint32 majorityBatchCount, bool isCheckPassed)
-    internal {
+    function updateValidatedBatchState(uint128 DataBatchId, QualityStatus[] memory confirmed_statuses)
+    internal 
+    {
+        BatchMetadata storage batch_ = DataBatch[_ModB(DataBatchId)];
         // Update DataBatch properties
         batch_.checked = true;
-        batch_.batchIPFSfile = majorityNewFile;
-        batch_.item_count = majorityBatchCount;
 
-        // Update DataBatch status and counters based on isCheckPassed
-        if (isCheckPassed) {
-            batch_.status = DataStatus.APPROVED;
-            AcceptedBatchsCounter += 1;
-        } else {
-            batch_.status = DataStatus.REJECTED;
-            RejectedBatchsCounter += 1;
+        // Manually copy the elements from confirmed_statuses to storage
+        uint len = confirmed_statuses.length;
+        for (uint i = 0; i < len; i++) {
+            ConfirmedBatchStatuses[_ModB(DataBatchId)][i] = confirmed_statuses[i];
         }
 
         // Update global counters
         AllTxsCounter += 1;
-        AllItemCounter += batch_.item_count;
-        ItemFlowManager[ItemFlowManager.length - 1].counter += batch_.item_count;
-        updateItemCount();
         NotCommitedCounter += batch_.uncommited_workers;
         NotRevealedCounter += batch_.unrevealed_workers;
     }
+
 
 
     /**
@@ -1710,20 +1497,9 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
             }
         }
 
-        uint128 _prevDataID = 0;
-        uint128 nextDataID = dllMap[msg.sender].getNext(_prevDataID);
-        // edge case: in-place update
-        if (nextDataID == _DataBatchId) {
-            nextDataID = dllMap[msg.sender].getNext(_DataBatchId);
-        }
-        require(validPosition(_prevDataID, nextDataID, msg.sender, _numTokens), "not a valid position");
-        // dllMap[msg.sender].insert(_prevDataID, _DataBatchId, nextDataID);
-
-        bytes32 UUID = attrUUID(msg.sender, _DataBatchId);
-        setAttribute(UUID, "numTokens", _numTokens);
         // for each vote, store the encrypted vote using UserEncryptedStatuses
         for (uint256 i = 0; i < _encryptedSubmissions.length; i++) {
-            encrypted_quality_status memory encrypted_tuple = encrypted_quality_status(_encryptedIndices[i], _encryptedSubmissions[i]);
+            EncryptedQualityStatus memory encrypted_tuple = EncryptedQualityStatus(_encryptedIndices[i], _encryptedSubmissions[i]);
             UserEncryptedStatuses[_ModB(_DataBatchId)][msg.sender].push(encrypted_tuple);
         }
         
@@ -1773,7 +1549,7 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
         for (uint i = 0; i < _clearSubmissions.length; i++) {
             bytes32 computedIndexHash = keccak256(abi.encodePacked(_clearIndicies[i], _salt));
             bytes32 computedSubmissionHash = keccak256(abi.encodePacked(_clearSubmissions[i], _salt));
-            encrypted_quality_status memory encrypted_tuple = UserEncryptedStatuses[_ModB(_DataBatchId)][msg.sender][i];
+            EncryptedQualityStatus memory encrypted_tuple = UserEncryptedStatuses[_ModB(_DataBatchId)][msg.sender][i];
             require(computedIndexHash == encrypted_tuple.index, "encryptedStatus mismatch");
             require(computedSubmissionHash == encrypted_tuple.status, "encryptedSubmission mismatch");
         }
@@ -1789,7 +1565,7 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
         }
         // fill the UserClearStatuses array
         for (uint256 i = 0; i < _clearSubmissions.length; i++) {
-            quality_status memory status_ = quality_status(_clearIndicies[i], _clearSubmissions[i]);
+            QualityStatus memory status_ = QualityStatus(_clearIndicies[i], _clearSubmissions[i]);
             UserClearStatuses[_ModB(_DataBatchId)][msg.sender].push(status_);
         }
         BatchRevealedVoteCount[_ModB(_DataBatchId)] += 1;
@@ -1831,7 +1607,7 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
 
         // Move directly to Validation if everyone revealed.
         if (VALIDATE_ON_LAST_REVEAL && DataBatch[_ModB(_DataBatchId)].unrevealed_workers == 0) {
-            ValidateDataBatch(_DataBatchId);
+            ValidateRICBatch(_DataBatchId);
         }
 
         AllTxsCounter += 1;
@@ -1871,27 +1647,6 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
     }
 
     /**
-     * @notice Withdraw _numTokens ERC20 tokens from the voting contract, revoking these voting rights
-     * @param _numTokens The number of ERC20 tokens desired in exchange for voting rights
-     */
-    function withdrawVotingRights(uint256 _numTokens) public {
-        require(IParametersManager(address(0)) != Parameters, "Parameters Manager must be set.");
-        address _selectedAddress = SelectAddressForUser(msg.sender, _numTokens);
-        require(_selectedAddress != address(0), "Error: _selectedAddress is null during withdrawVotingRights");
-        uint256 availableTokens = SystemStakedTokenBalance[_selectedAddress] - getLockedTokens(_selectedAddress);
-        require(availableTokens >= _numTokens, "availableTokens should be >= _numTokens");
-
-        IStakeManager _StakeManager = IStakeManager(Parameters.getStakeManager());
-        SystemStakedTokenBalance[_selectedAddress] -= _numTokens;
-        require(
-            _StakeManager.ProxyStakeDeallocate(_numTokens, _selectedAddress),
-            "Could not withdrawVotingRights through ProxyStakeDeallocate"
-        );
-        _retrieveSFuel();
-        emit _VotingRightsWithdrawn(_numTokens, _selectedAddress);
-    }
-
-    /**
      * @notice get BytesUsed (storage space), monitored by the contract
      *         can be approximative
      */
@@ -1920,42 +1675,6 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
         return RejectedBatchsCounter;
     }
 
-    /**
-     * @dev Unlocks tokens locked in unrevealed quality-check-vote where QualityData has ended
-     * @param _DataBatchId Integer identifier associated with the target QualityData
-     */
-    function rescueTokens(uint128 _DataBatchId) public {
-        require(
-            DataBatch[_ModB(_DataBatchId)].status == DataStatus.APPROVED,
-            "given DataBatch should be APPROVED, and it is not"
-        );
-        require(dllMap[msg.sender].contains(_DataBatchId), "dllMap: does not cointain _DataBatchId for the msg sender");
-
-        dllMap[msg.sender].remove(_DataBatchId);
-
-        //----- Track Storage usage -----
-        uint256 BytesUsedReduction = BYTES_128;
-        if (BytesUsed >= BytesUsedReduction) {
-            BytesUsed -= BytesUsedReduction;
-        } else {
-            BytesUsed = 0;
-        }
-        //----- Track Storage usage -----
-
-        _retrieveSFuel();
-        emit _TokensRescued(_DataBatchId, msg.sender);
-    }
-
-    /**
-     * @dev Unlocks tokens locked in unrevealed quality-check-votes where Datas have ended
-     * @param _DataBatchIDs Array of integer identifiers associated with the target Datas
-     */
-    function rescueTokensInMultipleDatas(uint128[] memory _DataBatchIDs) public {
-        // loop through arrays, rescuing tokens from all
-        for (uint256 i = 0; i < _DataBatchIDs.length; i++) {
-            rescueTokens(_DataBatchIDs[i]);
-        }
-    }
 
     // ================================================================================
     //                              GETTERS - DATA
@@ -2117,26 +1836,6 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
     // ----------------------------------------------------
 
     /**
-     * @dev Compares previous and next QualityData's committed tokens for sorting purposes
-     * @param _prevID Integer identifier associated with previous QualityData in sorted order
-     * @param _nextID Integer identifier associated with next QualityData in sorted order
-     * @param _voter Address of user to check DLL position for
-     * @param _numTokens The number of tokens to be committed towards the QualityData (used for sorting)
-     * @return APPROVED Boolean indication of if the specified position maintains the sort
-     */
-    function validPosition(
-        uint128 _prevID,
-        uint128 _nextID,
-        address _voter,
-        uint256 _numTokens
-    ) public view returns(bool APPROVED) {
-        bool prevValid = (_numTokens >= getNumTokens(_voter, _prevID));
-        // if next is zero node, _numTokens does not need to be greater
-        bool nextValid = (_numTokens <= getNumTokens(_voter, _nextID) || _nextID == 0);
-        return prevValid && nextValid;
-    }
-
-    /**
      * @notice Determines if proposal has passed
      * @dev Check if votesFor out of totalSpotChecks exceeds votesQuorum (requires DataEnded)
      * @param _DataBatchId Integer identifier associated with target QualityData
@@ -2146,28 +1845,6 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
         return (100 * batch_.votesFor) > (Parameters.getVoteQuorum() * (batch_.votesFor + batch_.votesAgainst));
     }
 
-    /**
-     * @param _DataBatchId Integer identifier associated with target QualityData
-     * @param _salt Arbitrarily chosen integer used to generate secretHash
-     * @return numTokens Number of tokens voted for winning option
-     */
-    function getNumPassingTokens(
-        address _voter,
-        uint128 _DataBatchId,
-        uint256 _salt
-    ) public view returns(uint256 numTokens) {
-        require(DataEnded(_DataBatchId), "_DataBatchId checking vote must have ended");
-        require(UserVoteSubmission[_ModB(_DataBatchId)][_voter].revealed,
-            "user must have revealed in this given Batch");
-
-        uint16 winningChoice = isPassed(_DataBatchId) ? 1 : 0;
-        bytes32 winnerHash = keccak256(abi.encodePacked(winningChoice, _salt));
-        bytes32 commitHash = getCommitVoteHash(_voter, _DataBatchId);
-
-        require(winnerHash == commitHash, "getNumPassingTokens: hashes must be equal");
-
-        return getNumTokens(_voter, _DataBatchId);
-    }
     
     /**
      * @notice Determines if QualityData is over
@@ -2470,20 +2147,6 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
         return WorkersState[msg.sender].registered;
     }
 
-    // ------------------------------------------------------------------------------------------------------------
-    // DOUBLE-LINKED-LIST HELPERS:
-    // ------------------------------------------------------------------------------------------------------------
-
-    /**
-     * @dev Gets the bytes32 commitHash property of target QualityData
-     * @param _voter Address of user to check against
-     * @param _DataBatchId Integer identifier associated with target QualityData
-     * @return commitHash Bytes32 hash property attached to target QualityData
-     */
-    function getCommitVoteHash(address _voter, uint128 _DataBatchId) public view returns(bytes32 commitHash) {
-        return bytes32(getAttribute(attrUUID(_voter, _DataBatchId), "commitVote"));
-    }
-
     /**
      * @dev Gets the bytes32 commitHash property of target QualityData
      * @param _clearVote vote Option
@@ -2508,73 +2171,6 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
         return keccak256(abi.encode(_hash, _salt));
     }
 
-    /**
-     * @dev Wrapper for getAttribute with attrName="numTokens"
-     * @param _voter Address of user to check against
-     * @param _DataBatchId Integer identifier associated with target QualityData
-     * @return numTokens Number of tokens committed to QualityData in sorted QualityData-linked-list
-     */
-    function getNumTokens(address _voter, uint128 _DataBatchId) public view returns(uint256 numTokens) {
-        return getAttribute(attrUUID(_voter, _DataBatchId), "numTokens");
-    }
-
-    /**
-     * @dev Gets top element of sorted QualityData-linked-list
-     * @param _voter Address of user to check against
-     * @return DataID Integer identifier to QualityData with maximum number of tokens committed to it
-     */
-    function getLastNode(address _voter) public view returns(uint128 DataID) {
-        return dllMap[_voter].getPrev(0);
-    }
-
-    /**
-     * @dev Gets the numTokens property of getLastNode
-     * @param _voter Address of user to check against
-     * @return numTokens Maximum number of tokens committed in QualityData specified
-     */
-    function getLockedTokens(address _voter) public view returns(uint256 numTokens) {
-        return getNumTokens(_voter, getLastNode(_voter));
-    }
-
-    /*
-  * @dev Takes the last node in the user's DLL and iterates backwards through the list searching
-  for a node with a value less than or equal to the provided _numTokens value. When such a node
-  is found, if the provided _DataBatchId matches the found nodeID, this operation is an in-place
-  update. In that case, return the previous node of the node being updated. Otherwise return the
-  first node that was found with a value less than or equal to the provided _numTokens.
-  * @param _voter The voter whose DLL will be searched
-  * @param _numTokens The value for the numTokens attribute in the node to be inserted
-  * @return the node which the propoded node should be inserted after
-  */
-    function getInsertPointForNumTokens(
-        address _voter,
-        uint256 _numTokens,
-        uint128 _DataBatchId
-    ) public view returns(uint256 prevNode) {
-        // Get the last node in the list and the number of tokens in that node
-        uint128 nodeID = getLastNode(_voter);
-        uint256 tokensInNode = getNumTokens(_voter, nodeID);
-
-        // Iterate backwards through the list until reaching the root node
-        while (nodeID != 0) {
-            // Get the number of tokens in the current node
-            tokensInNode = getNumTokens(_voter, nodeID);
-            if (tokensInNode <= _numTokens) {
-                // We found the insert point!
-                if (nodeID == _DataBatchId) {
-                    // This is an in-place update. Return the prev node of the node being updated
-                    nodeID = dllMap[_voter].getPrev(nodeID);
-                }
-                // Return the insert point
-                return nodeID;
-            }
-            // We did not find the insert point. Continue iterating backwards through th    e list
-            nodeID = dllMap[_voter].getPrev(nodeID);
-        }
-
-        // The list is empty, or a smaller value than anything else in the list is being inserted
-        return nodeID;
-    }
 
     // ----------------
     // GENERAL HELPERS:
