@@ -2106,9 +2106,6 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
      * @param _DataBatchId DataBatch ID
      * @param _salt arbitraty integer used to hash the previous commit & verify the reveal
      */
-        // UserClearCounts
-        // UserClearBountiesCounts
-        // UserClearDuplicatesIndices
     function revealRelevanceCheck(
         uint64 _DataBatchId,
         uint8[] memory counts_clearIndices,
@@ -2175,10 +2172,10 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
         // Handling Bounties
         for (uint256 i = 0; i < bounties_clearValues.length; i++) {
             bytes32 computedIndexHash = keccak256(
-                abi.encodePacked(counts_clearIndices[i], _salt)
+                abi.encodePacked(bounties_clearIndices[i], _salt)
             );
             bytes32 computedSubmissionHash = keccak256(
-                abi.encodePacked(counts_clearValues[i], _salt)
+                abi.encodePacked(bounties_clearValues[i], _salt)
             );
             EncryptedTuple
                 memory encrypted_tuple = UserEncryptedBountiesCounts[
@@ -2196,10 +2193,10 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
         // Handling Duplicates counts
         for (uint256 i = 0; i < duplicates_clearValues.length; i++) {
             bytes32 computedIndexHash = keccak256(
-                abi.encodePacked(counts_clearIndices[i], _salt)
+                abi.encodePacked(duplicates_clearIndices[i], _salt)
             );
             bytes32 computedSubmissionHash = keccak256(
-                abi.encodePacked(counts_clearValues[i], _salt)
+                abi.encodePacked(duplicates_clearValues[i], _salt)
             );
             EncryptedTuple
                 memory encrypted_tuple = UserEncryptedStatuses[
