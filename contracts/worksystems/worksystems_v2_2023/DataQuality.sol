@@ -35,15 +35,21 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
     );
     event _QualityCheckCommitted(
         uint256 indexed DataID,
-        uint256 numTokens,
         address indexed voter
     );
     event _QualityCheckRevealed(
         uint256 indexed DataID,
-        uint8[] quality_statuses,
         address indexed voter
     );
-    event _BatchRICValidated(uint256 indexed DataID, Tuple[] statuses);
+    event _RelevanceCheckCommitted(
+        uint256 indexed DataID,
+        address indexed voter
+    );
+    event _RelevanceCheckRevealed(
+        uint256 indexed DataID,
+        address indexed voter
+    );
+    event _BatchRICValidated(uint256 indexed DataID, DataItemVote statuses);
     event _WorkAllocated(uint256 indexed batchID, address worker);
     event _WorkerRegistered(address indexed worker, uint256 timestamp);
     event _WorkerUnregistered(address indexed worker, uint256 timestamp);
@@ -68,9 +74,14 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
     //        GLOBAL STATE VARIABLES
     // ====================================
 
-    struct EncryptedTuple {
-        bytes32 index;
-        bytes32 status;
+
+    struct DataItemVote {
+        // Dynamic arrays of uint8
+        uint8[] indices;
+        uint8[] statuses;
+        // Additional attributes - replace these with your actual attribute types and names
+        bytes32 extra;
+        bytes32 _id;
     }
 
     struct Tuple {
@@ -88,24 +99,26 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
     mapping(uint128 => mapping(address => VoteSubmission))
         public UserVoteSubmission;
     // 1. Quality structures
-    //  BatchID => (UserAddress => list of Tuple)
-    mapping(uint128 => mapping(address => EncryptedTuple[]))
-        public UserEncryptedStatuses;
-    mapping(uint128 => mapping(address => Tuple[]))
-        public UserClearStatuses;
+    mapping(uint128 => mapping(address => bytes32))
+        public QualityHashes;
+    //  BatchID => (UserAddress => lists (index, value))
+    mapping(uint128 => mapping(address => DataItemVote))
+        public QualitySubmissions;
+
     // 2. Relevance Structures
-    mapping(uint128 => mapping(address => EncryptedTuple[]))
-        public UserEncryptedCounts;
-    mapping(uint128 => mapping(address => EncryptedTuple[]))
+    mapping(uint128 => mapping(address => bytes32))
+        public UserEncryptedBaseCounts;
+    mapping(uint128 => mapping(address => bytes32))
         public UserEncryptedDuplicates;
-    mapping(uint128 => mapping(address => EncryptedTuple[]))
+    mapping(uint128 => mapping(address => bytes32))
         public UserEncryptedBountiesCounts;
         
-    mapping(uint128 => mapping(address => Tuple[]))
+    //  BatchID => (UserAddress => lists (index, value))
+    mapping(uint128 => mapping(address => DataItemVote))
         public UserClearCounts;
-    mapping(uint128 => mapping(address => Tuple[]))
+    mapping(uint128 => mapping(address => DataItemVote))
         public UserClearDuplicatesIndices;
-    mapping(uint128 => mapping(address => Tuple[]))
+    mapping(uint128 => mapping(address => DataItemVote))
         public UserClearBountiesCounts;
 
     // ------ Backend Data Stores
@@ -113,7 +126,7 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
     mapping(uint128 => BatchMetadata) public DataBatch; // refers to QualityData indices
     // structure to store the subsets for each batch
     mapping(uint128 => uint128[][]) public RandomQualitySubsets;
-    mapping(uint128 => Tuple[]) public ConfirmedBatchStatuses;
+    mapping(uint128 => DataItemVote) public ConfirmedBatchStatuses;
 
     // ------ Worker & Stake related structure
     mapping(address => WorkerState) public WorkersState;
@@ -1237,26 +1250,25 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
         ];
 
         // 2. Gather user submissions and vote inputs for the DataBatch
-        Tuple[][] memory proposed_RIC_statuses = getWorkersSubmissions(
+        DataItemVote[] memory proposed_RIC_statuses = getWorkersQualitySubmissions(
             _DataBatchId,
             allocated_workers
         );
 
         // 3. Compute the majority submission & vote for the DataBatch
         (
-            Tuple[] memory confirmed_statuses,
-            bool[] memory workers_in_majority
+            DataItemVote memory confirmed_statuses,
+            address[] memory workers_in_majority
         ) = computeMajorityQuorum(allocated_workers, proposed_RIC_statuses);
-        assert(workers_in_majority.length == allocated_workers.length);
+
         // 7. Iterate through the minority_workers first
-        for (uint256 i = 0; i < allocated_workers.length; i++) {
-            address worker_addr_ = allocated_workers[i];
-            bool has_worker_voted_ = UserVoteSubmission[_ModB(_DataBatchId)][
-                worker_addr_
+        for (uint256 i = 0; i < workers_in_majority.length; i++) {
+            address worker_addr = workers_in_majority[i];
+            bool has_worker_voted = UserVoteSubmission[_ModB(_DataBatchId)][
+                worker_addr
             ].revealed;
-            bool is_in_majority_ = workers_in_majority[i];
             // 8. Handle worker vote, update worker state and perform necessary actions
-            handleWorkerRIC(worker_addr_, has_worker_voted_, is_in_majority_);
+            handleWorkerRIC(worker_addr, has_worker_voted, true);
         }
 
         // 10. Update the DataBatch state and counters based on the validation results
@@ -1302,11 +1314,11 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
      * @param _DataBatchId The ID of the data batch.
      * @param allocated_workers Array of worker addresses allocated to the data batch.
      */
-    function getWorkersSubmissions(
+    function getWorkersQualitySubmissions(
         uint128 _DataBatchId,
         address[] memory allocated_workers
-    ) public view returns (Tuple[][] memory) {
-        Tuple[][] memory proposed_RIC_statuses = new Tuple[][](
+    ) public view returns (DataItemVote[] memory) {
+        DataItemVote[] memory proposed_RIC_statuses = new DataItemVote[](
             allocated_workers.length
         );
 
@@ -1314,7 +1326,7 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
         for (uint256 i = 0; i < allocated_workers.length; i++) {
             address worker_addr_ = allocated_workers[i];
             // Store the worker's submitted data
-            proposed_RIC_statuses[i] = UserClearStatuses[_ModB(_DataBatchId)][
+            proposed_RIC_statuses[i] = QualitySubmissions[_ModB(_DataBatchId)][
                 worker_addr_
             ];
         }
@@ -1325,78 +1337,89 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
     /**
      * @notice Compute the majority quorum for the data batch validation.
      * @param allocated_workers Array of worker addresses allocated to the data batch.
-     * @return confirmed_statuses the list of confirmed statuses
-     * @return workers_in_majority the boolean list indicating which worker has voted like the majority
+     * @param workers_statuses Array of DataItemVote representing each worker's votes.
+     * @return confirmed_statuses The list of confirmed statuses as DataItemVote.
+     * @return workers_in_majority The list of addresses indicating which worker has voted like the majority.
      */
     function computeMajorityQuorum(
         address[] memory allocated_workers,
-        Tuple[][] memory workers_statuses
+        DataItemVote[] memory workers_statuses
     )
         public
-        view
+        pure
         returns (
-            Tuple[] memory confirmed_statuses,
-            bool[] memory workers_in_majority
+            DataItemVote memory confirmed_statuses,
+            address[] memory workers_in_majority
         )
     {
-        // Find the maximum index
+        // Step 1: Find the maximum index
         uint256 maxIndex = 0;
         for (uint256 i = 0; i < workers_statuses.length; i++) {
-            for (uint256 j = 0; j < workers_statuses[i].length; j++) {
-                if (workers_statuses[i][j].index > maxIndex) {
-                    maxIndex = workers_statuses[i][j].index;
+            for (uint256 j = 0; j < workers_statuses[i].indices.length; j++) {
+                if (workers_statuses[i].indices[j] > maxIndex) {
+                    maxIndex = workers_statuses[i].indices[j];
                 }
             }
         }
 
-        // Initialize variables
+        // Step 2: Count statuses for each index
         uint256[] memory statusCounts = new uint256[](maxIndex + 1);
         uint256[] memory indexCounts = new uint256[](maxIndex + 1);
-        confirmed_statuses = new Tuple[](maxIndex + 1);
-        workers_in_majority = new bool[](allocated_workers.length);
 
-        // Count statuses for each index
         for (uint256 i = 0; i < workers_statuses.length; i++) {
-            for (uint256 j = 0; j < workers_statuses[i].length; j++) {
-                uint256 index = workers_statuses[i][j].index;
-                uint8 status = workers_statuses[i][j].status;
+            for (uint256 j = 0; j < workers_statuses[i].indices.length; j++) {
+                uint8 index = workers_statuses[i].indices[j];
+                uint8 status = workers_statuses[i].statuses[j];
 
-                // Assuming status is 0 or 1
-                if (status == 1) {
-                    statusCounts[index]++;
-                }
+                // Count the number of times a status appears for each index
+                statusCounts[index] += status;
                 indexCounts[index]++;
             }
         }
 
-        // Determine the majority status for each index
-        for (uint8 i = 0; i <= maxIndex; i++) {
-            if (
-                (statusCounts[i] * 100) / indexCounts[i] >
-                MAJORITY_THRESHOLD_PERCENT
-            ) {
-                confirmed_statuses[i] = Tuple(i, 1);
-            } else {
-                confirmed_statuses[i] = Tuple(i, 0);
+        // Step 3: Determine the majority status for each index
+        confirmed_statuses.indices = new uint8[](maxIndex + 1);
+        confirmed_statuses.statuses = new uint8[](maxIndex + 1);
+
+        for (uint256 i = 0; i <= maxIndex; i++) {
+            if (indexCounts[i] > 0) {
+                // Majority is determined by whether more than half of the statuses are 1
+                confirmed_statuses.indices[i] = uint8(i);
+                confirmed_statuses.statuses[i] = statusCounts[i] > (indexCounts[i] / 2) ? 1 : 0;
             }
         }
 
-        // Determine if each worker is in the majority
+        // Step 4: Determine which workers are in the majority
+        bool[] memory isInMajority = new bool[](allocated_workers.length);
         for (uint256 i = 0; i < allocated_workers.length; i++) {
-            uint256 majorityCount = 0;
-            uint256 totalCount = 0;
-            for (uint256 j = 0; j < workers_statuses[i].length; j++) {
-                uint256 index = workers_statuses[i][j].index;
-                if (
-                    workers_statuses[i][j].status ==
-                    confirmed_statuses[index].status
-                ) {
-                    majorityCount++;
+            isInMajority[i] = true; // Assume worker is in majority initially
+            for (uint256 j = 0; j < workers_statuses[i].indices.length; j++) {
+                uint8 index = workers_statuses[i].indices[j];
+                uint8 status = workers_statuses[i].statuses[j];
+
+                // Check if worker's status matches the majority status for each index
+                if (confirmed_statuses.statuses[index] != status) {
+                    isInMajority[i] = false;
+                    break;
                 }
-                totalCount++;
             }
-            workers_in_majority[i] = ((majorityCount * 100) / totalCount >
-                MAJORITY_THRESHOLD_PERCENT);
+        }
+
+        // Collect addresses of workers in the majority
+        uint256 count = 0;
+        for (uint256 i = 0; i < isInMajority.length; i++) {
+            if (isInMajority[i]) {
+                count++;
+            }
+        }
+
+        workers_in_majority = new address[](count);
+        count = 0;
+        for (uint256 i = 0; i < isInMajority.length; i++) {
+            if (isInMajority[i]) {
+                workers_in_majority[count] = allocated_workers[i];
+                count++;
+            }
         }
 
         return (confirmed_statuses, workers_in_majority);
@@ -1530,19 +1553,13 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
      */
     function updateValidatedBatchState(
         uint128 DataBatchId,
-        Tuple[] memory confirmed_statuses
+        DataItemVote memory confirmed_statuses
     ) internal {
         BatchMetadata storage batch_ = DataBatch[_ModB(DataBatchId)];
         // Update DataBatch properties
         batch_.checked = true;
 
-        // Manually copy the elements from confirmed_statuses to storage
-        uint256 len = confirmed_statuses.length;
-        for (uint256 i = 0; i < len; i++) {
-            ConfirmedBatchStatuses[_ModB(DataBatchId)][i] = confirmed_statuses[
-                i
-            ];
-        }
+        ConfirmedBatchStatuses[_ModB(DataBatchId)] = confirmed_statuses;
 
         // Update global counters
         AllTxsCounter += 1;
@@ -1757,15 +1774,12 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
     /**
      * @notice Commits quality-check-vote on a DataBatch
      * @param _DataBatchId DataBatch ID
-     * @param _encryptedSubmissions encrypted hash of the submitted status (list of integers), 
-                alternating index/value, in ascending order
-                example: [4,2,5,1,6,1,7,1] # index, value, index, value, ...
+     * @param quality_signature_hash encrypted hash of the submitted indices and values
      * @param _From extra information (for indexing / archival purpose)
      */
     function commitQualityCheck(
         uint128 _DataBatchId,
-        bytes32[] memory _encryptedIndices, 
-        bytes32[] memory _encryptedSubmissions, 
+        bytes32 quality_signature_hash, 
         string memory _From
     ) public whenNotPaused {
         require(
@@ -1784,11 +1798,6 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
             isWorkerAllocatedToBatch(_DataBatchId, msg.sender),
             "User needs to be allocated to this batch to commit on it"
         );
-        // check _encryptedIndices and _encryptedSubmissions are of same length
-        require(
-            _encryptedIndices.length == _encryptedSubmissions.length,
-            "_encryptedIndices length mismatch"
-        );
         require(
             Parameters.getAddressManager() != address(0),
             "AddressManager is null in Parameters"
@@ -1796,8 +1805,8 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
 
         // ---  Master/SubWorker Stake Management
         //_numTokens The number of tokens to be committed towards the target QualityData
-        uint256 _numTokens = Parameters.get_QUALITY_MIN_STAKE();
         if (STAKING_REQUIREMENT_TOGGLE_ENABLED) {
+            uint256 _numTokens = Parameters.get_QUALITY_MIN_STAKE();
             address _selectedAddress = SelectAddressForUser(
                 msg.sender,
                 _numTokens
@@ -1810,20 +1819,8 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
             }
         }
 
-        // for each vote, store the encrypted vote using UserEncryptedStatuses
-        for (uint256 i = 0; i < _encryptedSubmissions.length; i++) {
-            EncryptedTuple
-                memory encrypted_tuple = EncryptedTuple(
-                    _encryptedIndices[i],
-                    _encryptedSubmissions[i]
-                );
-            UserEncryptedStatuses[_ModB(_DataBatchId)][msg.sender].push(
-                encrypted_tuple
-            );
-        }
-
-        // ----------------------- USER STATE UPDATE -----------------------
-
+        // ----------------------- USER STATE UPDATE -----------------------        
+        QualityHashes[_ModB(_DataBatchId)][msg.sender] = quality_signature_hash;
         UserVoteSubmission[_ModB(_DataBatchId)][msg.sender].batchFrom = _From; //1 slot
         BatchCommitedVoteCount[_ModB(_DataBatchId)] += 1;
 
@@ -1837,20 +1834,20 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
 
         AllTxsCounter += 1;
         _retrieveSFuel();
-        emit _QualityCheckCommitted(_DataBatchId, _numTokens, msg.sender);
+        emit _QualityCheckCommitted(_DataBatchId, msg.sender);
     }
 
     /**
      * @notice Reveals quality-check-vote on a DataBatch
      * @param _DataBatchId DataBatch ID
-     * @param _clearSubmissions clear hash of the submitted IPFS vote
-     * @param _salt arbitraty integer used to hash the previous commit & verify the reveal
+     * @param clearSubmissions_ clear hash of the submitted IPFS vote
+     * @param salt_ arbitraty integer used to hash the previous commit & verify the reveal
      */
     function revealQualityCheck(
         uint64 _DataBatchId,
-        uint8[] memory _clearIndices,
-        uint8[] memory _clearSubmissions,
-        uint256 _salt
+        uint8[] memory clearIndices_,
+        uint8[] memory clearSubmissions_,
+        uint128 salt_
     ) public whenNotPaused {
         // Make sure the reveal period is active
         require(
@@ -1871,44 +1868,26 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
         );
         // check _encryptedIndices and _encryptedSubmissions are of same length
         require(
-            _clearIndices.length == _clearSubmissions.length,
-            "_clearIndices and _clearSubmissions length mismatch"
+            clearIndices_.length == clearSubmissions_.length,
+            "clearIndices_ and clearSubmissions_ length mismatch"
         );
-        for (uint256 i = 0; i < _clearSubmissions.length; i++) {
-            bytes32 computedIndexHash = keccak256(
-                abi.encodePacked(_clearIndices[i], _salt)
-            );
-            bytes32 computedSubmissionHash = keccak256(
-                abi.encodePacked(_clearSubmissions[i], _salt)
-            );
-            EncryptedTuple
-                memory encrypted_tuple = UserEncryptedStatuses[
-                    _ModB(_DataBatchId)
-                ][msg.sender][i];
-            require(
-                computedIndexHash == encrypted_tuple.index,
-                "encryptedStatus mismatch"
-            );
-            require(
-                computedSubmissionHash == encrypted_tuple.status,
-                "encryptedSubmission mismatch"
-            );
-        }
+        // check if hash(clearIndices_, clearSubmissions_, salt_) == QualityHashes(commited_values)
+        require(
+            hashTwoUint8Arrays(clearIndices_, clearSubmissions_, salt_) ==
+                QualityHashes[_ModB(_DataBatchId)][msg.sender],
+            "hash(clearIndices_, clearSubmissions_, salt_) != QualityHashes(commited_values)"
+        );
 
-        // ----------------------- USER STATE UPDATE -----------------------
+        // ----------------------- STORE SUBMITTED DATA --------------------
+        QualitySubmissions[_ModB(_DataBatchId)][msg.sender].indices = clearIndices_;
+        QualitySubmissions[_ModB(_DataBatchId)][msg.sender].statuses = clearSubmissions_;
+
+        // ----------------------- USER/STATS STATE UPDATE -----------------------
         UserVoteSubmission[_ModB(_DataBatchId)][msg.sender].revealed = true;
-        if (_clearSubmissions.length == 0) {
+        if (clearSubmissions_.length == 0) {
             UserVoteSubmission[_ModB(_DataBatchId)][msg.sender].vote = 0;
         } else {
             UserVoteSubmission[_ModB(_DataBatchId)][msg.sender].vote = 1;
-        }
-        // fill the UserClearStatuses array
-        for (uint256 i = 0; i < _clearSubmissions.length; i++) {
-            Tuple memory status_ = Tuple(
-                _clearIndices[i],
-                _clearSubmissions[i]
-            );
-            UserClearStatuses[_ModB(_DataBatchId)][msg.sender].push(status_);
         }
         BatchRevealedVoteCount[_ModB(_DataBatchId)] += 1;
 
@@ -1974,7 +1953,7 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
 
         AllTxsCounter += 1;
         _retrieveSFuel();
-        emit _QualityCheckRevealed(_DataBatchId, _clearSubmissions, msg.sender);
+        emit _QualityCheckRevealed(_DataBatchId, msg.sender);
     }
 
     /////////////////////////////////////////////////////////////////////////////////////
@@ -1984,20 +1963,17 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
     /**
      * @notice Commits Relevance-check-vote on a DataBatch
      * @param _DataBatchId DataBatch ID
-     * @param counts_encryptedIndices counts_encryptedValues encrypted hash of the submitted status (list of integers), 
-                alternating index/value, in ascending order
-                example: [4,2,5,1,6,1,7,1] # index, value, index, value, ...
+     * @param counts_signature_hash encrypted hash of the list of indices, values (and salt)
+     * @param bounties_signature_hash encrypted hash of the list of indices, values (and salt)
+     * @param duplicates_signature_hash encrypted hash of the list of indices, values (and salt)
      * @param _BatchCount Batch Count in number of items (in the aggregated IPFS hash)
      * @param _From extra information (for indexing / archival purpose)
      */
     function commitRelevanceCheck(
         uint128 _DataBatchId,
-        bytes32[] memory counts_encryptedIndices, 
-        bytes32[] memory counts_encryptedValues, 
-        bytes32[] memory bounties_encryptedIndices,
-        bytes32[] memory bounties_encryptedValues, 
-        bytes32[] memory duplicates_encryptedIndices, 
-        bytes32[] memory duplicates_encryptedValues, 
+        bytes32 counts_signature_hash,
+        bytes32 bounties_signature_hash,
+        bytes32 duplicates_signature_hash, 
         uint32 _BatchCount,
         string memory _From
     ) public whenNotPaused {
@@ -2017,25 +1993,6 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
             isWorkerAllocatedToBatch(_DataBatchId, msg.sender),
             "User needs to be allocated to this batch to commit on it"
         );
-        // check counts_encryptedIndices and counts_encryptedValues are of same length
-        require(
-            counts_encryptedIndices.length == counts_encryptedValues.length,
-            "counts_encryptedIndices length mismatch"
-        );
-        // check bounties_encryptedIndices and bounties_encryptedValues are of same length
-        require(
-            bounties_encryptedIndices.length == bounties_encryptedValues.length,
-            "bounties_encryptedIndices length mismatch"
-        );
-        // check duplicates_encryptedIndices and duplicates_encryptedValues are of same length
-        require(
-            duplicates_encryptedIndices.length == duplicates_encryptedValues.length,
-            "duplicates_encryptedIndices length mismatch"
-        );
-        require(
-            Parameters.getAddressManager() != address(0),
-            "AddressManager is null in Parameters"
-        );
 
         // ---  Master/SubWorker Stake Management
         //_numTokens The number of tokens to be committed towards the target QualityData
@@ -2052,36 +2009,12 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
                 requestAllocatedStake(remainder, _selectedAddress);
             }
         }
-        for (uint256 i = 0; i < counts_encryptedValues.length; i++) {
-            EncryptedTuple
-                memory encrypted_tuple = EncryptedTuple(
-                    counts_encryptedIndices[i],
-                    counts_encryptedValues[i]
-                );
-            UserEncryptedCounts[_ModB(_DataBatchId)][msg.sender].push(
-                encrypted_tuple
-            );
-        }
-        for (uint256 i = 0; i < bounties_encryptedValues.length; i++) {
-            EncryptedTuple
-                memory encrypted_tuple = EncryptedTuple(
-                    bounties_encryptedIndices[i],
-                    bounties_encryptedValues[i]
-                );
-            UserEncryptedBountiesCounts[_ModB(_DataBatchId)][msg.sender].push(
-                encrypted_tuple
-            );
-        }
-        for (uint256 i = 0; i < duplicates_encryptedValues.length; i++) {
-            EncryptedTuple
-                memory encrypted_tuple = EncryptedTuple(
-                    duplicates_encryptedIndices[i],
-                    duplicates_encryptedValues[i]
-                );
-            UserEncryptedDuplicates[_ModB(_DataBatchId)][msg.sender].push(
-                encrypted_tuple
-            );
-        }
+        // ----------------------- STORE HASHES  -----------------------
+        // Store encrypted hash for the 3 arrays
+        UserEncryptedBaseCounts[_ModB(_DataBatchId)][msg.sender] = counts_signature_hash;
+        UserEncryptedBountiesCounts[_ModB(_DataBatchId)][msg.sender] = bounties_signature_hash;
+        UserEncryptedDuplicates[_ModB(_DataBatchId)][msg.sender] = duplicates_signature_hash;
+        
         // ----------------------- USER STATE UPDATE -----------------------
         UserVoteSubmission[_ModB(_DataBatchId)][msg.sender]
             .batchCount = _BatchCount; //1 slot
@@ -2098,23 +2031,29 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
 
         AllTxsCounter += 1;
         _retrieveSFuel();
-        emit _QualityCheckCommitted(_DataBatchId, _numTokens, msg.sender);
+        emit _RelevanceCheckCommitted(_DataBatchId, msg.sender);
     }
 
     /**
      * @notice Reveals quality-check-vote on a DataBatch
      * @param _DataBatchId DataBatch ID
-     * @param _salt arbitraty integer used to hash the previous commit & verify the reveal
+     * @param base_counts_indices_ list of uint8 representing base count indices
+     * @param base_counts_values_ list of uint8 representing base count values
+     * @param bounties_counts_indices_ list of uint8 representing bounties count indices
+     * @param bounties_counts_values_ list of uint8 representing bounties count values
+     * @param duplicates_counts_indices_ list of uint8 representing duplicate count indices
+     * @param duplicates_counts_values_ list of uint8 representing base count values
+     * @param salt_ arbitraty integer used to hash the previous commit & verify the reveal
      */
     function revealRelevanceCheck(
         uint64 _DataBatchId,
-        uint8[] memory counts_clearIndices,
-        uint8[] memory counts_clearValues,
-        uint8[] memory bounties_clearIndices,
-        uint8[] memory bounties_clearValues,
-        uint8[] memory duplicates_clearIndices,
-        uint8[] memory duplicates_clearValues,
-        uint256 _salt
+        uint8[] memory base_counts_indices_,
+        uint8[] memory base_counts_values_,
+        uint8[] memory bounties_counts_indices_,
+        uint8[] memory bounties_counts_values_,
+        uint8[] memory duplicates_counts_indices_,
+        uint8[] memory duplicates_counts_values_,
+        uint128 salt_
     ) public whenNotPaused {
         // Make sure the reveal period is active
         require(
@@ -2133,100 +2072,46 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
             !UserVoteSubmission[_ModB(_DataBatchId)][msg.sender].revealed,
             "User has already revealed, thus can't reveal"
         );
-        // check counts_clearIndices and counts_clearValues are of same length
+        // check countsclearIndices_ and counts_clearValues are of same length
         require(
-            counts_clearIndices.length == counts_clearValues.length,
-            "counts_clearIndices length mismatch"
+            base_counts_indices_.length == base_counts_values_.length,
+            "countsclearIndices_ length mismatch"
         );
-        // check bounties_clearIndices and bounties_clearValues are of same length
+        // check bountiesclearIndices_ and bounties_clearValues are of same length
         require(
-            bounties_clearIndices.length == bounties_clearValues.length,
-            "bounties_clearIndices length mismatch"
+            bounties_counts_indices_.length == bounties_counts_values_.length,
+            "bountiesclearIndices_ length mismatch"
         );
-        // check duplicates_clearIndices and duplicates_clearValues are of same length
+        // check duplicatesclearIndices_ and duplicates_clearValues are of same length
         require(
-            duplicates_clearIndices.length == duplicates_clearValues.length,
-            "duplicates_clearIndices length mismatch"
+            duplicates_counts_indices_.length == duplicates_counts_values_.length,
+            "duplicatesclearIndices_ length mismatch"
         );
         // Handling Counts
-        for (uint256 i = 0; i < counts_clearValues.length; i++) {
-            bytes32 computedIndexHash = keccak256(
-                abi.encodePacked(counts_clearIndices[i], _salt)
-            );
-            bytes32 computedSubmissionHash = keccak256(
-                abi.encodePacked(counts_clearValues[i], _salt)
-            );
-            EncryptedTuple
-                memory encrypted_tuple = UserEncryptedCounts[
-                    _ModB(_DataBatchId)
-                ][msg.sender][i];
-            require(
-                computedIndexHash == encrypted_tuple.index,
-                "encryptedStatus mismatch"
-            );
-            require(
-                computedSubmissionHash == encrypted_tuple.status,
-                "encryptedSubmission mismatch"
-            );
-        }
+        require(
+            hashTwoUint8Arrays(base_counts_indices_, base_counts_values_, salt_) ==
+                UserEncryptedBaseCounts[_ModB(_DataBatchId)][msg.sender],
+            "Base arrays don't match the previously commited hash"
+        );
         // Handling Bounties
-        for (uint256 i = 0; i < bounties_clearValues.length; i++) {
-            bytes32 computedIndexHash = keccak256(
-                abi.encodePacked(bounties_clearIndices[i], _salt)
-            );
-            bytes32 computedSubmissionHash = keccak256(
-                abi.encodePacked(bounties_clearValues[i], _salt)
-            );
-            EncryptedTuple
-                memory encrypted_tuple = UserEncryptedBountiesCounts[
-                    _ModB(_DataBatchId)
-                ][msg.sender][i];
-            require(
-                computedIndexHash == encrypted_tuple.index,
-                "encryptedStatus mismatch"
-            );
-            require(
-                computedSubmissionHash == encrypted_tuple.status,
-                "encryptedSubmission mismatch"
-            );
-        }
+        require(
+            hashTwoUint8Arrays(base_counts_indices_, bounties_counts_values_, salt_) ==
+                UserEncryptedBountiesCounts[_ModB(_DataBatchId)][msg.sender],
+            "Bounties arrays don't match the previously commited hash"
+        );
         // Handling Duplicates counts
-        for (uint256 i = 0; i < duplicates_clearValues.length; i++) {
-            bytes32 computedIndexHash = keccak256(
-                abi.encodePacked(duplicates_clearIndices[i], _salt)
-            );
-            bytes32 computedSubmissionHash = keccak256(
-                abi.encodePacked(duplicates_clearValues[i], _salt)
-            );
-            EncryptedTuple
-                memory encrypted_tuple = UserEncryptedStatuses[
-                    _ModB(_DataBatchId)
-                ][msg.sender][i];
-            require(
-                computedIndexHash == encrypted_tuple.index,
-                "encryptedStatus mismatch"
-            );
-            require(
-                computedSubmissionHash == encrypted_tuple.status,
-                "encryptedSubmission mismatch"
-            );
-        }
+        require(
+            hashTwoUint8Arrays(duplicates_counts_indices_, duplicates_counts_values_, salt_) ==
+                UserEncryptedDuplicates[_ModB(_DataBatchId)][msg.sender],
+            "Duplicate arrays don't match the previously commited hash"
+        );
+
+        // ----------------------- STORE THE SUBMITTED VALUES  -----------------------
+        // Store encrypted hash for the 3 arrays
 
         // ----------------------- USER STATE UPDATE -----------------------
         UserVoteSubmission[_ModB(_DataBatchId)][msg.sender].revealed = true;
-        if (counts_clearValues.length == 0) {
-            UserVoteSubmission[_ModB(_DataBatchId)][msg.sender].vote = 0;
-        } else {
-            UserVoteSubmission[_ModB(_DataBatchId)][msg.sender].vote = 1;
-        }
-        // fill the UserClearStatuses array
-        for (uint256 i = 0; i < counts_clearValues.length; i++) {
-            Tuple memory status_ = Tuple(
-                counts_clearIndices[i],
-                counts_clearValues[i]
-            );
-            UserClearStatuses[_ModB(_DataBatchId)][msg.sender].push(status_);
-        }
+        UserVoteSubmission[_ModB(_DataBatchId)][msg.sender].vote = 1;
         BatchRevealedVoteCount[_ModB(_DataBatchId)] += 1;
 
         // ----------------------- WORKER STATE UPDATE -----------------------
@@ -2291,7 +2176,7 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
 
         AllTxsCounter += 1;
         _retrieveSFuel();
-        emit _QualityCheckRevealed(_DataBatchId, counts_clearValues, msg.sender);
+        emit _RelevanceCheckRevealed(_DataBatchId, msg.sender);
     }
 
     // ================================================================================
@@ -2885,37 +2770,37 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
     /**
      * @dev Gets the bytes32 commitHash property of target QualityData
      * @param _clearVote vote Option
-     * @param _salt is the salt
+     * @param salt_ is the salt
      * @return keccak256hash Bytes32 hash property attached to target QualityData
      */
-    function getEncryptedHash(uint256 _clearVote, uint256 _salt)
+    function getEncryptedHash(uint256 _clearVote, uint256 salt_)
         public
         pure
         returns (bytes32 keccak256hash)
     {
-        return keccak256(abi.encodePacked(_clearVote, _salt));
+        return keccak256(abi.encodePacked(_clearVote, salt_));
     }
 
-    function getEncryptedListHash(uint8[] memory values, uint256 _salt)
+    function getEncryptedListHash(uint8[] memory values, uint256 salt_)
         public
         pure
         returns (bytes32)
     {
-        return keccak256(abi.encodePacked(values, _salt));
+        return keccak256(abi.encodePacked(values, salt_));
     }
 
     /**
      * @dev Gets the bytes32 commitHash property of target QualityData
      * @param _hash ipfs hash of aggregated data in a string
-     * @param _salt is the salt
+     * @param salt_ is the salt
      * @return keccak256hash Bytes32 hash property attached to target QualityData
      */
-    function getEncryptedStringHash(string memory _hash, uint256 _salt)
+    function getEncryptedStringHash(string memory _hash, uint256 salt_)
         public
         pure
         returns (bytes32 keccak256hash)
     {
-        return keccak256(abi.encode(_hash, _salt));
+        return keccak256(abi.encode(_hash, salt_));
     }
 
     // ----------------
@@ -2934,4 +2819,80 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
     {
         return (block.timestamp > _terminationDate);
     }
+
+        /**
+     * @dev Hashes an array of bytes32 values with a salt.
+     * @param data The bytes32 array to be hashed.
+     * @param salt The uint128 salt to be used in the hash.
+     * @return The keccak256 hash of the encoded bytes32 array and the salt.
+     *
+     * This function takes an array of bytes32 values and a uint128 salt,
+     * encodes them using Solidity's abi.encodePacked function, and then
+     * computes the keccak256 hash. The inclusion of a salt ensures that
+     * the hash output is unique even for identical input arrays.
+     */
+    function hashBytes32Array(bytes32[] memory data, uint128 salt) public pure returns (bytes32) {
+        return keccak256(abi.encodePacked(data, salt));
+    }
+
+    /**
+     * @dev Hashes an array of uint8 values with a salt.
+     * @param data The uint8 array to be hashed.
+     * @param salt The uint128 salt to be used in the hash.
+     * @return The keccak256 hash of the encoded uint8 array and the salt.
+     *
+     * Similar to hashBytes32Array, this function takes an array of uint8 values
+     * and a uint128 salt, encodes them using abi.encodePacked, and computes
+     * the keccak256 hash. The use of a salt enhances the security of the hash.
+     */
+    function hashUint8Array(uint8[] memory data, uint128 salt) public pure returns (bytes32) {
+        return keccak256(abi.encodePacked(data, salt));
+    }
+
+    /**
+     * @dev Hashes an array of uint128 values with a salt.
+     * @param data The uint128 array to be hashed.
+     * @param salt The uint128 salt to be used in the hash.
+     * @return The keccak256 hash of the encoded uint128 array and the salt.
+     *
+     * This function takes an array of uint128 values and a uint128 salt,
+     * encodes them using abi.encodePacked, and computes the keccak256 hash.
+     * The salt adds an extra layer of security, ensuring unique hash outputs.
+     */
+    function hashUint128Array(uint128[] memory data, uint128 salt) public pure returns (bytes32) {
+        return keccak256(abi.encodePacked(data, salt));
+    }
+
+    /**
+    * @dev Hashes two arrays of uint8 values with a salt.
+    * @param data1 The first uint8 array to be hashed.
+    * @param data2 The second uint8 array to be hashed.
+    * @param salt The uint128 salt to be used in the hash.
+    * @return The keccak256 hash of the encoded uint8 arrays and the salt.
+    *
+    * This function takes two arrays of uint8 values and a uint128 salt,
+    * encodes them using abi.encodePacked, and computes the keccak256 hash.
+    * The salt adds an extra layer of security, ensuring unique hash outputs
+    * even for identical array inputs.
+    */
+    function hashTwoUint8Arrays(uint8[] memory data1, uint8[] memory data2, uint128 salt) public pure returns (bytes32) {
+        return keccak256(abi.encodePacked(data1, data2, salt));
+    }
+
+    /**
+    * @dev Hashes two arrays of uint128 values with a salt.
+    * @param data1 The first uint128 array to be hashed.
+    * @param data2 The second uint128 array to be hashed.
+    * @param salt The uint128 salt to be used in the hash.
+    * @return The keccak256 hash of the encoded uint128 arrays and the salt.
+    *
+    * This function takes two arrays of uint128 values and a uint128 salt,
+    * encodes them using abi.encodePacked, and computes the keccak256 hash.
+    * The inclusion of a salt ensures that the hash output is unique even
+    * for identical array inputs.
+    */
+    function hashTwoUint128Arrays(uint128[] memory data1, uint128[] memory data2, uint128 salt) public pure returns (bytes32) {
+        return keccak256(abi.encodePacked(data1, data2, salt));
+    }
+
 }
