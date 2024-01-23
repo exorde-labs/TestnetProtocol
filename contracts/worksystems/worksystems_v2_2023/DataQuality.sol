@@ -123,7 +123,7 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
 
     // ------ Backend Data Stores
     mapping(uint128 => QualityData) public QualityMapping; // maps DataID to QualityData struct
-    mapping(uint128 => BatchMetadata) public DataBatch; // refers to QualityData indices
+    mapping(uint128 => BatchMetadata) public DataBatch; 
     // structure to store the subsets for each batch
     mapping(uint128 => uint128[][]) public RandomQualitySubsets;
     mapping(uint128 => DataItemVote) public ConfirmedBatchStatuses;
@@ -141,6 +141,9 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
     uint16 constant MIN_REGISTRATION_DURATION = 120; // in seconds
 
     uint32 private REMOVED_WORKER_INDEX_VALUE = 2**32 - 1;
+
+    uint8 constant NB_UNIQUE_QUALITY_STATUSES = 4;
+
 
     address[] public availableWorkers;
     address[] public busyWorkers;
@@ -1057,7 +1060,8 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
                         MAX_ONGOING_JOBS)
                     // number of allocated/processed batchs must not exceed this number
                 ) {
-                    AllocateWork();
+                    AllocateQualityWork();
+                    AllocateRelevanceWork();
                     progress = true;
                 }
                 if (!progress) {
@@ -1182,10 +1186,10 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
     }
 
     /**
-     * @dev Allocates work to a set of selected workers from the available pool.
+     * @dev Allocates Quality Work to a set of selected workers from the available pool.
      * This function selects workers, updates the allocated batch state, and assigns work to the selected workers.
      */
-    function AllocateWork() internal {
+    function AllocateQualityWork() internal {
         BatchMetadata storage allocated_batch = DataBatch[
             _ModB(AllocatedBatchCursor)
         ];
@@ -1231,6 +1235,58 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
             AllTxsCounter += 1;
         }
     }
+
+    /**
+     * @dev Allocates Relevance Work to a set of selected workers from the available pool.
+     * This function selects workers, updates the allocated batch state, and assigns work to the selected workers.
+     */
+    function AllocateRelevanceWork() internal {
+        BatchMetadata storage allocated_batch = DataBatch[
+            _ModB(AllocatedBatchCursor)
+        ];
+        require(
+            DataBatch[_ModB(AllocatedBatchCursor)].complete,
+            "Can't allocate work, the current batch is not complete"
+        );
+        require(
+            !DataBatch[_ModB(AllocatedBatchCursor)].allocated_to_work,
+            "Can't allocate work, the current batch is already allocated"
+        );
+
+        if (
+            (uint64(block.timestamp) - LastAllocationTime) >=
+            Parameters.get_QUALITY_INTER_ALLOCATION_DURATION()
+        ) {
+            // select workers
+            uint16 selected_k_workers = getSelectedWorkersCount();
+            // update newly allocated batch state
+            updateAllocatedBatchState(allocated_batch, selected_k_workers);
+            // get selected worker addresses
+            address[] memory selected_workers_addresses = selectWorkers(
+                selected_k_workers
+            );
+            // get the random subsets to be allocated to the selected workers
+            // get the batch size
+            uint128 _RIC_N = allocated_batch.counter;
+            uint128[][] memory allocated_random_subsets = getRandomSubsets(
+                _RIC_subset_count,
+                _RIC_N,
+                _RIC_coverage
+            );
+            // fill BatchSubset
+            RandomQualitySubsets[
+                _ModB(AllocatedBatchCursor)
+            ] = allocated_random_subsets;
+            // update selected workers states
+            allocateWorkToWorkers(selected_workers_addresses);
+            // post checks
+            LastAllocationTime = uint64(block.timestamp);
+            AllocatedBatchCursor += 1;
+            LastRandomSeed = getRandom();
+            AllTxsCounter += 1;
+        }
+    }
+
 
     // ================================================================================
     //                             Validate Data Batch
@@ -1346,13 +1402,13 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
         DataItemVote[] memory workers_statuses
     )
         public
-        pure
+        view
         returns (
             DataItemVote memory confirmed_statuses,
             address[] memory workers_in_majority
         )
     {
-        // Step 1: Find the maximum index
+        // Find the maximum index
         uint256 maxIndex = 0;
         for (uint256 i = 0; i < workers_statuses.length; i++) {
             for (uint256 j = 0; j < workers_statuses[i].indices.length; j++) {
@@ -1362,43 +1418,47 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
             }
         }
 
-        // Step 2: Count statuses for each index
-        uint256[] memory statusCounts = new uint256[](maxIndex + 1);
+        // Initialize variables
+        uint256[][] memory statusCounts = new uint256[][](maxIndex + 1);
+        for (uint256 i = 0; i <= maxIndex; i++) {
+            statusCounts[i] = new uint256[](NB_UNIQUE_QUALITY_STATUSES);
+        }
         uint256[] memory indexCounts = new uint256[](maxIndex + 1);
+        bool[] memory isInMajority = new bool[](allocated_workers.length);
 
+        // Count statuses for each index
         for (uint256 i = 0; i < workers_statuses.length; i++) {
             for (uint256 j = 0; j < workers_statuses[i].indices.length; j++) {
                 uint8 index = workers_statuses[i].indices[j];
                 uint8 status = workers_statuses[i].statuses[j];
-
-                // Count the number of times a status appears for each index
-                statusCounts[index] += status;
+                statusCounts[index][uint256(status)]++;
                 indexCounts[index]++;
             }
         }
 
-        // Step 3: Determine the majority status for each index
+        // Determine the majority status for each index
         confirmed_statuses.indices = new uint8[](maxIndex + 1);
         confirmed_statuses.statuses = new uint8[](maxIndex + 1);
 
         for (uint256 i = 0; i <= maxIndex; i++) {
-            if (indexCounts[i] > 0) {
-                // Majority is determined by whether more than half of the statuses are 1
-                confirmed_statuses.indices[i] = uint8(i);
-                confirmed_statuses.statuses[i] = statusCounts[i] > (indexCounts[i] / 2) ? 1 : 0;
+            uint256 maxStatusCount = 0;
+            uint256 maxStatus = 0;
+            for (uint256 s = 0; s < 4; s++) {
+                if (statusCounts[i][s] > maxStatusCount) {
+                    maxStatusCount = statusCounts[i][s];
+                    maxStatus = s;
+                }
             }
+            confirmed_statuses.indices[i] = uint8(i);
+            confirmed_statuses.statuses[i] = uint8(maxStatus);
         }
 
-        // Step 4: Determine which workers are in the majority
-        bool[] memory isInMajority = new bool[](allocated_workers.length);
+        // Determine which workers are in the majority
         for (uint256 i = 0; i < allocated_workers.length; i++) {
-            isInMajority[i] = true; // Assume worker is in majority initially
+            isInMajority[i] = true;
             for (uint256 j = 0; j < workers_statuses[i].indices.length; j++) {
                 uint8 index = workers_statuses[i].indices[j];
-                uint8 status = workers_statuses[i].statuses[j];
-
-                // Check if worker's status matches the majority status for each index
-                if (confirmed_statuses.statuses[index] != status) {
+                if (workers_statuses[i].statuses[j] != confirmed_statuses.statuses[index]) {
                     isInMajority[i] = false;
                     break;
                 }
