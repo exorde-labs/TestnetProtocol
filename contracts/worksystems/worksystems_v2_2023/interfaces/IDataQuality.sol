@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0
-pragma solidity 0.8.8;
+pragma solidity 0.8.20;
+
 
 import "./IDataQualityBase.sol";
 
@@ -24,7 +25,6 @@ interface IDataQuality is IDataQualityBase {
         uint64 timestamp; // expiration date of commit period for SpottedData
         uint64 item_count;
         // uint16 lang;    // language of the spotted data (all sub items must be of the same language)
-        DataStatus status; // state of the vote
         string extra; // extra_data
         address author; // author of the proposal
         string ipfs_hash; // expiration date of commit period for SpottedData
@@ -46,7 +46,6 @@ interface IDataQuality is IDataQualityBase {
         uint64 timestamp; // expiration date of commit period for QualityData
         uint64 unverified_item_count;
         // uint16 lang;    // language of the Quality data (all sub items must be of the same language)
-        DataStatus status; // state of the vote
         address author; // author of the proposal
         string ipfs_hash; // expiration date of commit period for QualityData
     }
@@ -58,20 +57,9 @@ interface IDataQuality is IDataQualityBase {
     function getBatchByID(uint128 _DataBatchId) external view returns(BatchMetadata memory batch);
 
     /**
-     * @notice get Output Batch IPFS File By ID
-     * @return batch IPFS File
-     */
-    function getBatchIPFSFileByID(uint128 _DataBatchId) external view returns(string memory batch);
-    
-    /**
      * @notice get Data By ID
      * @return data as QualityData struct
      */
     function getDataByID(uint128 _DataId) external view returns(QualityData memory data);
     
-    /**
-     * @notice push Data batch from worksystem N-1 to worksystem N
-     * @return bool the status of the import
-     */
-    function pushData(BatchMetadata memory batch_) external returns(bool);
 }
