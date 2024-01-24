@@ -4,16 +4,19 @@ pragma solidity 0.8.20;
 
 interface IDataQualityBase {
     
-    // ------ Data batch status
-    enum DataStatus {
-        TBD,
-        APPROVED,
-        REJECTED,
-        FLAGGED
-    }
 
     // ------ Data batch Structure : 4 slots
     struct BatchMetadata {
+        uint128 start_idx;
+        uint32 counter;
+        uint32 item_count;
+        bool complete;
+        bool quality_checked;
+        bool relevance_checked;
+        bool allocated_to_work;
+    }
+
+    struct ProcessMetadata {
         uint128 start_idx;
         uint32 counter;
         uint32 item_count;
@@ -25,12 +28,10 @@ interface IDataQualityBase {
         bool quality_checked;
         bool relevance_checked;
         bool allocated_to_work;
-        DataStatus status; // state of the vote
         uint64 quality_commitEndDate; // expiration date of commit period for the quality round
         uint64 quality_revealEndDate; // expiration date of reveal period for the quality round
         uint64 relevance_commitEndDate; // expiration date of commit period for the relevance round
         uint64 relevance_revealEndDate; // expiration date of reveal period for the relevance round
-        string batchIPFSfile; // to be updated during SpotChecking
     }
 
     // ------ Spot-flow related structure : 1 slots
