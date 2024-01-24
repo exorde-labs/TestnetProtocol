@@ -123,7 +123,8 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
 
     // ------ Backend Data Stores
     mapping(uint128 => QualityData) public QualityMapping; // maps DataID to QualityData struct
-    mapping(uint128 => BatchMetadata) public DataBatch; 
+    mapping(uint128 => BatchMetadata) public ProcessedBatch; 
+    mapping(uint128 => ProcessMetadata) public ProcessBatchInfo; 
     // structure to store the subsets for each batch
     mapping(uint128 => uint128[][]) public RandomQualitySubsets;
     mapping(uint128 => DataItemVote) public ConfirmedBatchStatuses;
@@ -841,15 +842,15 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
             for (uint128 i = 0; i < iteration_count; i++) {
                 _deletion_index = BatchDeletionCursor;
                 // First Delete Atomic Data composing the Batch, from start to end indices
-                uint128 start_batch_idx = DataBatch[_ModB(_deletion_index)]
+                uint128 start_batch_idx = ProcessedBatch[_ModB(_deletion_index)]
                     .start_idx;
-                uint128 end_batch_idx = DataBatch[_ModB(_deletion_index)]
-                    .start_idx + DataBatch[_ModB(_deletion_index)].counter;
+                uint128 end_batch_idx = ProcessedBatch[_ModB(_deletion_index)]
+                    .start_idx + ProcessedBatch[_ModB(_deletion_index)].counter;
                 for (uint128 l = start_batch_idx; l < end_batch_idx; l++) {
                     delete QualityMapping[_ModS(l)]; // delete QualityMapping at index l
                 }
                 // delete the batch
-                delete DataBatch[_ModB(_deletion_index)];
+                delete ProcessedBatch[_ModB(_deletion_index)];
                 // delete the BatchCommitedVoteCount && BatchRevealedVoteCount
                 delete BatchCommitedVoteCount[_ModB(_deletion_index)];
                 delete BatchRevealedVoteCount[_ModB(_deletion_index)];
@@ -970,7 +971,7 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
     ///////////////              TRIGGER NEW EPOCH: DEPEND ON QUALITY SYSTEM
     ///////////////  ---------------------------------------------------------------------
 
-    function pushData(BatchMetadata memory batch_) external returns (bool) {
+    function pushData(IDataSpotting.BatchMetadata memory batch_) external returns (bool) {
         require(
             msg.sender == Parameters.getSpottingSystem(),
             "only the appointed DataSpotting contract can ping the system"
@@ -982,13 +983,12 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
             ipfs_hash: SpotBatch.batchIPFSfile,
             author: msg.sender,
             timestamp: uint64(block.timestamp),
-            unverified_item_count: SpotBatch.item_count,
-            status: DataStatus.TBD
+            unverified_item_count: SpotBatch.item_count
         });
 
         uint128 _batch_counter = LastBatchCounter;
         // UPDATE STREAMING DATA BATCH STRUCTURE
-        BatchMetadata storage current_data_batch = DataBatch[
+        BatchMetadata storage current_data_batch = ProcessedBatch[
             _ModB(_batch_counter)
         ];
         if (
@@ -1003,11 +1003,12 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
         ) {
             // batch is complete trigger new work round, new batch
             current_data_batch.complete = true;
-            current_data_batch.checked = false;
+            current_data_batch.quality_checked = false;
+            current_data_batch.relevance_checked = false;
             LastBatchCounter += 1;
-            delete DataBatch[_ModB(LastBatchCounter)];
+            delete ProcessedBatch[_ModB(LastBatchCounter)];
             // we indicate that the first Quality of the new batch, is the one we just built
-            DataBatch[_ModB(_batch_counter)].start_idx = DataNonce;
+            ProcessedBatch[_ModB(_batch_counter)].start_idx = DataNonce;
         }
 
         DataNonce = DataNonce + 1;
@@ -1027,7 +1028,7 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
             "Parameters Manager must be set."
         );
         updateItemCount();
-        TriggerValidation(iteration_count);
+        TriggerQualityValidation(iteration_count);
         // Log off waiting users first
         processLogoffRequests(iteration_count);
         TriggerAllocations(iteration_count);
@@ -1051,17 +1052,16 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
                 bool progress = false;
                 // IF CURRENT BATCH IS COMPLETE AND NOT ALLOCATED TO WORKERS TO BE CHECKED, THEN ALLOCATE!
                 if (
-                    DataBatch[_ModB(AllocatedBatchCursor)].allocated_to_work !=
+                    ProcessedBatch[_ModB(AllocatedBatchCursor)].allocated_to_work !=
                     true &&
                     availableWorkers.length >=
                     Parameters.get_QUALITY_MIN_CONSENSUS_WORKER_COUNT() &&
-                    DataBatch[_ModB(AllocatedBatchCursor)].complete &&
+                    ProcessedBatch[_ModB(AllocatedBatchCursor)].complete &&
                     (AllocatedBatchCursor - BatchCheckingCursor <=
                         MAX_ONGOING_JOBS)
                     // number of allocated/processed batchs must not exceed this number
                 ) {
-                    AllocateQualityWork();
-                    AllocateRelevanceWork();
+                    AllocateWork();
                     progress = true;
                 }
                 if (!progress) {
@@ -1074,10 +1074,10 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
     }
 
     /**
-     * @notice Trigger at most iteration_count Ended DataBatch validations
+     * @notice Trigger at most iteration_count Ended ProcessedBatch validations
      * @param iteration_count max number of iterations
      */
-    function TriggerValidation(uint128 iteration_count) public {
+    function TriggerQualityValidation(uint128 iteration_count) public {
         require(
             IParametersManager(address(0)) != Parameters,
             "Parameters Manager must be set."
@@ -1087,12 +1087,12 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
             uint128 CurrentCursor = PrevCursor + i;
             // IF CURRENT BATCH IS ALLOCATED TO WORKERS AND VOTE HAS ENDED, TRIGGER VALIDATION
             if (
-                DataBatch[_ModB(CurrentCursor)].allocated_to_work &&
-                (DataEnded(CurrentCursor) ||
-                    (DataBatch[_ModB(CurrentCursor)].unrevealed_workers == 0))
+                ProcessedBatch[_ModB(CurrentCursor)].allocated_to_work &&
+                (QualityDataEnded(CurrentCursor) ||
+                    (ProcessedBatch[_ModB(CurrentCursor)].unrevealed_quality_workers == 0))
             ) {
                 // check if the batch is already validated
-                if (!DataBatch[_ModB(CurrentCursor)].checked) {
+                if (!ProcessedBatch[_ModB(CurrentCursor)].quality_checked) {
                     ValidateRICBatch(CurrentCursor);
                 }
                 // increment BatchCheckingCursor if possible
@@ -1189,67 +1189,16 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
      * @dev Allocates Quality Work to a set of selected workers from the available pool.
      * This function selects workers, updates the allocated batch state, and assigns work to the selected workers.
      */
-    function AllocateQualityWork() internal {
-        BatchMetadata storage allocated_batch = DataBatch[
+    function AllocateWork() internal {
+        BatchMetadata storage allocated_batch = ProcessedBatch[
             _ModB(AllocatedBatchCursor)
         ];
         require(
-            DataBatch[_ModB(AllocatedBatchCursor)].complete,
+            ProcessedBatch[_ModB(AllocatedBatchCursor)].complete,
             "Can't allocate work, the current batch is not complete"
         );
         require(
-            !DataBatch[_ModB(AllocatedBatchCursor)].allocated_to_work,
-            "Can't allocate work, the current batch is already allocated"
-        );
-
-        if (
-            (uint64(block.timestamp) - LastAllocationTime) >=
-            Parameters.get_QUALITY_INTER_ALLOCATION_DURATION()
-        ) {
-            // select workers
-            uint16 selected_k_workers = getSelectedWorkersCount();
-            // update newly allocated batch state
-            updateAllocatedBatchState(allocated_batch, selected_k_workers);
-            // get selected worker addresses
-            address[] memory selected_workers_addresses = selectWorkers(
-                selected_k_workers
-            );
-            // get the random subsets to be allocated to the selected workers
-            // get the batch size
-            uint128 _RIC_N = allocated_batch.counter;
-            uint128[][] memory allocated_random_subsets = getRandomSubsets(
-                _RIC_subset_count,
-                _RIC_N,
-                _RIC_coverage
-            );
-            // fill BatchSubset
-            RandomQualitySubsets[
-                _ModB(AllocatedBatchCursor)
-            ] = allocated_random_subsets;
-            // update selected workers states
-            allocateWorkToWorkers(selected_workers_addresses);
-            // post checks
-            LastAllocationTime = uint64(block.timestamp);
-            AllocatedBatchCursor += 1;
-            LastRandomSeed = getRandom();
-            AllTxsCounter += 1;
-        }
-    }
-
-    /**
-     * @dev Allocates Relevance Work to a set of selected workers from the available pool.
-     * This function selects workers, updates the allocated batch state, and assigns work to the selected workers.
-     */
-    function AllocateRelevanceWork() internal {
-        BatchMetadata storage allocated_batch = DataBatch[
-            _ModB(AllocatedBatchCursor)
-        ];
-        require(
-            DataBatch[_ModB(AllocatedBatchCursor)].complete,
-            "Can't allocate work, the current batch is not complete"
-        );
-        require(
-            !DataBatch[_ModB(AllocatedBatchCursor)].allocated_to_work,
+            !ProcessedBatch[_ModB(AllocatedBatchCursor)].allocated_to_work,
             "Can't allocate work, the current batch is already allocated"
         );
 
@@ -1296,26 +1245,26 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
      * @param _DataBatchId The ID of the data batch to be validated.
      */
     function ValidateRICBatch(uint128 _DataBatchId) internal {
-        BatchMetadata storage batch_ = DataBatch[_ModB(_DataBatchId)];
+        BatchMetadata storage batch_ = ProcessedBatch[_ModB(_DataBatchId)];
         // 0. Check if initial conditions are met before validation process
-        requireInitialConditions(_DataBatchId, batch_);
+        requireInitialQualityConditions(_DataBatchId, batch_);
 
         // 1. Get allocated workers
         address[] memory allocated_workers = WorkersPerBatch[
             _ModB(_DataBatchId)
         ];
 
-        // 2. Gather user submissions and vote inputs for the DataBatch
+        // 2. Gather user submissions and vote inputs for the ProcessedBatch
         DataItemVote[] memory proposed_RIC_statuses = getWorkersQualitySubmissions(
             _DataBatchId,
             allocated_workers
         );
 
-        // 3. Compute the majority submission & vote for the DataBatch
+        // 3. Compute the majority submission & vote for the ProcessedBatch
         (
             DataItemVote memory confirmed_statuses,
             address[] memory workers_in_majority
-        ) = computeMajorityQuorum(allocated_workers, proposed_RIC_statuses);
+        ) = getQualityQuorum(allocated_workers, proposed_RIC_statuses);
 
         // 7. Iterate through the minority_workers first
         for (uint256 i = 0; i < workers_in_majority.length; i++) {
@@ -1324,11 +1273,11 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
                 worker_addr
             ].revealed;
             // 8. Handle worker vote, update worker state and perform necessary actions
-            handleWorkerRIC(worker_addr, has_worker_voted, true);
+            handleWorkerQualityParticipation(worker_addr, has_worker_voted, true);
         }
 
-        // 10. Update the DataBatch state and counters based on the validation results
-        updateValidatedBatchState(_DataBatchId, confirmed_statuses);
+        // 10. Update the ProcessedBatch state and counters based on the validation results
+        updateValidatedQualityBatchState(_DataBatchId, confirmed_statuses);
 
         emit _BatchRICValidated(_DataBatchId, confirmed_statuses);
     }
@@ -1338,7 +1287,7 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
      * @param _DataBatchId The ID of the data batch.
      * @param batch_ BatchMetadata storage reference for the data batch.
      */
-    function requireInitialConditions(
+    function requireInitialQualityConditions(
         uint128 _DataBatchId,
         BatchMetadata storage batch_
     ) private view {
@@ -1359,10 +1308,10 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
             "RewardManager is null in Parameters"
         );
         require(
-            DataEnded(_DataBatchId) || (batch_.unrevealed_workers == 0),
+            QualityDataEnded(_DataBatchId) || (batch_.unrevealed_quality_workers == 0),
             "_DataBatchId has not ended, or not every voters have voted"
         ); // votes need to be closed
-        require(!batch_.checked, "_DataBatchId is already validated"); // votes need to be closed
+        require(!batch_.quality_checked, "_DataBatchId is already validated"); // votes need to be closed
     }
 
     /**
@@ -1397,12 +1346,12 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
      * @return confirmed_statuses The list of confirmed statuses as DataItemVote.
      * @return workers_in_majority The list of addresses indicating which worker has voted like the majority.
      */
-    function computeMajorityQuorum(
+    function getQualityQuorum(
         address[] memory allocated_workers,
         DataItemVote[] memory workers_statuses
     )
         public
-        view
+        pure
         returns (
             DataItemVote memory confirmed_statuses,
             address[] memory workers_in_majority
@@ -1485,23 +1434,6 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
         return (confirmed_statuses, workers_in_majority);
     }
 
-    /**
-     * @notice Check if the validation process has passed for a given data batch.
-     * @param _DataBatchId The ID of the data batch to be checked.
-     * @param majorityNewFile The majority new file string.
-     * @param majorityBatchCount The majority batch count.
-     * @return bool True if the validation check passed, otherwise false.
-     */
-    function isValidationCheckPassed(
-        uint128 _DataBatchId,
-        string memory majorityNewFile,
-        uint32 majorityBatchCount
-    ) internal view returns (bool) {
-        return
-            isPassed(_DataBatchId) &&
-            !AreStringsEqual(majorityNewFile, "") &&
-            majorityBatchCount != 0;
-    }
 
     /**
      * @notice Update the majority batch count.
@@ -1558,7 +1490,7 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
      * @param has_worker_voted_ True if the worker has voted, otherwise false.
      * @param isInMajority True if worker in Majority
      */
-    function handleWorkerRIC(
+    function handleWorkerQualityParticipation(
         address worker_addr_,
         bool has_worker_voted_,
         bool isInMajority
@@ -1611,20 +1543,20 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
      * @param DataBatchId DataBatchId
      * @param confirmed_statuses The confirmed list of statuses
      */
-    function updateValidatedBatchState(
+    function updateValidatedQualityBatchState(
         uint128 DataBatchId,
         DataItemVote memory confirmed_statuses
     ) internal {
-        BatchMetadata storage batch_ = DataBatch[_ModB(DataBatchId)];
-        // Update DataBatch properties
-        batch_.checked = true;
+        BatchMetadata storage batch_ = ProcessedBatch[_ModB(DataBatchId)];
+        // Update ProcessedBatch properties
+        batch_.quality_checked = true;
 
         ConfirmedBatchStatuses[_ModB(DataBatchId)] = confirmed_statuses;
 
         // Update global counters
         AllTxsCounter += 1;
-        NotCommitedCounter += batch_.uncommited_workers;
-        NotRevealedCounter += batch_.unrevealed_workers;
+        NotCommitedCounter += batch_.uncommited_quality_workers;
+        NotRevealedCounter += batch_.unrevealed_quality_workers;
     }
 
     /**
@@ -1658,18 +1590,26 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
         uint16 selected_k_workers
     ) internal {
         uint128 _allocated_batch_cursor = AllocatedBatchCursor;
-        allocated_batch.uncommited_workers = selected_k_workers;
-        allocated_batch.unrevealed_workers = selected_k_workers;
-        DataBatch[_ModB(_allocated_batch_cursor)]
-            .uncommited_workers = selected_k_workers;
-        uint64 _commitEndDate = uint64(
+        allocated_batch.uncommited_quality_workers = selected_k_workers;
+        allocated_batch.unrevealed_quality_workers = selected_k_workers;
+        ProcessedBatch[_ModB(_allocated_batch_cursor)]
+            .uncommited_quality_workers = selected_k_workers;
+        uint64 quality_commitEndDate = uint64(
             block.timestamp + Parameters.get_QUALITY_COMMIT_ROUND_DURATION()
         );
-        uint64 _revealEndDate = uint64(
-            _commitEndDate + Parameters.get_QUALITY_REVEAL_ROUND_DURATION()
+        uint64 quality_revealEndDate = uint64(
+            quality_commitEndDate + Parameters.get_QUALITY_REVEAL_ROUND_DURATION()
         );
-        allocated_batch.commitEndDate = _commitEndDate;
-        allocated_batch.revealEndDate = _revealEndDate;
+        uint64 relevance_commitEndDate = uint64(
+            block.timestamp + Parameters.get_QUALITY_COMMIT_ROUND_DURATION()
+        );
+        uint64 relevance_revealEndDate = uint64(
+            relevance_commitEndDate + Parameters.get_QUALITY_REVEAL_ROUND_DURATION()
+        );
+        allocated_batch.quality_commitEndDate = quality_commitEndDate;
+        allocated_batch.quality_revealEndDate = quality_revealEndDate;
+        allocated_batch.relevance_commitEndDate = relevance_commitEndDate;
+        allocated_batch.relevance_revealEndDate = relevance_revealEndDate;
         allocated_batch.allocated_to_work = true;
     }
 
@@ -1752,7 +1692,7 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
         }
         if (
             !didReveal(user_, _currentUserBatch) &&
-            !commitPeriodOver(_currentUserBatch)
+            !QualityCommitPeriodOver(_currentUserBatch)
         ) {
             new_work_available = true;
         }
@@ -1772,7 +1712,7 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
         }
         if (
             !didReveal(user_, _currentUserBatch) &&
-            !commitPeriodOver(_currentUserBatch)
+            !QualityCommitPeriodOver(_currentUserBatch)
         ) {
             new_work_available = true;
         }
@@ -1814,7 +1754,7 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
         // if user has failed to commit and commitPeriod is Over, then currentWork is "missed".
         if (
             !didCommit(user_, _currentUserBatch) &&
-            commitPeriodOver(_currentUserBatch)
+            QualityCommitPeriodOver(_currentUserBatch)
         ) {
             _currentUserBatch = 0;
         }
@@ -1832,8 +1772,8 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
     }
 
     /**
-     * @notice Commits quality-check-vote on a DataBatch
-     * @param _DataBatchId DataBatch ID
+     * @notice Commits quality-check-vote on a ProcessedBatch
+     * @param _DataBatchId ProcessedBatch ID
      * @param quality_signature_hash encrypted hash of the submitted indices and values
      * @param _From extra information (for indexing / archival purpose)
      */
@@ -1847,7 +1787,7 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
             "Parameters Manager must be set."
         );
         require(
-            commitPeriodActive(_DataBatchId),
+            QualityCommitPeriodActive(_DataBatchId),
             "commit period needs to be open for this batchId"
         );
         require(
@@ -1886,8 +1826,8 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
 
         // ----------------------- WORKER STATE UPDATE -----------------------
         WorkerState storage worker_state = WorkersState[msg.sender];
-        DataBatch[_ModB(_DataBatchId)].uncommited_workers =
-            DataBatch[_ModB(_DataBatchId)].uncommited_workers -
+        ProcessedBatch[_ModB(_DataBatchId)].uncommited_quality_workers =
+            ProcessedBatch[_ModB(_DataBatchId)].uncommited_quality_workers -
             1;
         worker_state.last_interaction_date = uint64(block.timestamp);
         UserVoteSubmission[_ModB(_DataBatchId)][msg.sender].commited = true;
@@ -1898,8 +1838,8 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
     }
 
     /**
-     * @notice Reveals quality-check-vote on a DataBatch
-     * @param _DataBatchId DataBatch ID
+     * @notice Reveals quality-check-vote on a ProcessedBatch
+     * @param _DataBatchId ProcessedBatch ID
      * @param clearSubmissions_ clear hash of the submitted IPFS vote
      * @param salt_ arbitraty integer used to hash the previous commit & verify the reveal
      */
@@ -1911,7 +1851,7 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
     ) public whenNotPaused {
         // Make sure the reveal period is active
         require(
-            revealPeriodActive(_DataBatchId),
+            QualityRevealPeriodActive(_DataBatchId),
             "Reveal period not open for this DataID"
         );
         require(
@@ -1953,8 +1893,8 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
 
         // ----------------------- WORKER STATE UPDATE -----------------------
         WorkerState storage worker_state = WorkersState[msg.sender];
-        DataBatch[_ModB(_DataBatchId)].unrevealed_workers =
-            DataBatch[_ModB(_DataBatchId)].unrevealed_workers -
+        ProcessedBatch[_ModB(_DataBatchId)].unrevealed_quality_workers =
+            ProcessedBatch[_ModB(_DataBatchId)].unrevealed_quality_workers -
             1;
 
         worker_state.last_interaction_date = uint64(block.timestamp);
@@ -2006,7 +1946,7 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
         // Move directly to Validation if everyone revealed.
         if (
             VALIDATE_ON_LAST_REVEAL &&
-            DataBatch[_ModB(_DataBatchId)].unrevealed_workers == 0
+            ProcessedBatch[_ModB(_DataBatchId)].unrevealed_quality_workers == 0
         ) {
             ValidateRICBatch(_DataBatchId);
         }
@@ -2021,8 +1961,8 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
     /////////////////////////////////////////////////////////////////////////////////////
 
     /**
-     * @notice Commits Relevance-check-vote on a DataBatch
-     * @param _DataBatchId DataBatch ID
+     * @notice Commits Relevance-check-vote on a ProcessedBatch
+     * @param _DataBatchId ProcessedBatch ID
      * @param counts_signature_hash encrypted hash of the list of indices, values (and salt)
      * @param bounties_signature_hash encrypted hash of the list of indices, values (and salt)
      * @param duplicates_signature_hash encrypted hash of the list of indices, values (and salt)
@@ -2042,7 +1982,7 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
             "Parameters Manager must be set."
         );
         require(
-            commitPeriodActive(_DataBatchId),
+            QualityCommitPeriodActive(_DataBatchId),
             "commit period needs to be open for this batchId"
         );
         require(
@@ -2083,8 +2023,8 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
 
         // ----------------------- WORKER STATE UPDATE -----------------------
         WorkerState storage worker_state = WorkersState[msg.sender];
-        DataBatch[_ModB(_DataBatchId)].uncommited_workers =
-            DataBatch[_ModB(_DataBatchId)].uncommited_workers -
+        ProcessedBatch[_ModB(_DataBatchId)].uncommited_quality_workers =
+            ProcessedBatch[_ModB(_DataBatchId)].uncommited_quality_workers -
             1;
         worker_state.last_interaction_date = uint64(block.timestamp);
         UserVoteSubmission[_ModB(_DataBatchId)][msg.sender].commited = true;
@@ -2095,8 +2035,8 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
     }
 
     /**
-     * @notice Reveals quality-check-vote on a DataBatch
-     * @param _DataBatchId DataBatch ID
+     * @notice Reveals quality-check-vote on a ProcessedBatch
+     * @param _DataBatchId ProcessedBatch ID
      * @param base_counts_indices_ list of uint8 representing base count indices
      * @param base_counts_values_ list of uint8 representing base count values
      * @param bounties_counts_indices_ list of uint8 representing bounties count indices
@@ -2117,7 +2057,7 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
     ) public whenNotPaused {
         // Make sure the reveal period is active
         require(
-            revealPeriodActive(_DataBatchId),
+            QualityRevealPeriodActive(_DataBatchId),
             "Reveal period not open for this DataID"
         );
         require(
@@ -2176,8 +2116,8 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
 
         // ----------------------- WORKER STATE UPDATE -----------------------
         WorkerState storage worker_state = WorkersState[msg.sender];
-        DataBatch[_ModB(_DataBatchId)].unrevealed_workers =
-            DataBatch[_ModB(_DataBatchId)].unrevealed_workers -
+        ProcessedBatch[_ModB(_DataBatchId)].unrevealed_quality_workers =
+            ProcessedBatch[_ModB(_DataBatchId)].unrevealed_quality_workers -
             1;
 
         worker_state.last_interaction_date = uint64(block.timestamp);
@@ -2229,7 +2169,7 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
         // Move directly to Validation if everyone revealed.
         if (
             VALIDATE_ON_LAST_REVEAL &&
-            DataBatch[_ModB(_DataBatchId)].unrevealed_workers == 0
+            ProcessedBatch[_ModB(_DataBatchId)].unrevealed_quality_workers == 0
         ) {
             ValidateRICBatch(_DataBatchId);
         }
@@ -2332,7 +2272,7 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
         uint128[] memory _batch_counts_list = new uint128[](_batch_amount);
 
         for (uint128 i = 0; i < _batch_amount; i++) {
-            BatchMetadata memory batch_ = DataBatch[_ModB(i + _DataBatchId_a)];
+            BatchMetadata memory batch_ = ProcessedBatch[_ModB(i + _DataBatchId_a)];
             _total_batchs_count += batch_.item_count;
             _batch_counts_list[i] = batch_.item_count;
         }
@@ -2422,16 +2362,15 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
     // ----------------------------------------------------
 
     /**
-     * @notice Determines if proposal has passed
-     * @dev Check if votesFor out of totalSpotChecks exceeds votesQuorum (requires DataEnded)
-     * @param _DataBatchId Integer identifier associated with target QualityData
+     * @notice Determines if QualityData is over
+     * @dev Checks isExpired for specified QualityData's revealEndDate
+     * @return ended Boolean indication of whether Dataing period is over
      */
-    function isPassed(uint128 _DataBatchId) public view returns (bool passed) {
-        BatchMetadata memory batch_ = DataBatch[_ModB(_DataBatchId)];
+    function QualityDataEnded(uint128 _DataBatchId) public view returns (bool ended) {
         return
-            (100 * batch_.votesFor) >
-            (Parameters.getVoteQuorum() *
-                (batch_.votesFor + batch_.votesAgainst));
+            isExpired(ProcessedBatch[_ModB(_DataBatchId)].quality_revealEndDate) ||
+            (QualityCommitPeriodOver(_DataBatchId) &&
+                BatchCommitedVoteCount[_ModB(_DataBatchId)] == 0);
     }
 
     /**
@@ -2439,10 +2378,10 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
      * @dev Checks isExpired for specified QualityData's revealEndDate
      * @return ended Boolean indication of whether Dataing period is over
      */
-    function DataEnded(uint128 _DataBatchId) public view returns (bool ended) {
+    function RelevanceDataEnded(uint128 _DataBatchId) public view returns (bool ended) {
         return
-            isExpired(DataBatch[_ModB(_DataBatchId)].revealEndDate) ||
-            (commitPeriodOver(_DataBatchId) &&
+            isExpired(ProcessedBatch[_ModB(_DataBatchId)].relevance_revealEndDate) ||
+            (QualityCommitPeriodOver(_DataBatchId) &&
                 BatchCommitedVoteCount[_ModB(_DataBatchId)] == 0);
     }
 
@@ -2487,7 +2426,7 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
     }
 
     /**
-     * @notice get DataBatch By ID
+     * @notice get ProcessedBatch By ID
      * @return batch as BatchMetadata struct
      */
     function getBatchByID(uint128 _DataBatchId)
@@ -2496,46 +2435,9 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
         returns (BatchMetadata memory batch)
     {
         require(DataExists(_DataBatchId));
-        return DataBatch[_ModB(_DataBatchId)];
+        return ProcessedBatch[_ModB(_DataBatchId)];
     }
 
-    /**
-     * @notice get Output Batch IPFS File By ID
-     * @return batch IPFS File
-     */
-    function getBatchIPFSFileByID(uint128 _DataBatchId)
-        public
-        view
-        returns (string memory batch)
-    {
-        require(DataExists(_DataBatchId));
-        return DataBatch[_ModB(_DataBatchId)].batchIPFSfile;
-    }
-
-    /**
-     * @notice get all Output Batch IPFS Files (hashes),between batch indices A and B (a < B)
-     * @param _DataBatchId_a ID of the starting batch
-     * @param _DataBatchId_b ID of the ending batch (included)
-     * @return array of Batch File ID between index A and B included
-     */
-
-    function getBatchsFilesByID(uint128 _DataBatchId_a, uint128 _DataBatchId_b)
-        public
-        view
-        returns (string[] memory)
-    {
-        require(
-            _DataBatchId_a > 0 && _DataBatchId_a < _DataBatchId_b,
-            "Input boundaries are invalid"
-        );
-        uint128 _array_size = _DataBatchId_b - _DataBatchId_a + 1;
-        string[] memory ipfs_hash_list = new string[](_array_size);
-        for (uint128 i = 0; i < _array_size; i++) {
-            ipfs_hash_list[i] = DataBatch[_ModB(_DataBatchId_a + i)]
-                .batchIPFSfile;
-        }
-        return ipfs_hash_list;
-    }
 
     /**
      * @dev Returns all worker addresses between index A_ and index B
@@ -2598,37 +2500,64 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
      * @notice Determines DataCommitEndDate
      * @return commitEndDate indication of whether Dataing period is over
      */
-    function DataCommitEndDate(uint128 _DataBatchId)
+    function QualityDataCommitEndDate(uint128 _DataBatchId)
         public
         view
         returns (uint256 commitEndDate)
     {
         require(DataExists(_DataBatchId), "_DataBatchId must exist");
 
-        return DataBatch[_ModB(_DataBatchId)].commitEndDate;
+        return ProcessedBatch[_ModB(_DataBatchId)].quality_commitEndDate;
     }
 
     /**
      * @notice Determines DataRevealEndDate
      * @return revealEndDate indication of whether Dataing period is over
      */
-    function DataRevealEndDate(uint128 _DataBatchId)
+    function QualityDataRevealEndDate(uint128 _DataBatchId)
         public
         view
         returns (uint256 revealEndDate)
     {
         require(DataExists(_DataBatchId), "_DataBatchId must exist");
 
-        return DataBatch[_ModB(_DataBatchId)].revealEndDate;
+        return ProcessedBatch[_ModB(_DataBatchId)].quality_revealEndDate;
     }
 
+    /**
+     * @notice Determines DataCommitEndDate
+     * @return commitEndDate indication of whether Dataing period is over
+     */
+    function RelevanceDataCommitEndDate(uint128 _DataBatchId)
+        public
+        view
+        returns (uint256 commitEndDate)
+    {
+        require(DataExists(_DataBatchId), "_DataBatchId must exist");
+
+        return ProcessedBatch[_ModB(_DataBatchId)].relevance_commitEndDate;
+    }
+
+    /**
+     * @notice Determines DataRevealEndDate
+     * @return revealEndDate indication of whether Dataing period is over
+     */
+    function RelevanceDataRevealEndDate(uint128 _DataBatchId)
+        public
+        view
+        returns (uint256 revealEndDate)
+    {
+        require(DataExists(_DataBatchId), "_DataBatchId must exist");
+
+        return ProcessedBatch[_ModB(_DataBatchId)].relevance_revealEndDate;
+    }
     /**
      * @notice Checks if the commit period is still active for the specified QualityData
      * @dev Checks isExpired for the specified QualityData's commitEndDate
      * @param _DataBatchId Integer identifier associated with target QualityData
-     * @return active Boolean indication of isCommitPeriodActive for target QualityData
+     * @return active Boolean indication of isQualityCommitPeriodActive for target QualityData
      */
-    function commitPeriodActive(uint128 _DataBatchId)
+    function QualityCommitPeriodActive(uint128 _DataBatchId)
         public
         view
         returns (bool active)
@@ -2636,17 +2565,17 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
         require(DataExists(_DataBatchId), "_DataBatchId must exist");
 
         return
-            !isExpired(DataBatch[_ModB(_DataBatchId)].commitEndDate) &&
-            (DataBatch[_ModB(_DataBatchId)].uncommited_workers > 0);
+            !isExpired(ProcessedBatch[_ModB(_DataBatchId)].quality_commitEndDate) &&
+            (ProcessedBatch[_ModB(_DataBatchId)].uncommited_quality_workers > 0);
     }
 
     /**
      * @notice Checks if the commit period is over
      * @dev Checks isExpired for the specified QualityData's commitEndDate
      * @param _DataBatchId Integer identifier associated with target QualityData
-     * @return active Boolean indication of isCommitPeriodActive for target QualityData
+     * @return active Boolean indication of isQualityCommitPeriodActive for target QualityData
      */
-    function commitPeriodOver(uint128 _DataBatchId)
+    function QualityCommitPeriodOver(uint128 _DataBatchId)
         public
         view
         returns (bool active)
@@ -2656,17 +2585,17 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
         } else {
             // a commitPeriod is Over if : time has expired OR if revealPeriod for the same _DataBatchId is true
             return
-                isExpired(DataBatch[_ModB(_DataBatchId)].commitEndDate) ||
-                revealPeriodActive(_DataBatchId);
+                isExpired(ProcessedBatch[_ModB(_DataBatchId)].quality_commitEndDate) ||
+                QualityRevealPeriodActive(_DataBatchId);
         }
     }
 
     /**
-     * @notice commitPeriodStatus
+     * @notice QualityCommitPeriodStatus
      * @param _DataBatchId Integer identifier associated with target QualityData
      * @return status 0 = don't exist, 1 = active, 2 = expired/closed
      */
-    function commitPeriodStatus(uint128 _DataBatchId)
+    function QualityCommitPeriodStatus(uint128 _DataBatchId)
         public
         view
         returns (uint8 status)
@@ -2674,9 +2603,9 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
         if (!DataExists(_DataBatchId)) {
             return 0;
         } else {
-            if (commitPeriodOver(_DataBatchId)) {
+            if (QualityCommitPeriodOver(_DataBatchId)) {
                 return 2;
-            } else if (commitPeriodActive(_DataBatchId)) {
+            } else if (QualityCommitPeriodActive(_DataBatchId)) {
                 return 1;
             }
         }
@@ -2688,16 +2617,16 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
      * @param _DataBatchId Integer identifier associated with target QualityData
      * @return remainingTime Integer
      */
-    function remainingCommitDuration(uint128 _DataBatchId)
+    function remainingQualityCommitDuration(uint128 _DataBatchId)
         public
         view
         returns (uint256 remainingTime)
     {
         require(DataExists(_DataBatchId), "_DataBatchId must exist");
         uint64 _remainingTime = 0;
-        if (commitPeriodActive(_DataBatchId)) {
+        if (QualityCommitPeriodActive(_DataBatchId)) {
             _remainingTime =
-                DataBatch[_ModB(_DataBatchId)].commitEndDate -
+                ProcessedBatch[_ModB(_DataBatchId)].quality_commitEndDate -
                 uint64(block.timestamp);
         }
         return _remainingTime;
@@ -2708,7 +2637,7 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
      * @dev Checks isExpired for the specified QualityData's revealEndDate
      * @param _DataBatchId Integer identifier associated with target QualityData
      */
-    function revealPeriodActive(uint128 _DataBatchId)
+    function QualityRevealPeriodActive(uint128 _DataBatchId)
         public
         view
         returns (bool active)
@@ -2716,8 +2645,8 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
         require(DataExists(_DataBatchId), "_DataBatchId must exist");
 
         return
-            !isExpired(DataBatch[_ModB(_DataBatchId)].revealEndDate) &&
-            !commitPeriodActive(_DataBatchId);
+            !isExpired(ProcessedBatch[_ModB(_DataBatchId)].quality_revealEndDate) &&
+            !QualityCommitPeriodActive(_DataBatchId);
     }
 
     /**
@@ -2725,7 +2654,7 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
      * @dev Checks isExpired for the specified QualityData's revealEndDate
      * @param _DataBatchId Integer identifier associated with target QualityData
      */
-    function revealPeriodOver(uint128 _DataBatchId)
+    function QualityRevealPeriodOver(uint128 _DataBatchId)
         public
         view
         returns (bool active)
@@ -2735,8 +2664,8 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
         } else {
             // a commitPeriod is Over if : time has expired OR if revealPeriod for the same _DataBatchId is true
             return
-                isExpired(DataBatch[_ModB(_DataBatchId)].revealEndDate) ||
-                DataBatch[_ModB(_DataBatchId)].unrevealed_workers == 0;
+                isExpired(ProcessedBatch[_ModB(_DataBatchId)].quality_revealEndDate) ||
+                ProcessedBatch[_ModB(_DataBatchId)].unrevealed_quality_workers == 0;
         }
     }
 
@@ -2753,9 +2682,9 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
         if (!DataExists(_DataBatchId)) {
             return 0;
         } else {
-            if (revealPeriodOver(_DataBatchId)) {
+            if (QualityRevealPeriodOver(_DataBatchId)) {
                 return 2;
-            } else if (revealPeriodActive(_DataBatchId)) {
+            } else if (QualityRevealPeriodActive(_DataBatchId)) {
                 return 1;
             }
         }
@@ -2765,18 +2694,18 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
      * @notice Checks if the commit period is still active for the specified QualityData
      * @dev Checks isExpired for the specified QualityData's commitEndDate
      * @param _DataBatchId Integer identifier associated with target QualityData
-     * @return remainingTime Integer indication of isCommitPeriodActive for target QualityData
+     * @return remainingTime Integer indication of isQualityCommitPeriodActive for target QualityData
      */
-    function remainingRevealDuration(uint128 _DataBatchId)
+    function QualityRemainingRevealDuration(uint128 _DataBatchId)
         public
         view
         returns (uint256 remainingTime)
     {
         require(DataExists(_DataBatchId), "_DataBatchId must exist");
         uint256 _remainingTime = 0;
-        if (revealPeriodActive(_DataBatchId)) {
+        if (QualityRevealPeriodActive(_DataBatchId)) {
             _remainingTime =
-                DataBatch[_ModB(_DataBatchId)].revealEndDate -
+                ProcessedBatch[_ModB(_DataBatchId)].quality_revealEndDate -
                 block.timestamp;
         }
         return _remainingTime;
@@ -2820,7 +2749,7 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
         view
         returns (bool exists)
     {
-        return (DataBatch[_ModB(_DataBatchId)].complete);
+        return (ProcessedBatch[_ModB(_DataBatchId)].complete);
     }
 
     function AmIRegistered() public view returns (bool passed) {
