@@ -4,7 +4,7 @@ pragma solidity 0.8.8;
 
 import "./IDataBase.sol";
 
-interface IDataQuality is IDataBase {
+interface IDataQuality is IDataQualityBase {
 
     // ------ Worker State Structure : 2 slots
     struct WorkerState {
