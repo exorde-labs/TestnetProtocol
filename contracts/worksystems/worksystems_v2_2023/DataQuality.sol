@@ -49,7 +49,7 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
         uint256 indexed DataID,
         address indexed voter
     );
-    event _BatchRICValidated(uint256 indexed DataID, DataItemVote statuses);
+    event _BatchQualityValidated(uint256 indexed DataID, DataItemVote statuses);
     event _WorkAllocated(uint256 indexed batchID, address worker);
     event _WorkerRegistered(address indexed worker, uint256 timestamp);
     event _WorkerUnregistered(address indexed worker, uint256 timestamp);
@@ -127,7 +127,6 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
     mapping(uint128 => ProcessMetadata) public ProcessBatchInfo; 
     // structure to store the subsets for each batch
     mapping(uint128 => uint128[][]) public RandomQualitySubsets;
-    mapping(uint128 => DataItemVote) public ConfirmedBatchStatuses;
 
     // ------ Worker & Stake related structure
     mapping(address => WorkerState) public WorkersState;
@@ -191,8 +190,8 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
     uint16 public InstantRevealRewardsDivider = 1;
     uint16 public MaxPendingDataBatchCount = 250;
     // Data random integrity check parameters
-    uint128 public _RIC_subset_count = 2;
-    uint128 public _RIC_coverage = 5;
+    uint128 public _Quality_subset_count = 2;
+    uint128 public _Quality_coverage = 5;
     uint16 public QUALITY_FILE_SIZE_MIN = 1000;
     uint256 public MAX_ONGOING_JOBS = 500;
     uint256 public NB_BATCH_TO_TRIGGER_GARBAGE_COLLECTION = 1000;
@@ -1091,7 +1090,7 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
             ) {
                 // check if the batch is already validated
                 if (!ProcessedBatch[_ModB(CurrentCursor)].quality_checked) {
-                    ValidateRICBatch(CurrentCursor);
+                    ValidateQualityBatch(CurrentCursor);
                 }
                 // increment BatchCheckingCursor if possible
                 if (CurrentCursor == BatchCheckingCursor + 1) {
@@ -1164,7 +1163,7 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
 
     function triggerNewnessCheck(uint128 _DataBatchId) internal {}
 
-    function triggerRICCheck(uint128 _DataBatchId) internal {}
+    function triggerQualityCheck(uint128 _DataBatchId) internal {}
 
     // ================================================================================
     //                             Duplicates Registries Update
@@ -1175,12 +1174,12 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
     // ================================================================================
     // ================================================================================
 
-    function updateRICParameters(
-        uint128 new_RIC_subset_count,
-        uint128 new_RIC_coverage
+    function updateQualityParameters(
+        uint128 new_Quality_subset_count,
+        uint128 new_Quality_coverage
     ) public onlyOwner {
-        _RIC_subset_count = new_RIC_subset_count;
-        _RIC_coverage = new_RIC_coverage;
+        _Quality_subset_count = new_Quality_subset_count;
+        _Quality_coverage = new_Quality_coverage;
     }
 
     /**
@@ -1217,11 +1216,11 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
             );
             // get the random subsets to be allocated to the selected workers
             // get the batch size
-            uint128 _RIC_N = allocated_batch.counter;
+            uint128 _Quality_N = allocated_batch.counter;
             uint128[][] memory allocated_random_subsets = getRandomSubsets(
-                _RIC_subset_count,
-                _RIC_N,
-                _RIC_coverage
+                _Quality_subset_count,
+                _Quality_N,
+                _Quality_coverage
             );
             // fill BatchSubset
             RandomQualitySubsets[
@@ -1245,7 +1244,7 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
      * @notice Validate data for the specified data batch.
      * @param _DataBatchId The ID of the data batch to be validated.
      */
-    function ValidateRICBatch(uint128 _DataBatchId) internal {
+    function ValidateQualityBatch(uint128 _DataBatchId) internal {
         // BatchMetadata storage batch = ProcessedBatch[_ModB(_DataBatchId)];
         // ProcessMetadata storage process_info = ProcessBatchInfo[_ModB(_DataBatchId)];
         // 0. Check if initial conditions are met before validation process
@@ -1257,7 +1256,7 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
         ];
 
         // 2. Gather user submissions and vote inputs for the ProcessedBatch
-        DataItemVote[] memory proposed_RIC_statuses = getWorkersQualitySubmissions(
+        DataItemVote[] memory proposed_Quality_statuses = getWorkersQualitySubmissions(
             _DataBatchId,
             allocated_workers
         );
@@ -1266,7 +1265,7 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
         (
             DataItemVote memory confirmed_statuses,
             address[] memory workers_in_majority
-        ) = getQualityQuorum(allocated_workers, proposed_RIC_statuses);
+        ) = getQualityQuorum(allocated_workers, proposed_Quality_statuses);
 
         // 7. Iterate through the minority_workers first
         for (uint256 i = 0; i < workers_in_majority.length; i++) {
@@ -1281,7 +1280,7 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
         // 10. Update the ProcessedBatch state and counters based on the validation results
         updateValidatedQualityBatchState(_DataBatchId, confirmed_statuses);
 
-        emit _BatchRICValidated(_DataBatchId, confirmed_statuses);
+        emit _BatchQualityValidated(_DataBatchId, confirmed_statuses);
     }
 
     /**
@@ -1323,20 +1322,20 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
         uint128 _DataBatchId,
         address[] memory allocated_workers
     ) public view returns (DataItemVote[] memory) {
-        DataItemVote[] memory proposed_RIC_statuses = new DataItemVote[](
+        DataItemVote[] memory proposed_Quality_statuses = new DataItemVote[](
             allocated_workers.length
         );
 
-        // Iterate through all allocated workers for their RIC submissions
+        // Iterate through all allocated workers for their Quality submissions
         for (uint256 i = 0; i < allocated_workers.length; i++) {
             address worker_addr_ = allocated_workers[i];
             // Store the worker's submitted data
-            proposed_RIC_statuses[i] = QualitySubmissions[_ModB(_DataBatchId)][
+            proposed_Quality_statuses[i] = QualitySubmissions[_ModB(_DataBatchId)][
                 worker_addr_
             ];
         }
 
-        return (proposed_RIC_statuses);
+        return (proposed_Quality_statuses);
     }
 
     /**
@@ -1551,8 +1550,6 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
         ProcessMetadata storage process_info = ProcessBatchInfo[_ModB(DataBatchId)];
         // Update ProcessedBatch properties
         batch.quality_checked = true;
-
-        ConfirmedBatchStatuses[_ModB(DataBatchId)] = confirmed_statuses;
 
         // Update global counters
         AllTxsCounter += 1;
