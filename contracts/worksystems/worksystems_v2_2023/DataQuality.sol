@@ -1055,17 +1055,16 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
      * @notice Trigger potential Data Batches Validations & Work Allocations
      * @param iteration_count max number of iterations
      */
-    function TriggerUpdate(uint128 iteration_count) public {
+    function TriggerUpdate(uint128 iteration_count, TaskType taskType) public {
         require(
             IParametersManager(address(0)) != Parameters,
             "Parameters Manager must be set."
         );
         updateItemCount();
-        TriggerValidation(iteration_count, TaskType.Quality);
-        TriggerValidation(iteration_count, TaskType.Relevance);
+        TriggerValidation(iteration_count, taskType);
         // Log off waiting users first
         processLogoffRequests(iteration_count);
-        TriggerAllocations(iteration_count);
+        TriggerAllocations(iteration_count, taskType);
         _retrieveSFuel();
     }
 
@@ -1073,7 +1072,8 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
      * @notice Trigger at most iteration_count Work Allocations (N workers on a Batch)
      * @param iteration_count max number of iterations
      */
-    function TriggerAllocations(uint128 iteration_count) public {
+    function TriggerAllocations(uint128 iteration_count, TaskType taskType) public {
+        require(taskType == TaskType.Quality || taskType == TaskType.Relevance, "TaskType must be set.");
         require(
             IParametersManager(address(0)) != Parameters,
             "Parameters Manager must be set."
@@ -1091,8 +1091,7 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
                     && ProcessedBatch[_ModB(AllocatedBatchCursor)].complete 
                     && (AllocatedBatchCursor - BatchCheckingCursor <= MAX_ONGOING_JOBS)
                 ) {
-                    AllocateWork(TaskType.Quality);
-                    AllocateWork(TaskType.Relevance);
+                    AllocateWork(taskType);
                     progress = true;
                 }
                 if (!progress) {
@@ -1703,7 +1702,7 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
                     .commited = false;
                 UserRelevanceVoteSubmission[_ModB(_allocated_batch_cursor)][selected_worker_]
                     .revealed = false;
-            }            
+            }
 
             // swap worker from available to busy, not to be picked again while working
             PopFromAvailableWorkers(selected_worker_);
