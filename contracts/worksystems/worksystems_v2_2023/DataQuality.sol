@@ -1086,14 +1086,10 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
                 bool progress = false;
                 // IF CURRENT BATCH IS COMPLETE AND NOT ALLOCATED TO WORKERS TO BE CHECKED, THEN ALLOCATE!
                 if (
-                    ProcessedBatch[_ModB(AllocatedBatchCursor)].allocated_to_work !=
-                    true &&
-                    availableWorkers.length >=
-                    Parameters.get_QUALITY_MIN_CONSENSUS_WORKER_COUNT() &&
-                    ProcessedBatch[_ModB(AllocatedBatchCursor)].complete &&
-                    (AllocatedBatchCursor - BatchCheckingCursor <=
-                        MAX_ONGOING_JOBS)
-                    // number of allocated/processed batchs must not exceed this number
+                    ProcessedBatch[_ModB(AllocatedBatchCursor)].allocated_to_work != true 
+                    && availableWorkers.length >= Parameters.get_QUALITY_MIN_CONSENSUS_WORKER_COUNT() 
+                    && ProcessedBatch[_ModB(AllocatedBatchCursor)].complete 
+                    && (AllocatedBatchCursor - BatchCheckingCursor <= MAX_ONGOING_JOBS)
                 ) {
                     AllocateWork(TaskType.Quality);
                     AllocateWork(TaskType.Relevance);
@@ -1286,33 +1282,33 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
             _ModB(_DataBatchId)
         ];
 
-        // 2. Gather user submissions and vote inputs for the ProcessedBatch
-        DataItemVote[] memory proposed_Quality_statuses = getWorkersQualitySubmissions(
-            _DataBatchId,
-            allocated_workers,
-            taskType
-        );
+        if(taskType == TaskType.Quality){
+            // 2. Gather user submissions and vote inputs for the ProcessedBatch
+            DataItemVote[] memory proposed_Quality_statuses = getWorkersQualitySubmissions(
+                _DataBatchId,
+                allocated_workers
+            );
 
-        // 3. Compute the majority submission & vote for the ProcessedBatch
-        (
-            DataItemVote memory confirmed_statuses,
-            address[] memory workers_in_majority
-        ) = getQualityQuorum(allocated_workers, proposed_Quality_statuses);
+            // 3. Compute the majority submission & vote for the ProcessedBatch
+            (
+                DataItemVote memory confirmed_statuses,
+                address[] memory workers_in_majority
+            ) = getQualityQuorum(allocated_workers, proposed_Quality_statuses);
 
-        // 7. Iterate through the minority_workers first
-        for (uint256 i = 0; i < workers_in_majority.length; i++) {
-            address worker_addr = workers_in_majority[i];
-            bool has_worker_voted = UserQualityVoteSubmission[_ModB(_DataBatchId)][
-                worker_addr
-            ].revealed;
-            // 8. Handle worker vote, update worker state and perform necessary actions
-            handleWorkerQualityParticipation(worker_addr, has_worker_voted, true, taskType);
+            // 7. Iterate through the minority_workers first
+            for (uint256 i = 0; i < workers_in_majority.length; i++) {
+                address worker_addr = workers_in_majority[i];
+                bool has_worker_voted = UserQualityVoteSubmission[_ModB(_DataBatchId)][
+                    worker_addr
+                ].revealed;
+                // 8. Handle worker vote, update worker state and perform necessary actions
+                handleWorkerQualityParticipation(worker_addr, has_worker_voted, true);
+            }
+
+            // 10. Update the ProcessedBatch state and counters based on the validation results
+            updateValidatedQualityBatchState(_DataBatchId, confirmed_statuses, taskType);
+            emit _BatchQualityValidated(_DataBatchId, confirmed_statuses);
         }
-
-        // 10. Update the ProcessedBatch state and counters based on the validation results
-        updateValidatedQualityBatchState(_DataBatchId, confirmed_statuses, taskType);
-
-        emit _BatchQualityValidated(_DataBatchId, confirmed_statuses);
     }
 
 
@@ -1361,8 +1357,7 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
      */
     function getWorkersQualitySubmissions(
         uint128 _DataBatchId,
-        address[] memory allocated_workers,
-        TaskType taskType
+        address[] memory allocated_workers
     ) public view returns (DataItemVote[] memory) {
         DataItemVote[] memory proposed_Quality_statuses = new DataItemVote[](
             allocated_workers.length
@@ -1534,8 +1529,7 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
     function handleWorkerQualityParticipation(
         address worker_addr_,
         bool has_worker_voted_,
-        bool isInMajority,
-        TaskType taskType
+        bool isInMajority
     ) internal {
         // Access worker state
         WorkerState storage worker_state = WorkersState[worker_addr_];
@@ -2354,7 +2348,7 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
     function getExtrasForQualityBatch(uint128 _DataBatchId, TaskType taskType)
         public
         view
-        returns (string[] memory)
+        returns (string[] memory extras)
     {
         require(DataExists(_DataBatchId), "_DataBatchId must exist");
 
@@ -2392,7 +2386,7 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
     function getSubmissionsForBatch(uint128 _DataBatchId, TaskType taskType)
         public
         view
-        returns (uint128[] memory)
+        returns (uint128[] memory submissions)
     {
         require(DataExists(_DataBatchId), "_DataBatchId must exist");
 
@@ -2462,11 +2456,11 @@ contract DataQuality is Ownable, Pausable, RandomSubsets, IDataQuality {
      */
     function DataEnded(uint128 _DataBatchId, TaskType taskType) public view returns (bool ended) {
         if(taskType == TaskType.Quality) {
-            isExpired(ProcessBatchInfo[_ModB(_DataBatchId)].quality_revealEndDate) ||
+            return isExpired(ProcessBatchInfo[_ModB(_DataBatchId)].quality_revealEndDate) ||
             (CommitPeriodOver(_DataBatchId, taskType) &&
                 QualityBatchCommitedVoteCount[_ModB(_DataBatchId)] == 0);
         } else if(taskType == TaskType.Relevance) {
-            isExpired(ProcessBatchInfo[_ModB(_DataBatchId)].relevance_revealEndDate) ||
+            return isExpired(ProcessBatchInfo[_ModB(_DataBatchId)].relevance_revealEndDate) ||
             (CommitPeriodOver(_DataBatchId, taskType) &&
                 RelevanceBatchCommitedVoteCount[_ModB(_DataBatchId)] == 0);
         }
