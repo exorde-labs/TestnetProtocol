@@ -11,23 +11,16 @@ interface IDataQualityBase {
         uint32 counter;
         uint32 item_count;
         bool complete;
+        bool allocated_to_work;
         bool quality_checked;
         bool relevance_checked;
-        bool allocated_to_work;
     }
 
     struct ProcessMetadata {
-        uint128 start_idx;
-        uint32 counter;
-        uint32 item_count;
         uint16 uncommited_quality_workers;
         uint16 unrevealed_quality_workers;
         uint16 uncommited_relevance_workers;
         uint16 unrevealed_relevance_workers;
-        bool complete;
-        bool quality_checked;
-        bool relevance_checked;
-        bool allocated_to_work;
         uint64 quality_commitEndDate; // expiration date of commit period for the quality round
         uint64 quality_revealEndDate; // expiration date of reveal period for the quality round
         uint64 relevance_commitEndDate; // expiration date of commit period for the relevance round

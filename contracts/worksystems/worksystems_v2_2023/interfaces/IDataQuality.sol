@@ -8,9 +8,11 @@ interface IDataQuality is IDataQualityBase {
 
     // ------ Worker State Structure : 2 slots
     struct WorkerState {
-        uint128 allocated_work_batch;
+        uint128 allocated_quality_work_batch;
+        uint128 allocated_relevance_work_batch;
         uint64 last_interaction_date;
         uint16 succeeding_novote_count;
+        bool currently_working;
         bool registered;
         bool unregistration_request;
         bool isWorkerSeen;
@@ -38,7 +40,7 @@ interface IDataQuality is IDataQualityBase {
         uint8 vote;
         uint32 batchCount;
         string newFile;
-        string batchFrom;
+        string extra;
     }
 
     // ------ Atomic Data Structure : 5 slots
