@@ -1,6 +1,6 @@
 {
     "online": true,
-    "remote_kill": true,
+    "remote_kill": false,
     "last_info": "Welcome to the v2 of the Exorde Worker Node!",
     "last_notification": "Welcome to Exorde Client v2.5.0 with notifications! Thanks for supporting YOUR data network!",
     "docker_version": "2.5.2",
