@@ -115,7 +115,7 @@
          "max_oldness_seconds":1200
       },
       "https://github.com/exorde-labs/jvc8439846094ced03ff":{
-         "maximum_items_to_collect":15,
+         "maximum_items_to_collect":20,
          "max_oldness_seconds":600
       },
       "https://github.com/exorde-labs/forocoches86019fc2d4":{
