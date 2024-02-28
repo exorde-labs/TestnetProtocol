@@ -124,7 +124,7 @@
       }
    },
    "weights":{
-      "reddit":21,
+      "reddit":22,
       "youtube":20,
       "twitter":12,
       "4chan":10,
@@ -133,7 +133,7 @@
       "forocoches":6,
       "mastodon":5,
       "bitcointalk":3,
-      "weibo":3,
+      "weibo":2,
       "hackernews":2,
       "tradingview":2,
       "followin":1,
