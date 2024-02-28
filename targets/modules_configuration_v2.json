@@ -112,7 +112,7 @@
       },
       "https://github.com/exorde-labs/followinc645fc950d7f":{
          "maximum_items_to_collect":5,
-         "max_oldness_seconds":800
+         "max_oldness_seconds":1200
       },
       "https://github.com/exorde-labs/jvc8439846094ced03ff":{
          "maximum_items_to_collect":15,
