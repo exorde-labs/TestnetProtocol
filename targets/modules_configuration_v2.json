@@ -102,11 +102,11 @@
       },
       "https://github.com/exorde-labs/seekingalphad89ba32s":{
          "maximum_items_to_collect":10,
-         "max_oldness_seconds":300
+         "max_oldness_seconds":400
       },
       "https://github.com/exorde-labs/youtube00e1f862e5eff":{
          "maximum_items_to_collect":25,
-         "max_oldness_seconds":9000,
+         "max_oldness_seconds":3600,
          "max_total_comments_to_check":200,
          "probability_to_select_default_kws":0.42
       },
@@ -120,7 +120,7 @@
       },
       "https://github.com/exorde-labs/forocoches86019fc2d4":{
          "maximum_items_to_collect":15,
-         "max_oldness_seconds":240
+         "max_oldness_seconds":500
       }
    },
    "weights":{
