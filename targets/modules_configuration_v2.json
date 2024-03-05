@@ -18,6 +18,9 @@
       "mastodon":[
          "https://github.com/exorde-labs/masto65ezfd86424f69a"
       ],
+      "lemmy":[
+         "https://github.com/exorde-labs/lemmyw04b6eb792ca4a1"
+      ],
       "nostr":[
          "https://github.com/exorde-labs/nostr5fa856e7234fbee"
       ],
@@ -78,25 +81,29 @@
          "max_oldness_seconds":3600
       },
       "https://github.com/exorde-labs/rss007d0675444aa13fc":{
-         "maximum_items_to_collect":3,
+         "maximum_items_to_collect":4,
          "max_oldness_seconds":500,
          "max_extraction_trials":40
       },
       "https://github.com/exorde-labs/masto65ezfd86424f69a":{
-         "maximum_items_to_collect":15,
+         "maximum_items_to_collect":20,
          "max_oldness_seconds":600,
          "special_keywords_checks":2
+      },
+      "https://github.com/exorde-labs/lemmyw04b6eb792ca4a1":{
+         "maximum_items_to_collect":20,
+         "max_oldness_seconds":360
       },
       "https://github.com/exorde-labs/nostr5fa856e7234fbee":{
          "maximum_items_to_collect":10,
          "max_oldness_seconds":240
       },
       "https://github.com/exorde-labs/tradview251ae30a11ee":{
-         "maximum_items_to_collect":8,
+         "maximum_items_to_collect":5,
          "max_oldness_seconds":600
       },
       "https://github.com/exorde-labs/bitcointalk4de40ec26":{
-         "maximum_items_to_collect":10,
+         "maximum_items_to_collect":15,
          "max_oldness_seconds":500,
          "nb_selections":2
       },
@@ -124,13 +131,14 @@
       }
    },
    "weights":{
-      "reddit":22,
+      "reddit":20,
       "youtube":20,
-      "twitter":12,
+      "twitter":10,
       "4chan":10,
+      "lemmy":6,
       "rss":8,
-      "jvc":6,
-      "forocoches":6,
+      "jvc":5,
+      "forocoches":5,
       "mastodon":5,
       "bitcointalk":3,
       "weibo":2,
@@ -165,6 +173,9 @@
          "zh"
       ],
       "masto65ezfd86424f69a":[
+         "all"
+      ],
+      "lemmyw04b6eb792ca4a1":[
          "all"
       ],
       "nostr5fa856e7234fbee":[
@@ -203,6 +214,7 @@
       "weibo":"social",
       "mastodon":"social",
       "nostr":"social",
+      "lemmy":"social",
       "tradingview":"social",
       "rss":"news",
       "bitcointalk":"social",
