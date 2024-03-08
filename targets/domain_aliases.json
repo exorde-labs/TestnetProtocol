@@ -10,6 +10,7 @@
    "mastodon.social":"mastodon",
    "lemmy.world":"lemmy",
    "mastodon":"mastodon",
+   "mastodon.social":"mastodon",
    "weibo.com":"weibo",
    "weibo.org":"weibo",
    "nostr.social":"nostr",
@@ -18,6 +19,7 @@
    "forocoches.com":"forocoches",
    "bitcointalk.org":"bitcointalk",
    "ycombinator.com":"hackernews",
+   "news.ycombinator.com":"hackernews",
    "tradingview.com":"tradingview",
    "followin.in":"followin",
    "seekingalpha.io":"seekingalpha"
