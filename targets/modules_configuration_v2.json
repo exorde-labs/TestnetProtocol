@@ -30,6 +30,9 @@
       "rss":[
          "https://github.com/exorde-labs/rss007d0675444aa13fc"
       ],
+      "articlefeed":[
+         "https://github.com/exorde-labs/news8a841d781095471c"
+      ],
       "bitcointalk":[
          "https://github.com/exorde-labs/bitcointalk4de40ec26"
       ],
@@ -128,6 +131,10 @@
       "https://github.com/exorde-labs/forocoches86019fc2d4":{
          "maximum_items_to_collect":15,
          "max_oldness_seconds":200
+      },
+      "https://github.com/exorde-labs/news8a841d781095471c":{
+         "maximum_items_to_collect":15,
+         "max_oldness_seconds":2000
       }
    },
    "weights":{
@@ -136,7 +143,8 @@
       "twitter":10,
       "4chan":10,
       "lemmy":6,
-      "rss":8,
+      "articlefeed":5,
+      "rss":3,
       "jvc":5,
       "forocoches":5,
       "mastodon":5,
@@ -154,11 +162,12 @@
       "a7df32de3a60dfdb7a0b":10,
       "ch4875eda56be56000ac":10,
       "lemmyw04b6eb792ca4a1":6,
-      "rss007d0675444aa13fc":8,
+      "news8a841d781095471c":5,
       "jvc8439846094ced03ff":5,
       "forocoches86019fc2d4":5,
       "masto65ezfd86424f69a":5,
       "bitcointalk4de40ec26":3,
+      "rss007d0675444aa13fc":3,
       "wei223be19ab11e891bo":2,
       "hackbc9419ab11eebe56":2,
       "tradview251ae30a11ee":2,
@@ -222,6 +231,9 @@
       ],
       "forocoches86019fc2d4":[
          "es"
+      ],
+      "news8a841d781095471c":[
+         "all"
       ]
    },
    "new_keyword_alg":35
