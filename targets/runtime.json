@@ -8,7 +8,7 @@
    "protocol_version":"1.4.0",
    "expiration_delta":1200,
    "minimum_items_in_spotfile":1,
-   "max_token_count":250,
+   "max_token_count":300,
    "batch_size":15,
    "inter_spot_delay_seconds":2,
    "max_depth":1,
