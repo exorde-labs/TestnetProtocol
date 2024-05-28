@@ -28,6 +28,272 @@
     "Last Build Date": "2023-11-01 09:29:10"
   },
   {
+    "Source": "Le Monde - A la une",
+    "Description": "Le Monde - A la une",
+    "Language": "fr",
+    "URL": "https://www.lemonde.fr/rss/une.xml",
+    "Last Build Date": "2023-11-01 09:37:58"
+  },
+  {
+    "Source": "Le Monde - En continu",
+    "Description": "Le Monde - En continu",
+    "Language": "fr",
+    "URL": "https://www.lemonde.fr/rss/en_continu.xml",
+    "Last Build Date": "2023-11-01 09:37:58"
+  },
+  {
+    "Source": "Le Monde - Vidéos",
+    "Description": "Le Monde - Vidéos",
+    "Language": "fr",
+    "URL": "https://www.lemonde.fr/rss/videos.xml",
+    "Last Build Date": "2023-11-01 09:37:58"
+  },
+  {
+    "Source": "Le Monde - Portfolios",
+    "Description": "Le Monde - Portfolios",
+    "Language": "fr",
+    "URL": "https://www.lemonde.fr/rss/portfolios.xml",
+    "Last Build Date": "2023-11-01 09:37:58"
+  },
+  {
+    "Source": "Le Monde - Les plus lus",
+    "Description": "Le Monde - Les plus lus",
+    "Language": "fr",
+    "URL": "https://www.lemonde.fr/rss/les_plus_lus.xml",
+    "Last Build Date": "2023-11-01 09:37:58"
+  },
+  {
+    "Source": "Le Monde - Les plus partagés",
+    "Description": "Le Monde - Les plus partagés",
+    "Language": "fr",
+    "URL": "https://www.lemonde.fr/rss/les_plus_partages.xml",
+    "Last Build Date": "2023-11-01 09:37:58"
+  },
+  {
+    "Source": "Le Monde - International",
+    "Description": "Le Monde - International",
+    "Language": "fr",
+    "URL": "https://www.lemonde.fr/rss/international.xml",
+    "Last Build Date": "2023-11-01 09:37:58"
+  },
+  {
+    "Source": "Le Monde - Europe",
+    "Description": "Le Monde - Europe",
+    "Language": "fr",
+    "URL": "https://www.lemonde.fr/rss/europe.xml",
+    "Last Build Date": "2023-11-01 09:37:58"
+  },
+  {
+    "Source": "Le Monde - Amériques",
+    "Description": "Le Monde - Amériques",
+    "Language": "fr",
+    "URL": "https://www.lemonde.fr/rss/ameriques.xml",
+    "Last Build Date": "2023-11-01 09:37:58"
+  },
+  {
+    "Source": "Le Monde - Afrique",
+    "Description": "Le Monde - Afrique",
+    "Language": "fr",
+    "URL": "https://www.lemonde.fr/rss/afrique.xml",
+    "Last Build Date": "2023-11-01 09:37:58"
+  },
+  {
+    "Source": "Le Monde - Asie Pacifique",
+    "Description": "Le Monde - Asie Pacifique",
+    "Language": "fr",
+    "URL": "https://www.lemonde.fr/rss/asie_pacifique.xml",
+    "Last Build Date": "2023-11-01 09:37:58"
+  },
+  {
+    "Source": "Le Monde - Proche-Orient",
+    "Description": "Le Monde - Proche-Orient",
+    "Language": "fr",
+    "URL": "https://www.lemonde.fr/rss/proche_orient.xml",
+    "Last Build Date": "2023-11-01 09:37:58"
+  },
+  {
+    "Source": "Le Monde - Royaume-Uni",
+    "Description": "Le Monde - Royaume-Uni",
+    "Language": "fr",
+    "URL": "https://www.lemonde.fr/rss/royaume_uni.xml",
+    "Last Build Date": "2023-11-01 09:37:58"
+  },
+  {
+    "Source": "Le Monde - Etats-Unis",
+    "Description": "Le Monde - Etats-Unis",
+    "Language": "fr",
+    "URL": "https://www.lemonde.fr/rss/etats_unis.xml",
+    "Last Build Date": "2023-11-01 09:37:58"
+  },
+  {
+    "Source": "Le Monde - Politique",
+    "Description": "Le Monde - Politique",
+    "Language": "fr",
+    "URL": "https://www.lemonde.fr/rss/politique.xml",
+    "Last Build Date": "2023-11-01 09:37:58"
+  },
+  {
+    "Source": "Le Monde - Société",
+    "Description": "Le Monde - Société",
+    "Language": "fr",
+    "URL": "https://www.lemonde.fr/rss/societe.xml",
+    "Last Build Date": "2023-11-01 09:37:58"
+  },
+  {
+    "Source": "Le Monde - Les décodeurs",
+    "Description": "Le Monde - Les décodeurs",
+    "Language": "fr",
+    "URL": "https://www.lemonde.fr/rss/les_decodeurs.xml",
+    "Last Build Date": "2023-11-01 09:37:58"
+  },
+  {
+    "Source": "Le Monde - Justice",
+    "Description": "Le Monde - Justice",
+    "Language": "fr",
+    "URL": "https://www.lemonde.fr/rss/justice.xml",
+    "Last Build Date": "2023-11-01 09:37:58"
+  },
+  {
+    "Source": "Le Monde - Police",
+    "Description": "Le Monde - Police",
+    "Language": "fr",
+    "URL": "https://www.lemonde.fr/rss/police.xml",
+    "Last Build Date": "2023-11-01 09:37:58"
+  },
+  {
+    "Source": "Le Monde - Campus",
+    "Description": "Le Monde - Campus",
+    "Language": "fr",
+    "URL": "https://www.lemonde.fr/rss/campus.xml",
+    "Last Build Date": "2023-11-01 09:37:58"
+  },
+  {
+    "Source": "Le Monde - Education",
+    "Description": "Le Monde - Education",
+    "Language": "fr",
+    "URL": "https://www.lemonde.fr/rss/education.xml",
+    "Last Build Date": "2023-11-01 09:37:58"
+  },
+  {
+    "Source": "Le Monde - Economie",
+    "Description": "Le Monde - Economie",
+    "Language": "fr",
+    "URL": "https://www.lemonde.fr/rss/economie.xml",
+    "Last Build Date": "2023-11-01 09:37:58"
+  },
+  {
+    "Source": "Le Monde - Entreprises",
+    "Description": "Le Monde - Entreprises",
+    "Language": "fr",
+    "URL": "https://www.lemonde.fr/rss/entreprises.xml",
+    "Last Build Date": "2023-11-01 09:37:58"
+  },
+  {
+    "Source": "Le Monde - Argent",
+    "Description": "Le Monde - Argent",
+    "Language": "fr",
+    "URL": "https://www.lemonde.fr/rss/argent.xml",
+    "Last Build Date": "2023-11-01 09:37:58"
+  },
+  {
+    "Source": "Le Monde - Économie française",
+    "Description": "Le Monde - Économie française",
+    "Language": "fr",
+    "URL": "https://www.lemonde.fr/rss/economie_francaise.xml",
+    "Last Build Date": "2023-11-01 09:37:58"
+  },
+  {
+    "Source": "Le Monde - Industrie",
+    "Description": "Le Monde - Industrie",
+    "Language": "fr",
+    "URL": "https://www.lemonde.fr/rss/industrie.xml",
+    "Last Build Date": "2023-11-01 09:37:58"
+  },
+  {
+    "Source": "Le Monde - Emploi",
+    "Description": "Le Monde - Emploi",
+    "Language": "fr",
+    "URL": "https://www.lemonde.fr/rss/emploi.xml",
+    "Last Build Date": "2023-11-01 09:37:58"
+  },
+  {
+    "Source": "Le Monde - Immobilier",
+    "Description": "Le Monde - Immobilier",
+    "Language": "fr",
+    "URL": "https://www.lemonde.fr/rss/immobilier.xml",
+    "Last Build Date": "2023-11-01 09:37:58"
+  },
+  {
+    "Source": "Le Monde - Médias",
+    "Description": "Le Monde - Médias",
+    "Language": "fr",
+    "URL": "https://www.lemonde.fr/rss/medias.xml",
+    "Last Build Date": "2023-11-01 09:37:58"
+  },
+  {
+    "Source": "Le Monde - Culture",
+    "Description": "Le Monde - Culture",
+    "Language": "fr",
+    "URL": "https://www.lemonde.fr/rss/culture.xml",
+    "Last Build Date": "2023-11-01 09:37:58"
+  },
+  {
+    "Source": "Le Monde - Cinéma",
+    "Description": "Le Monde - Cinéma",
+    "Language": "fr",
+    "URL": "https://www.lemonde.fr/rss/cinema.xml",
+    "Last Build Date": "2023-11-01 09:37:58"
+  },
+  {
+    "Source": "Le Monde - Musiques",
+    "Description": "Le Monde - Musiques",
+    "Language": "fr",
+    "URL": "https://www.lemonde.fr/rss/musiques.xml",
+    "Last Build Date": "2023-11-01 09:37:58"
+  },
+  {
+    "Source": "Le Monde - Télévision et radio",
+    "Description": "Le Monde - Télévision et radio",
+    "Language": "fr",
+    "URL": "https://www.lemonde.fr/rss/television_et_radio.xml",
+    "Last Build Date": "2023-11-01 09:37:58"
+  },
+  {
+    "Source": "Le Monde - Le Monde des livres",
+    "Description": "Le Monde - Le Monde des livres",
+    "Language": "fr",
+    "URL": "https://www.lemonde.fr/rss/le_monde_des_livres.xml",
+    "Last Build Date": "2023-11-01 09:37:58"
+  },
+  {
+    "Source": "Le Monde - Arts",
+    "Description": "Le Monde - Arts",
+    "Language": "fr",
+    "URL": "https://www.lemonde.fr/rss/arts.xml",
+    "Last Build Date": "2023-11-01 09:37:58"
+  },
+  {
+    "Source": "Le Monde - Scènes",
+    "Description": "Le Monde - Scènes",
+    "Language": "fr",
+    "URL": "https://www.lemonde.fr/rss/scenes.xml",
+    "Last Build Date": "2023-11-01 09:37:58"
+  },
+  {
+    "Source": "Le Monde - Sport",
+    "Description": "Le Monde - Sport",
+    "Language": "fr",
+    "URL": "https://www.lemonde.fr/rss/sport.xml",
+    "Last Build Date": "2023-11-01 09:37:58"
+  },
+  {
+    "Source": "Le Monde - Football",
+    "Description": "Le Monde - Football",
+    "Language": "fr",
+    "URL": "https://www.lemonde.fr/rss/football.xml",
+    "Last Build Date": "2023-11-01 09:37:58"
+  },
+  {
     "Source": "Internacional en EL PA\u00cdS",
     "Description": "Sigue la \u00faltima hora de la actualidad internacional con EL PA\u00cdS.",
     "Language": "es",
