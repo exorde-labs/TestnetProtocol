@@ -138,13 +138,13 @@
       }
    },
    "weights":{
-      "reddit":20,
       "youtube":20,
+      "reddit":15,
       "twitter":10,
       "4chan":10,
       "lemmy":6,
-      "articlefeed":5,
-      "rss":3,
+      "articlefeed":7,
+      "rss":5,
       "jvc":5,
       "forocoches":5,
       "mastodon":5,
