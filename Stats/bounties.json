@@ -1,14 +1,6 @@
 {
-   "tweets":{
-      
-   },
-   "reddit":{
-      
-   },
-   "youtube":{
-      
-   },
-   "news":{
-      
-   }
+    "tweets": {},
+    "reddit": {},
+    "youtube": {},
+    "news": {}
 }
