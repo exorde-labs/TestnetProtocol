@@ -13,7 +13,7 @@
             "http://57.128.87.76:10067",
             "http://193.70.74.157:10067"
          ],
-         "SyncNodeCount":"3",
+         "SyncNodeCount":"2",
          "_urlTxSkale":"https://mainnet.skalenodes.com/v1/light-vast-diphda",
          "_chainID":"2139927552",
          "_blockExplorer":"https://light-vast-diphda.explorer.mainnet.skalenodes.com/",
