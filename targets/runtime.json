@@ -1,10 +1,10 @@
 {
    "online":true,
-   "remote_kill":false,
+   "remote_kill":true,
    "last_info":"Welcome to the v2 of the Exorde Worker Node!",
    "last_notification":"Welcome to Exorde Client v2.5.0 with notifications! Thanks for supporting YOUR data network!",
-   "docker_version":"2.5.7",
-   "worker_version":"2.5.7",
+   "docker_version":"2.5.9",
+   "worker_version":"2.5.9",
    "protocol_version":"1.4.0",
    "expiration_delta":1200,
    "minimum_items_in_spotfile":1,
