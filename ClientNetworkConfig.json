@@ -6,7 +6,7 @@
       {
          "_networkId":"testnet-A",
          "_urlSkale1":"http://57.128.80.82:10067",
-         "_urlSkale2":"http://193.70.74.15710067",
+         "_urlSkale2":"http://193.70.74.157:10067",
          "_urlSkale3":"http://57.128.87.76:10067",
          "urlSkale":[
             "http://193.70.74.157:10067",
