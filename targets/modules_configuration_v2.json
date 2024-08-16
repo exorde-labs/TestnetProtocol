@@ -140,8 +140,8 @@
          "max_oldness_seconds":9000
       },
       "https://github.com/exorde-labs/bluesky5f61dce7fa034":{
-         "maximum_items_to_collect":15,
-         "max_oldness_seconds":1200
+         "maximum_items_to_collect":20,
+         "max_oldness_seconds":3000
       }
    },
    "weights":{
