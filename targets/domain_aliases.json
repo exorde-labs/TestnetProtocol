@@ -22,5 +22,8 @@
    "news.ycombinator.com":"hackernews",
    "tradingview.com":"tradingview",
    "followin.in":"followin",
-   "seekingalpha.io":"seekingalpha"
+   "seekingalpha.io":"seekingalpha",
+   "bsky.app":"bluesky",
+   "bsky.social":"bluesky",
+   "bluesky.social":"bluesky"
 }
