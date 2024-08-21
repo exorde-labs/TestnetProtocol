@@ -121,7 +121,7 @@
          "maximum_items_to_collect":25,
          "max_oldness_seconds":2000,
          "max_total_comments_to_check":200,
-         "probability_to_select_default_kws":0.42
+         "probability_to_select_default_kws":0.5
       },
       "https://github.com/exorde-labs/followinc645fc950d7f":{
          "maximum_items_to_collect":5,
