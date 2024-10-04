@@ -9,7 +9,7 @@
    "expiration_delta":1200,
    "minimum_items_in_spotfile":1,
    "max_token_count":300,
-   "batch_size":15,
+   "batch_size":18,
    "inter_spot_delay_seconds":2,
    "max_depth":0,
    "target":"testnet-A",
