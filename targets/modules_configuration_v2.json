@@ -62,10 +62,10 @@
    },
    "specific_modules_parameters":{
       "https://github.com/exorde-labs/ap98j3envoubi3fco1kc":{
-         "max_oldness_seconds":4000,
+         "max_oldness_seconds":7000,
          "nb_subreddit_attempts":5,
          "maximum_items_to_collect":40,
-         "skip_post_probability":0.01,
+         "skip_post_probability":0.03,
          "new_layout_scraping_weight":0.03
       },
       "https://github.com/exorde-labs/a7df32de3a60dfdb7a0b":{
