@@ -62,21 +62,21 @@
    },
    "specific_modules_parameters":{
       "https://github.com/exorde-labs/ap98j3envoubi3fco1kc":{
-         "max_oldness_seconds":3600,
-         "nb_subreddit_attempts":7,
-         "maximum_items_to_collect":30,
-         "skip_post_probability":0.02,
+         "max_oldness_seconds":4000,
+         "nb_subreddit_attempts":5,
+         "maximum_items_to_collect":40,
+         "skip_post_probability":0.01,
          "new_layout_scraping_weight":0.03
       },
       "https://github.com/exorde-labs/a7df32de3a60dfdb7a0b":{
-         "max_oldness_seconds":1200,
+         "max_oldness_seconds":3600,
          "pick_default_keyword_weight":0.42,
          "maximum_items_to_collect":30,
          "check_top_tweets_weight":0.15
       },
       "https://github.com/exorde-labs/hackbc9419ab11eebe56":{
          "maximum_items_to_collect":15,
-         "max_oldness_seconds":180
+         "max_oldness_seconds":300
       },
       "https://github.com/exorde-labs/ch4875eda56be56000ac":{
          "maximum_items_to_collect":15,
@@ -93,12 +93,12 @@
       },
       "https://github.com/exorde-labs/masto65ezfd86424f69a":{
          "maximum_items_to_collect":20,
-         "max_oldness_seconds":600,
+         "max_oldness_seconds":3600,
          "special_keywords_checks":2
       },
       "https://github.com/exorde-labs/lemmyw04b6eb792ca4a1":{
          "maximum_items_to_collect":20,
-         "max_oldness_seconds":200
+         "max_oldness_seconds":400
       },
       "https://github.com/exorde-labs/nostr5fa856e7234fbee":{
          "maximum_items_to_collect":10,
@@ -106,11 +106,11 @@
       },
       "https://github.com/exorde-labs/tradview251ae30a11ee":{
          "maximum_items_to_collect":5,
-         "max_oldness_seconds":600
+         "max_oldness_seconds":1200
       },
       "https://github.com/exorde-labs/bitcointalk4de40ec26":{
          "maximum_items_to_collect":15,
-         "max_oldness_seconds":500,
+         "max_oldness_seconds":800,
          "nb_selections":2
       },
       "https://github.com/exorde-labs/seekingalphad89ba32s":{
@@ -119,7 +119,7 @@
       },
       "https://github.com/exorde-labs/youtube00e1f862e5eff":{
          "maximum_items_to_collect":25,
-         "max_oldness_seconds":2000,
+         "max_oldness_seconds":3600,
          "max_total_comments_to_check":200,
          "probability_to_select_default_kws":0.5
       },
@@ -129,11 +129,11 @@
       },
       "https://github.com/exorde-labs/jvc8439846094ced03ff":{
          "maximum_items_to_collect":20,
-         "max_oldness_seconds":200
+         "max_oldness_seconds":600
       },
       "https://github.com/exorde-labs/forocoches86019fc2d4":{
          "maximum_items_to_collect":15,
-         "max_oldness_seconds":200
+         "max_oldness_seconds":600
       },
       "https://github.com/exorde-labs/news8a841d781095471c":{
          "maximum_items_to_collect":8,
