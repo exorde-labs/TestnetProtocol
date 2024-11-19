@@ -3,7 +3,6 @@
    "4channel.org":"4chan",
    "reddit.com":"reddit",
    "twitter.com":"twitter",
-   "theads":"threads.net",
    "t.co":"twitter",
    "x.com":"twitter",
    "youtube.com":"youtube",
@@ -24,6 +23,7 @@
    "tradingview.com":"tradingview",
    "followin.in":"followin",
    "seekingalpha.io":"seekingalpha",
+   "threads.net":"threads",
    "bsky.app":"bluesky",
    "bsky.social":"bluesky",
    "bluesky.social":"bluesky"
