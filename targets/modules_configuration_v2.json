@@ -69,10 +69,10 @@
          "new_layout_scraping_weight":0.03
       },
       "https://github.com/exorde-labs/a7df32de3a60dfdb7a0b":{
-         "max_oldness_seconds":2600,
-         "pick_default_keyword_weight":0.25,
-         "maximum_items_to_collect":40,
-         "check_top_tweets_weight":0.15
+         "max_oldness_seconds":3000,
+         "pick_default_keyword_weight":0.15,
+         "maximum_items_to_collect":30,
+         "check_top_tweets_weight":0.08
       },
       "https://github.com/exorde-labs/hackbc9419ab11eebe56":{
          "maximum_items_to_collect":20,
