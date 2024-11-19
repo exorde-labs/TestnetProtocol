@@ -152,9 +152,10 @@
       }
    },
    "weights":{
-      "youtube":18,
-      "articlefeed":17,
-      "bluesky":8,
+      "articlefeed":12,
+      "threads":11,
+      "youtube":10,
+      "bluesky":10,
       "reddit":8,
       "4chan":8,
       "twitter":6,
@@ -169,15 +170,15 @@
       "tradingview":2,
       "followin":1,
       "seekingalpha":1,
-      "nostr":0,
-      "threads":0
+      "nostr":0
    },
    "_weights":{
-      "youtube00e1f862e5eff":18,
-      "news8a841d781095471c":17,
-      "ap98j3envoubi3fco1kc":8,
-      "bluesky5f61dce7fa034":8,
-      "ch4875eda56be56000ac":8,
+      "threads9703e8c4640bd":11,
+      "youtube00e1f862e5eff":10,
+      "ap98j3envoubi3fco1kc":10,
+      "news8a841d781095471c":10,
+      "bluesky5f61dce7fa034":10,
+      "ch4875eda56be56000ac":9,
       "a7df32de3a60dfdb7a0b":6,
       "lemmyw04b6eb792ca4a1":5,
       "jvc8439846094ced03ff":5,
@@ -190,8 +191,7 @@
       "followinc645fc950d7f":1,
       "wei223be19ab11e891bo":1,
       "seekingalphad89ba32s":1,
-      "nostr5fa856e7234fbee":0,
-      "threads9703e8c4640bd":0
+      "nostr5fa856e7234fbee":0
    },
    "lang_map":{
       "a7df32de3a60dfdb7a0b":[
