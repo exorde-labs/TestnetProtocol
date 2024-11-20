@@ -153,9 +153,9 @@
    },
    "weights":{
       "articlefeed":12,
-      "threads":6,
+      "threads":4,
       "youtube":15,
-      "bluesky":10,
+      "bluesky":12,
       "reddit":8,
       "4chan":8,
       "twitter":6,
@@ -173,11 +173,11 @@
       "nostr":0
    },
    "_weights":{
-      "threads9703e8c4640bd":6,
+      "threads9703e8c4640bd":4,
       "youtube00e1f862e5eff":15,
       "ap98j3envoubi3fco1kc":10,
       "news8a841d781095471c":10,
-      "bluesky5f61dce7fa034":10,
+      "bluesky5f61dce7fa034":12,
       "ch4875eda56be56000ac":9,
       "a7df32de3a60dfdb7a0b":6,
       "lemmyw04b6eb792ca4a1":5,
