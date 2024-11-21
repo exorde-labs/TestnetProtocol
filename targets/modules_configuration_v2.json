@@ -128,15 +128,15 @@
       },
       "https://github.com/exorde-labs/followinc645fc950d7f":{
          "maximum_items_to_collect":5,
-         "max_oldness_seconds":1200
+         "max_oldness_seconds":1600
       },
       "https://github.com/exorde-labs/jvc8439846094ced03ff":{
          "maximum_items_to_collect":20,
-         "max_oldness_seconds":800
+         "max_oldness_seconds":1200
       },
       "https://github.com/exorde-labs/forocoches86019fc2d4":{
          "maximum_items_to_collect":15,
-         "max_oldness_seconds":1000
+         "max_oldness_seconds":1200
       },
       "https://github.com/exorde-labs/news8a841d781095471c":{
          "maximum_items_to_collect":10,
@@ -148,13 +148,13 @@
       },
       "https://github.com/exorde-labs/threads9703e8c4640bd":{
          "maximum_items_to_collect":20,
-         "max_oldness_seconds":9000
+         "max_oldness_seconds":10800
       }
    },
    "weights":{
       "articlefeed":12,
-      "threads":4,
-      "youtube":15,
+      "threads":7,
+      "youtube":12,
       "bluesky":12,
       "reddit":8,
       "4chan":8,
@@ -173,8 +173,8 @@
       "nostr":0
    },
    "_weights":{
-      "threads9703e8c4640bd":4,
-      "youtube00e1f862e5eff":15,
+      "threads9703e8c4640bd":7,
+      "youtube00e1f862e5eff":12,
       "ap98j3envoubi3fco1kc":10,
       "news8a841d781095471c":10,
       "bluesky5f61dce7fa034":12,
