@@ -148,7 +148,7 @@
       },
       "https://github.com/exorde-labs/threads9703e8c4640bd":{
          "maximum_items_to_collect":20,
-         "max_oldness_seconds":4500
+         "max_oldness_seconds":9000
       }
    },
    "weights":{
