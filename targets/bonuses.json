@@ -1,8 +1,8 @@
 {
-  "x.com": "7.5",
-  "reddit.com": "13",
-  "youtube.com": "5",
+  "twitter": "7.5",
+  "reddit": "13",
+  "youtube": "5",
   "news": "25",
-  "threads.net": "5",
-  "bsky.app": "6"
+  "threads": "5",
+  "bluesky": "6"
 }
