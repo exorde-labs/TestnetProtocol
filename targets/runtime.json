@@ -14,7 +14,7 @@
    "max_depth":1,
    "target":"testnet-A",
    "gas_cap_min":1000000,
-   "default_gas_amount":4000000,
+   "default_gas_amount":3000000,
    "default_gas_price":100000,
    "scraping_modules":[
       "4chan",
