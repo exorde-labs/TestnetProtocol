@@ -90,7 +90,7 @@
          "max_oldness_seconds":3600
       },
       "https://github.com/exorde-labs/rss007d0675444aa13fc":{
-         "maximum_items_to_collect":8,
+         "maximum_items_to_collect":0,
          "max_oldness_seconds":3600,
          "max_extraction_trials":40
       },
