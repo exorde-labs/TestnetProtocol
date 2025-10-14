@@ -1,20 +1,8 @@
 {
-    "tweets":{
-      
-    },
-    "reddit":{
-       
-    },
-    "youtube":{
-       
-    },
-    "news":{
-       
-    },
-    "bsky":{
-       
-    },
-    "threads": {
-       
-    }
- }
+    "tweets": {},
+    "reddit": {},
+    "youtube": {},
+    "news": {},
+    "bsky": {},
+    "threads": {}
+}
